@@ -9,6 +9,9 @@ import React, { useState } from 'react';
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import routes from 'routes.js';
 import WebsiteDataDetails from 'views/admin/websiteData/WebsiteDataDetails';
+import ProjectBidDetail from 'views/admin/projectBids/ProjectBidDetail';
+import SalesOrder from 'views/admin/salesOrder';
+import Invoice from 'views/admin/invoice';
 
 // Custom Chakra theme
 export default function Dashboard(props) {
@@ -40,7 +43,7 @@ export default function Dashboard(props) {
           const fullPath = routes[i].layout + routes[i].path;
           // Check if current path matches the route path
           if (currentPath === fullPath || currentPath.startsWith(fullPath + '/')) {
-            return routes[i].name;
+          return routes[i].name;
           }
         }
       }
@@ -161,6 +164,18 @@ export default function Dashboard(props) {
                   <Route
                     path="/website-data/:id/details"
                     element={<WebsiteDataDetails />}
+                  />
+                  <Route
+                    path="/project-bids/:bidId/details"
+                    element={<ProjectBidDetail />}
+                  />
+                  <Route
+                    path="/salesorder/:milestoneId/:projectbidId"
+                    element={<SalesOrder />}
+                  />
+                  <Route
+                    path="/invoice/:milestoneId/:projectbidId"
+                    element={<Invoice />}
                   />
                   <Route
                     path="/"

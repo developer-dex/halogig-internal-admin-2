@@ -22,9 +22,11 @@ import {
 } from '@chakra-ui/react';
 import { MdChevronLeft, MdChevronRight, MdVisibility } from 'react-icons/md';
 import { getAllProjectBids } from '../../../features/admin/projectBidsSlice';
+import { useNavigate } from 'react-router-dom';
 
 export default function ProjectBids() {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState(1);
   const pageLimit = 50;
 
@@ -193,8 +195,7 @@ export default function ProjectBids() {
                                   _hover={{ bg: 'red.600' }}
                                   leftIcon={<MdVisibility />}
                                   onClick={() => {
-                                    // TODO: Navigate to bid details
-                                    console.log('View bid:', bid.id);
+                                    navigate(`/admin/project-bids/${bid.id || bid._id}/details`);
                                   }}
                                 >
                                   View
