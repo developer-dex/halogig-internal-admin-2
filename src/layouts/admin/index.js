@@ -6,12 +6,14 @@ import Navbar from 'components/navbar/NavbarAdmin.js';
 import Sidebar from 'components/sidebar/Sidebar.js';
 import { SidebarContext } from 'contexts/SidebarContext';
 import React, { useState } from 'react';
-import { Navigate, Route, Routes } from 'react-router-dom';
+import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import routes from 'routes.js';
+import WebsiteDataDetails from 'views/admin/websiteData/WebsiteDataDetails';
 
 // Custom Chakra theme
 export default function Dashboard(props) {
   const { ...rest } = props;
+  const location = useLocation();
   // states and functions
   const [fixed] = useState(false);
   const [toggleSidebar, setToggleSidebar] = useState(false);
@@ -19,24 +21,27 @@ export default function Dashboard(props) {
   const getRoute = () => {
     return window.location.pathname !== '/admin/full-screen-maps';
   };
-  const getActiveRoute = (routes) => {
+  const getActiveRoute = (routes, currentPath) => {
     let activeRoute = 'Default Brand Text';
+    
     for (let i = 0; i < routes.length; i++) {
       if (routes[i].collapse) {
-        let collapseActiveRoute = getActiveRoute(routes[i].items);
-        if (collapseActiveRoute !== activeRoute) {
+        let collapseActiveRoute = getActiveRoute(routes[i].items, currentPath);
+        if (collapseActiveRoute !== 'Default Brand Text') {
           return collapseActiveRoute;
         }
       } else if (routes[i].category) {
-        let categoryActiveRoute = getActiveRoute(routes[i].items);
-        if (categoryActiveRoute !== activeRoute) {
+        let categoryActiveRoute = getActiveRoute(routes[i].items, currentPath);
+        if (categoryActiveRoute !== 'Default Brand Text') {
           return categoryActiveRoute;
         }
       } else {
-        if (
-          window.location.href.indexOf(routes[i].layout + routes[i].path) !== -1
-        ) {
-          return routes[i].name;
+        if (routes[i].layout && routes[i].path && routes[i].name) {
+          const fullPath = routes[i].layout + routes[i].path;
+          // Check if current path matches the route path
+          if (currentPath === fullPath || currentPath.startsWith(fullPath + '/')) {
+            return routes[i].name;
+          }
         }
       }
     }
@@ -90,12 +95,12 @@ export default function Dashboard(props) {
   };
   const getRoutes = (routes) => {
     return routes.map((route, key) => {
-      if (route.layout === '/admin') {
+      if (route.layout === '/admin' && route.path) {
         return (
           <Route path={`${route.path}`} element={route.component} key={key} />
         );
       }
-      if (route.collapse) {
+      if (route.collapse || route.category) {
         return getRoutes(route.items);
       } else {
         return null;
@@ -134,7 +139,7 @@ export default function Dashboard(props) {
                 <Navbar
                   onOpen={onOpen}
                   logoText={'Horizon UI Dashboard PRO'}
-                  brandText={getActiveRoute(routes)}
+                  brandText={getActiveRoute(routes, location.pathname)}
                   secondary={getActiveNavbar(routes)}
                   message={getActiveNavbarText(routes)}
                   fixed={fixed}
@@ -153,6 +158,10 @@ export default function Dashboard(props) {
               >
                 <Routes>
                   {getRoutes(routes)}
+                  <Route
+                    path="/website-data/:id/details"
+                    element={<WebsiteDataDetails />}
+                  />
                   <Route
                     path="/"
                     element={<Navigate to="/admin/default" replace />}

@@ -1,0 +1,464 @@
+import React, { useEffect, useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import {
+  Box,
+  Table,
+  Thead,
+  Tbody,
+  Tr,
+  Th,
+  Td,
+  Text,
+  Button,
+  IconButton,
+  useColorModeValue,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalFooter,
+  ModalBody,
+  ModalCloseButton,
+  useDisclosure,
+  Checkbox,
+  HStack,
+  Spinner,
+  Tooltip,
+  Flex,
+  Card,
+} from '@chakra-ui/react';
+import { 
+  MdVisibility, 
+  MdContentCopy,
+  MdChevronLeft,
+  MdChevronRight,
+} from 'react-icons/md';
+import { clientData, statusChange } from '../../../features/admin/clientManagementSlice';
+import { showSuccess, showError } from '../../../helpers/messageHelper';
+import { copyToClipboard } from '../../../utils/utils';
+
+export default function ClientList() {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  
+  const [currentPage, setCurrentPage] = useState(1);
+  const [clients, setClients] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [totalCount, setTotalCount] = useState(0);
+  const [selectedClient, setSelectedClient] = useState(null);
+  const [selectedStatus, setSelectedStatus] = useState('');
+  
+  const statusOptions = ['Pending', 'Approved', 'Rejected', 'Under Review'];
+  const pageLimit = 50;
+
+  // Chakra color mode values
+  const textColor = useColorModeValue('secondaryGray.900', 'white');
+  const borderColor = useColorModeValue('gray.200', 'whiteAlpha.100');
+  const bgColor = useColorModeValue('white', 'navy.800');
+  const hoverBg = useColorModeValue('gray.50', 'whiteAlpha.50');
+
+  const fetchClients = async () => {
+    setIsLoading(true);
+    try {
+      const response = await dispatch(clientData({
+        page: currentPage,
+        pageLimit
+      }));
+      if (response.payload?.data?.data) {
+        setClients(response.payload.data.data.clients || []);
+        setTotalCount(response.payload.data.data.total_count || 0);
+      }
+    } catch (error) {
+      showError('Failed to fetch clients');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchClients();
+  }, [currentPage]);
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+  };
+
+  const handleOpenModal = (client) => {
+    setSelectedClient(client);
+    setSelectedStatus(client.status || '');
+    onOpen();
+  };
+
+  const handleCloseModal = () => {
+    onClose();
+    setSelectedClient(null);
+    setSelectedStatus('');
+  };
+
+  const handleStatusChange = async () => {
+    if (!selectedClient) return;
+    
+    try {
+      await dispatch(statusChange({ 
+        id: selectedClient.id, 
+        apiData: { status: selectedStatus } 
+      }));
+      
+      setClients((prevClients) =>
+        prevClients.map((c) => 
+          c.id === selectedClient.id ? { ...c, status: selectedStatus } : c
+        )
+      );
+      
+      showSuccess('Status updated successfully');
+      handleCloseModal();
+      fetchClients();
+    } catch (error) {
+      showError('Failed to update status');
+    }
+  };
+
+  const handleViewClient = (client) => {
+    navigate(`/admin/clients/${client.id}`);
+  };
+
+  const handlePostProject = (client) => {
+    navigate(`/admin/create-client-project`, {
+      state: {
+        clientId: client.id,
+        clientName: `${client.first_name} ${client.last_name}`,
+        clientEmail: client.email
+      }
+    });
+  };
+
+  const handleCopyLink = async (link) => {
+    try {
+      await copyToClipboard(link);
+      showSuccess('Link copied to clipboard');
+    } catch (error) {
+      showError('Failed to copy link');
+    }
+  };
+
+  const truncateLink = (link, maxLength = 30) => {
+    if (!link || link.length <= maxLength) return link;
+    return link.substring(0, maxLength) + '...';
+  };
+
+  const getStatusColorScheme = (status) => {
+    const statusLower = status?.toLowerCase();
+    switch (statusLower) {
+      case 'pending':
+        return { bg: 'orange.100', color: 'orange.700', border: 'orange.300' };
+      case 'approved':
+      case 'otpverified':
+        return { bg: 'green.100', color: 'green.700', border: 'green.300' };
+      case 'rejected':
+        return { bg: 'red.100', color: 'red.700', border: 'red.300' };
+      case 'under review':
+      case 'incomplete':
+        return { bg: 'blue.100', color: 'blue.700', border: 'blue.300' };
+      default:
+        return { bg: 'gray.100', color: 'gray.700', border: 'gray.300' };
+    }
+  };
+
+  const totalPages = Math.ceil(totalCount / pageLimit);
+
+  return (
+    <Box pt={{ base: '130px', md: '80px', xl: '80px' }}>
+      <Card>
+        <Box p="24px" mb="20px">
+          <Text
+            color={textColor}
+            fontSize="2xl"
+            fontWeight="700"
+            mb="20px"
+          >
+            Clients
+          </Text>
+
+          {isLoading && clients.length === 0 ? (
+            <Flex justify="center" align="center" minH="400px">
+              <Spinner size="xl" color="brand.500" />
+            </Flex>
+          ) : (
+            <>
+              <Box overflowX="auto">
+                <Table variant="simple" color="gray.500">
+                  <Thead>
+                    <Tr>
+                      <Th
+                        borderColor={borderColor}
+                        color="gray.400"
+                        fontSize="xs"
+                        fontWeight="700"
+                        textTransform="uppercase"
+                      >
+                        FIRST NAME
+                      </Th>
+                      <Th
+                        borderColor={borderColor}
+                        color="gray.400"
+                        fontSize="xs"
+                        fontWeight="700"
+                        textTransform="uppercase"
+                      >
+                        LAST NAME
+                      </Th>
+                      <Th
+                        borderColor={borderColor}
+                        color="gray.400"
+                        fontSize="xs"
+                        fontWeight="700"
+                        textTransform="uppercase"
+                      >
+                        EMAIL
+                      </Th>
+                      <Th
+                        borderColor={borderColor}
+                        color="gray.400"
+                        fontSize="xs"
+                        fontWeight="700"
+                        textTransform="uppercase"
+                        textAlign="center"
+                      >
+                        ACTION
+                      </Th>
+                      <Th
+                        borderColor={borderColor}
+                        color="gray.400"
+                        fontSize="xs"
+                        fontWeight="700"
+                        textTransform="uppercase"
+                        textAlign="center"
+                      >
+                        POST PROJECT
+                      </Th>
+                      <Th
+                        borderColor={borderColor}
+                        color="gray.400"
+                        fontSize="xs"
+                        fontWeight="700"
+                        textTransform="uppercase"
+                        textAlign="center"
+                      >
+                        SET-UP LINK
+                      </Th>
+                      <Th
+                        borderColor={borderColor}
+                        color="gray.400"
+                        fontSize="xs"
+                        fontWeight="700"
+                        textTransform="uppercase"
+                        textAlign="center"
+                      >
+                        VIEW
+                      </Th>
+                    </Tr>
+                  </Thead>
+                  <Tbody>
+                    {clients.length === 0 ? (
+                      <Tr>
+                        <Td colSpan={7} textAlign="center" py="40px">
+                          <Text color="gray.400">No clients found</Text>
+                        </Td>
+                      </Tr>
+                    ) : (
+                      clients.map((client) => {
+                        const statusColors = getStatusColorScheme(client.status);
+                        return (
+                          <Tr
+                            key={client.id}
+                            _hover={{ bg: hoverBg }}
+                            transition="all 0.2s"
+                          >
+                            <Td borderColor={borderColor}>
+                              <Text color={textColor} fontSize="sm" fontWeight="700">
+                                {client.first_name || '--'}
+                              </Text>
+                            </Td>
+                            <Td borderColor={borderColor}>
+                              <Text color={textColor} fontSize="sm" fontWeight="700">
+                                {client.last_name || '--'}
+                              </Text>
+                            </Td>
+                            <Td borderColor={borderColor}>
+                              <Text color={textColor} fontSize="sm" fontWeight="500">
+                                {client.email || '--'}
+                              </Text>
+                            </Td>
+                            <Td borderColor={borderColor} textAlign="center">
+                              <Button
+                                size="sm"
+                                bg={statusColors.bg}
+                                color={statusColors.color}
+                                borderColor={statusColors.border}
+                                borderWidth="2px"
+                                borderRadius="full"
+                                fontWeight="600"
+                                fontSize="xs"
+                                textTransform="capitalize"
+                                _hover={{
+                                  opacity: 0.8,
+                                  transform: 'translateY(-2px)',
+                                }}
+                                onClick={() => handleOpenModal(client)}
+                              >
+                                {client.status || 'Pending'}
+                              </Button>
+                            </Td>
+                            <Td borderColor={borderColor} textAlign="center">
+                              {client.created_by_admin && (
+                                <Button
+                                  size="sm"
+                                  bg="brand.500"
+                                  color="white"
+                                  _hover={{
+                                    bg: 'brand.600',
+                                  }}
+                                  onClick={() => handlePostProject(client)}
+                                >
+                                  Post A Project
+                                </Button>
+                              )}
+                            </Td>
+                            <Td borderColor={borderColor} textAlign="center">
+                              {client.created_by_admin && client.share_link ? (
+                                <HStack spacing="8px" justify="center">
+                                  <Tooltip label={client.share_link}>
+                                    <Text
+                                      fontSize="xs"
+                                      color="brand.500"
+                                      cursor="pointer"
+                                      textDecoration="underline"
+                                      onClick={() => window.open(client.share_link, '_blank')}
+                                    >
+                                      {truncateLink(client.share_link, 15)}
+                                    </Text>
+                                  </Tooltip>
+                                  <Tooltip label="Copy link">
+                                    <IconButton
+                                      aria-label="Copy link"
+                                      icon={<MdContentCopy />}
+                                      size="xs"
+                                      variant="ghost"
+                                      onClick={() => handleCopyLink(client.share_link)}
+                                    />
+                                  </Tooltip>
+                                </HStack>
+                              ) : (
+                                <Text color="gray.400">--</Text>
+                              )}
+                            </Td>
+                            <Td borderColor={borderColor} textAlign="center">
+                              <Tooltip label="View Client Details">
+                                <IconButton
+                                  aria-label="View client"
+                                  icon={<MdVisibility />}
+                                  size="sm"
+                                  variant="ghost"
+                                  colorScheme="brand"
+                                  onClick={() => handleViewClient(client)}
+                                />
+                              </Tooltip>
+                            </Td>
+                          </Tr>
+                        );
+                      })
+                    )}
+                  </Tbody>
+                </Table>
+              </Box>
+
+              {/* Pagination */}
+              <Flex
+                justify="space-between"
+                align="center"
+                mt="20px"
+                pt="20px"
+                borderTop="1px solid"
+                borderColor={borderColor}
+              >
+                <Text color="gray.400" fontSize="sm">
+                  Showing <Text as="span" fontWeight="700" color="brand.500">
+                    {clients.length}
+                  </Text> of {totalCount}
+                </Text>
+                
+                <HStack spacing="8px">
+                  <IconButton
+                    aria-label="Previous page"
+                    icon={<MdChevronLeft />}
+                    size="sm"
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    isDisabled={currentPage === 1}
+                    variant="outline"
+                  />
+                  
+                  {Array.from({ length: totalPages }, (_, i) => i + 1)
+                    .slice(0, 10)
+                    .map((page) => (
+                      <Button
+                        key={page}
+                        size="sm"
+                        variant={currentPage === page ? 'solid' : 'outline'}
+                        colorScheme={currentPage === page ? 'brand' : 'gray'}
+                        onClick={() => handlePageChange(page)}
+                      >
+                        {page}
+                      </Button>
+                    ))}
+                  
+                  <IconButton
+                    aria-label="Next page"
+                    icon={<MdChevronRight />}
+                    size="sm"
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    isDisabled={currentPage === totalPages}
+                    variant="outline"
+                  />
+                </HStack>
+              </Flex>
+            </>
+          )}
+        </Box>
+      </Card>
+
+      {/* Status Change Modal */}
+      <Modal isOpen={isOpen} onClose={handleCloseModal} isCentered>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Select Status</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            {statusOptions.map((status) => (
+              <Box key={status} mb="12px">
+                <Checkbox
+                  isChecked={selectedStatus === status}
+                  onChange={() => setSelectedStatus(status)}
+                  colorScheme="brand"
+                >
+                  <Text ml="8px" fontSize="sm" fontWeight="500">
+                    {status}
+                  </Text>
+                </Checkbox>
+              </Box>
+            ))}
+          </ModalBody>
+          <ModalFooter>
+            <Button variant="ghost" mr={3} onClick={handleCloseModal}>
+              Cancel
+            </Button>
+            <Button colorScheme="brand" onClick={handleStatusChange}>
+              OK
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+    </Box>
+  );
+}
