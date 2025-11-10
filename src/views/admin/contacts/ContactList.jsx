@@ -108,6 +108,7 @@ export default function ContactList() {
   // Chakra color mode values
   const textColor = useColorModeValue('secondaryGray.900', 'white');
   const borderColor = useColorModeValue('gray.200', 'whiteAlpha.100');
+  const bgColor = useColorModeValue('white', 'navy.800');
   const hoverBg = useColorModeValue('gray.50', 'whiteAlpha.50');
 
   const fetchContacts = async () => {
@@ -415,7 +416,7 @@ export default function ContactList() {
   return (
     <Box pt={{ base: '130px', md: '80px', xl: '80px' }}>
       <Card mb={{ base: '0px', '2xl': '20px' }}>
-        <Flex align="center" justify="space-between" mb="20px" p="24px">
+        <Flex align="center" justify="space-between" mb="20px" p="12px">
           <Text color={textColor} fontSize="2xl" fontWeight="700">
             Contact List
           </Text>
@@ -434,52 +435,61 @@ export default function ContactList() {
           </Flex>
         ) : (
           <>
-            <Box overflowX="auto" p="24px" pt="0">
-              <Table variant="simple" color="gray.500" mb="24px">
-                <Thead>
+            <Box
+              maxH={{ base: 'calc(100vh - 280px)', md: 'calc(100vh - 240px)', xl: 'calc(100vh - 240px)' }}
+              overflowY="auto"
+              overflowX="auto"
+              border="1px solid"
+              borderColor={borderColor}
+              borderRadius="8px"
+              mx="12px"
+              mb="12px"
+            >
+              <Table variant="simple" color="gray.500" minW="1000px">
+                <Thead position="sticky" top="0" zIndex="1" bg={bgColor}>
                   <Tr>
-                    <Th borderColor={borderColor} color="gray.400" fontSize="xs" fontWeight="700" textTransform="uppercase">First Name</Th>
-                    <Th borderColor={borderColor} color="gray.400" fontSize="xs" fontWeight="700" textTransform="uppercase">Last Name</Th>
-                    <Th borderColor={borderColor} color="gray.400" fontSize="xs" fontWeight="700" textTransform="uppercase">Email</Th>
-                    <Th borderColor={borderColor} color="gray.400" fontSize="xs" fontWeight="700" textTransform="uppercase">Phone Number</Th>
-                    <Th borderColor={borderColor} color="gray.400" fontSize="xs" fontWeight="700" textTransform="uppercase">Company Name</Th>
-                    <Th borderColor={borderColor} color="gray.400" fontSize="xs" fontWeight="700" textTransform="uppercase">Requirements</Th>
-                    <Th borderColor={borderColor} color="gray.400" fontSize="xs" fontWeight="700" textTransform="uppercase">Notes</Th>
-                    <Th borderColor={borderColor} color="gray.400" fontSize="xs" fontWeight="700" textTransform="uppercase" textAlign="center">Action</Th>
+                    <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" bg={bgColor}>First Name</Th>
+                    <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" bg={bgColor}>Last Name</Th>
+                    <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" bg={bgColor}>Email</Th>
+                    <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" bg={bgColor}>Phone Number</Th>
+                    <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" bg={bgColor}>Company Name</Th>
+                    <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" bg={bgColor}>Requirements</Th>
+                    <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" bg={bgColor}>Notes</Th>
+                    <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" textAlign="center" bg={bgColor}>Action</Th>
                   </Tr>
                 </Thead>
                 <Tbody>
                   {contacts.length === 0 ? (
                     <Tr>
                       <Td colSpan={8} textAlign="center" py="40px">
-                        <Text color="gray.400">No contacts found</Text>
+                        <Text color="black">No contacts found</Text>
                       </Td>
                     </Tr>
                   ) : (
                     contacts.map((contact) => (
                       <Tr key={contact.id || contact._id} _hover={{ bg: hoverBg }} transition="all 0.2s">
                         <Td borderColor={borderColor}>
-                          <Text color={textColor} fontSize="sm" fontWeight="500">
+                          <Text color="black" fontSize="sm" fontWeight="500">
                             {contact.first_name || '--'}
                           </Text>
                         </Td>
                         <Td borderColor={borderColor}>
-                          <Text color={textColor} fontSize="sm" fontWeight="500">
+                          <Text color="black" fontSize="sm" fontWeight="500">
                             {contact.last_name || '--'}
                           </Text>
                         </Td>
                         <Td borderColor={borderColor}>
-                          <Text color={textColor} fontSize="sm" fontWeight="500">
+                          <Text color="black" fontSize="sm" fontWeight="500">
                             {contact.email || '--'}
                           </Text>
                         </Td>
                         <Td borderColor={borderColor}>
-                          <Text color={textColor} fontSize="sm" fontWeight="500">
+                          <Text color="black" fontSize="sm" fontWeight="500">
                             {contact.mobile || '--'}
                           </Text>
                         </Td>
                         <Td borderColor={borderColor}>
-                          <Text color={textColor} fontSize="sm" fontWeight="500">
+                          <Text color="black" fontSize="sm" fontWeight="500">
                             {contact.company_name || '--'}
                           </Text>
                         </Td>
@@ -487,8 +497,9 @@ export default function ContactList() {
                           {contact.requirements ? (
                             <Flex align="center" gap={2} maxW="200px">
                               <Text
-                                color={textColor}
+                                color="black"
                                 fontSize="sm"
+                                fontWeight="500"
                                 noOfLines={1}
                                 flex={1}
                               >
@@ -501,21 +512,23 @@ export default function ContactList() {
                                     icon={<MdMoreHoriz />}
                                     size="xs"
                                     variant="ghost"
+                                    color="black"
                                     onClick={() => handleOpenReqModal(contact.requirements)}
                                   />
                                 </Tooltip>
                               )}
                             </Flex>
                           ) : (
-                            <Text color="gray.400" fontSize="sm">--</Text>
+                            <Text color="black" fontSize="sm" fontWeight="500">--</Text>
                           )}
                         </Td>
                         <Td borderColor={borderColor}>
                           {contact.notes ? (
                             <Flex align="center" gap={2} maxW="200px">
                               <Text
-                                color={textColor}
+                                color="black"
                                 fontSize="sm"
+                                fontWeight="500"
                                 noOfLines={1}
                                 flex={1}
                               >
@@ -528,13 +541,14 @@ export default function ContactList() {
                                     icon={<MdMoreHoriz />}
                                     size="xs"
                                     variant="ghost"
+                                    color="black"
                                     onClick={() => handleOpenReqModal(contact.notes)}
                                   />
                                 </Tooltip>
                               )}
                             </Flex>
                           ) : (
-                            <Text color="gray.400" fontSize="sm">--</Text>
+                            <Text color="black" fontSize="sm" fontWeight="500">--</Text>
                           )}
                         </Td>
                         <Td borderColor={borderColor} textAlign="center">
@@ -560,8 +574,8 @@ export default function ContactList() {
               </Table>
             </Box>
 
-            <Flex justify="space-between" align="center" mt="20px" pt="20px" borderTop="1px solid" borderColor={borderColor} px="24px" pb="24px">
-              <Text color="gray.400" fontSize="sm">
+            <Flex justify="space-between" align="center" mt="10px" pt="10px" borderTop="1px solid" borderColor={borderColor} px="12px" pb="12px">
+              <Text color="black" fontSize="sm">
                 Showing <Text as="span" fontWeight="700" color="brand.500">{contacts.length}</Text> of {totalCount}
               </Text>
               <HStack spacing="8px">

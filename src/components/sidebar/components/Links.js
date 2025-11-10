@@ -8,15 +8,12 @@ import { ChevronDownIcon, ChevronRightIcon } from "@chakra-ui/icons";
 export function SidebarLinks(props) {
   //   Chakra color mode
   let location = useLocation();
-  let activeColor = useColorModeValue("gray.700", "white");
-  let inactiveColor = useColorModeValue(
-    "secondaryGray.600",
-    "secondaryGray.600"
-  );
+  let activeColor = "black";
+  let inactiveColor = "black";
   let activeIcon = useColorModeValue("brand.500", "white");
-  let textColor = useColorModeValue("secondaryGray.500", "white");
+  let textColor = "black";
   let brandColor = useColorModeValue("brand.500", "brand.400");
-  let categoryColor = useColorModeValue("gray.600", "gray.300");
+  let categoryColor = "black";
   let categoryHoverBg = useColorModeValue("gray.50", "whiteAlpha.100");
 
   const { routes } = props;
@@ -63,9 +60,9 @@ export function SidebarLinks(props) {
             <Flex
               align="center"
               justify="space-between"
-              px="16px"
-              py="12px"
-              mt="18px"
+              // px="16px"
+              py="2px"
+              mt="8px"
               mb="8px"
               cursor="pointer"
               borderRadius="8px"
@@ -141,11 +138,7 @@ export function SidebarLinks(props) {
                   <Box
                     h='36px'
                     w='4px'
-                    bg={
-                      activeRoute(route.path.toLowerCase())
-                        ? brandColor
-                        : "transparent"
-                    }
+                    bg="transparent"
                     borderRadius='5px'
                   />
                 </HStack>
@@ -170,7 +163,7 @@ export function SidebarLinks(props) {
                     }>
                     {route.name}
                   </Text>
-                  <Box h='36px' w='4px' bg='brand.400' borderRadius='5px' />
+                  <Box h='36px' w='4px' bg='transparent' borderRadius='5px' />
                 </HStack>
               </Box>
             )}

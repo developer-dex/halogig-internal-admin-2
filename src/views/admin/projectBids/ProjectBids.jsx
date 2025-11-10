@@ -34,6 +34,7 @@ export default function ProjectBids() {
 
   const textColor = useColorModeValue('secondaryGray.900', 'white');
   const borderColor = useColorModeValue('gray.200', 'whiteAlpha.100');
+  const bgColor = useColorModeValue('white', 'navy.800');
   const hoverBg = useColorModeValue('gray.50', 'whiteAlpha.50');
 
   useEffect(() => {
@@ -58,7 +59,7 @@ export default function ProjectBids() {
   const getStatusColors = (statusText) => {
     const s = (statusText || '').toLowerCase();
     if (s.includes('accept') || s.includes('accepted')) {
-      return { bg: 'green.100', color: 'green.700', border: 'green.300' };
+      return { bg: 'transparent', color: 'black', border: 'black.600' };
     }
     if (s.includes('reject') || s.includes('rejected')) {
       return { bg: 'red.100', color: 'red.700', border: 'red.300' };
@@ -67,7 +68,7 @@ export default function ProjectBids() {
       return { bg: 'blue.100', color: 'blue.700', border: 'blue.300' };
     }
     if (s.includes('complete') || s.includes('completed')) {
-      return { bg: 'green.100', color: 'green.700', border: 'green.300' };
+      return { bg: 'transparent', color: 'black', border: 'black.600' };
     }
     return { bg: 'orange.100', color: 'orange.700', border: 'orange.300' };
   };
@@ -88,7 +89,7 @@ export default function ProjectBids() {
   return (
     <Box pt={{ base: '130px', md: '80px', xl: '80px' }}>
       <Card>
-        <Box p="24px" mb="20px">
+        <Box p="12px" mb="14px">
           <Text color={textColor} fontSize="2xl" fontWeight="700" mb="20px">
             Project Bids
           </Text>
@@ -99,24 +100,31 @@ export default function ProjectBids() {
             </Flex>
           ) : (
             <>
-              <Box overflowX="auto">
-                <Table variant="simple" color="gray.500">
-                  <Thead>
+              <Box
+                maxH={{ base: 'calc(100vh - 280px)', md: 'calc(100vh - 240px)', xl: 'calc(100vh - 240px)' }}
+                overflowY="auto"
+                overflowX="auto"
+                border="1px solid"
+                borderColor={borderColor}
+                borderRadius="8px"
+              >
+                <Table variant="simple" color="gray.500" minW="1000px">
+                  <Thead position="sticky" top="0" zIndex="1" bg={bgColor}>
                     <Tr>
-                      <Th borderColor={borderColor} color="gray.400" fontSize="xs" fontWeight="700" textTransform="uppercase">BID ID</Th>
-                      <Th borderColor={borderColor} color="gray.400" fontSize="xs" fontWeight="700" textTransform="uppercase">PROJECT</Th>
-                      <Th borderColor={borderColor} color="gray.400" fontSize="xs" fontWeight="700" textTransform="uppercase">FREELANCER</Th>
-                      <Th borderColor={borderColor} color="gray.400" fontSize="xs" fontWeight="700" textTransform="uppercase" textAlign="center">BID AMOUNT</Th>
-                      <Th borderColor={borderColor} color="gray.400" fontSize="xs" fontWeight="700" textTransform="uppercase" textAlign="center">SUBMITTED</Th>
-                      <Th borderColor={borderColor} color="gray.400" fontSize="xs" fontWeight="700" textTransform="uppercase" textAlign="center">STATUS</Th>
-                      <Th borderColor={borderColor} color="gray.400" fontSize="xs" fontWeight="700" textTransform="uppercase" textAlign="center">VIEW</Th>
+                      <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" bg={bgColor}>BID ID</Th>
+                      <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" bg={bgColor}>PROJECT</Th>
+                      <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" bg={bgColor}>FREELANCER</Th>
+                      <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" textAlign="center" bg={bgColor}>BID AMOUNT</Th>
+                      <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" textAlign="center" bg={bgColor}>SUBMITTED</Th>
+                      <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" textAlign="center" bg={bgColor}>STATUS</Th>
+                      <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" textAlign="center" bg={bgColor}>VIEW</Th>
                     </Tr>
                   </Thead>
                   <Tbody>
                     {rows.length === 0 ? (
                       <Tr>
                         <Td colSpan={7} textAlign="center" py="40px">
-                          <Text color="gray.400">No bids found</Text>
+                          <Text color="black">No bids found</Text>
                         </Td>
                       </Tr>
                     ) : (
@@ -137,24 +145,24 @@ export default function ProjectBids() {
                               <Text color={textColor} fontSize="sm" fontWeight="700">
                                 {bid?.ClientProject?.project_title || bid?.Project?.project_title || bid?.project_title || '--'}
                               </Text>
-                              <Text color="gray.400" fontSize="xs" mt="4px">
+                              <Text color="black" fontSize="xs" mt="4px">
                                 {bid?.ClientProject?.Category?.name || bid?.Project?.Category?.name || bid?.category_name || '--'}
                               </Text>
                             </Td>
                             <Td borderColor={borderColor}>
                               <Flex align="center" gap={3}>
-                                <Avatar
+                                {/* <Avatar
                                   size="sm"
                                   src={bid?.freelancer?.profile_image}
                                   name={freelancerName}
                                 >
                                   {freelancerInitial}
-                                </Avatar>
+                                </Avatar> */}
                                 <Box>
                                   <Text color={textColor} fontSize="sm" fontWeight="700">
                                     {freelancerName}
                                   </Text>
-                                  <Text color="gray.400" fontSize="xs">
+                                  <Text color="black" fontSize="xs">
                                     {bid?.freelancer?.email || '--'}
                                   </Text>
                                 </Box>
@@ -190,9 +198,11 @@ export default function ProjectBids() {
                               <Tooltip label="View Bid Details">
                                 <Button
                                   size="sm"
-                                  bg="red.500"
-                                  color="white"
-                                  _hover={{ bg: 'red.600' }}
+                                  bg="transparent"
+                                  color="black"
+                                  borderColor="black"
+                                  borderWidth="2px"
+                                  _hover={{ opacity: 0.8 }}
                                   leftIcon={<MdVisibility />}
                                   onClick={() => {
                                     navigate(`/admin/project-bids/${bid.id || bid._id}/details`);
@@ -210,8 +220,8 @@ export default function ProjectBids() {
                 </Table>
               </Box>
 
-              <Flex justify="space-between" align="center" mt="20px" pt="20px" borderTop="1px solid" borderColor={borderColor}>
-                <Text color="gray.400" fontSize="sm">
+              <Flex justify="space-between" align="center" mt="10px" pt="10px" borderTop="1px solid" borderColor={borderColor}>
+                <Text color="black" fontSize="sm">
                   Showing <Text as="span" fontWeight="700" color="brand.500">{rows.length}</Text> of {totalCount}
                 </Text>
                 <HStack spacing="8px">

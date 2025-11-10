@@ -28,7 +28,7 @@ import logo from 'assets/img/logo/logo.png';
 function SignIn() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  
+
   const { isLoading, isSuccess, isError, responseData } = useSelector(
     (state) => state.loginDataReducer
   );
@@ -41,10 +41,10 @@ function SignIn() {
   const [show, setShow] = useState(false);
 
   const textColor = useColorModeValue('navy.700', 'white');
-  const textColorSecondary = 'gray.400';
-  const textColorDetails = useColorModeValue('navy.700', 'secondaryGray.600');
+  const textColorSecondary = 'black.400';
+  const textColorDetails = useColorModeValue('black.700', 'black.600');
   const textColorBrand = useColorModeValue('brand.500', 'white');
-  const brandStars = useColorModeValue('brand.500', 'brand.400');
+  const brandStars = useColorModeValue('red.500', 'red.500');
 
   useEffect(() => {
     // Check if user is already logged in
@@ -60,7 +60,7 @@ function SignIn() {
       localStorage.setItem('adminToken', responseData.token);
       localStorage.setItem('adminData', JSON.stringify(responseData.admin));
       localStorage.setItem('isAdminLogIn', 'true');
-      
+
       // Navigate to clients page
       navigate('/admin/clients');
     }
@@ -74,7 +74,7 @@ function SignIn() {
       ...prev,
       [name]: value
     }));
-    
+
     // Clear error when user starts typing
     if (errors[name]) {
       setErrors(prev => ({
@@ -86,26 +86,26 @@ function SignIn() {
 
   const validateForm = () => {
     const newErrors = {};
-    
+
     if (!formData.email) {
       newErrors.email = 'Email is required';
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
       newErrors.email = 'Please enter a valid email';
     }
-    
+
     if (!formData.password) {
       newErrors.password = 'Password is required';
     } else if (formData.password.length < 6) {
       newErrors.password = 'Password must be at least 6 characters';
     }
-    
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       return;
     }
@@ -131,140 +131,148 @@ function SignIn() {
         justifyContent='center'
         px={{ base: '25px', md: '0px' }}
         flexDirection='column'>
-        <Box textAlign='center' mb='36px'>
-          <Image 
-            src={logo} 
-            alt="HaloGig Logo" 
-            h='auto' 
-            w='200px' 
-            maxH='80px'
-            mx='auto'
-            mb='24px'
-            objectFit='contain'
-          />
-          <Heading color={textColor} fontSize='36px' mb='10px'>
-            Admin Sign In
-          </Heading>
-          <Text
+        <Box style={{ border: '1px solid transparent', 
+        padding: '20px', 
+        borderRadius: '15px', 
+        boxShadow: '0px 0px 30px 0px #00000026',
+      }}>
+          <Box textAlign='center' mb='36px'>
+            <Image
+              src={logo}
+              alt="HaloGig Logo"
+              h='auto'
+              w='180px'
+              maxH='30px'
+              mx='auto'
+              mb='24px'
+              objectFit='contain'
+            />
+            <Heading color={textColor} fontSize='32px' mb='10px'>
+              Admin Console
+            </Heading>
+            {/* <Text
             color={textColorSecondary}
             fontWeight='400'
             fontSize='md'>
             Enter your email and password to sign in!
-          </Text>
-        </Box>
-        <Flex
-          zIndex='2'
-          direction='column'
-          w={{ base: '100%', md: '420px' }}
-          maxW='100%'
-          background='transparent'
-          borderRadius='15px'
-          mx='auto'>
-          
-          {isError && (
-            <Alert status='error' mb='24px' borderRadius='15px'>
-              <AlertIcon />
-              Invalid credentials. Please try again.
-            </Alert>
-          )}
+          </Text> */}
+          </Box>
+          <Flex
+            zIndex='2'
+            direction='column'
+            w={{ base: '100%', md: '420px' }}
+            maxW='100%'
+            background='transparent'
+            borderRadius='15px'
+            mx='auto'>
 
-          <form onSubmit={handleSubmit}>
-            <FormControl isInvalid={!!errors.email} mb='24px'>
-              <FormLabel
-                display='flex'
-                ms='4px'
-                fontSize='sm'
-                fontWeight='500'
-                color={textColor}
-                mb='8px'>
-                Email<Text color={brandStars}>*</Text>
-              </FormLabel>
-              <Input
-                isRequired={true}
-                variant='auth'
-                fontSize='sm'
-                ms={{ base: '0px', md: '0px' }}
-                type='email'
-                name='email'
-                placeholder='mail@example.com'
-                fontWeight='500'
-                size='lg'
-                value={formData.email}
-                onChange={handleChange}
-                autoComplete='email'
-                autoFocus
-              />
-              {errors.email && (
-                <Text color='red.500' fontSize='sm' mt='8px'>
-                  {errors.email}
-                </Text>
-              )}
-            </FormControl>
-            
-            <FormControl isInvalid={!!errors.password} mb='24px'>
-              <FormLabel
-                ms='4px'
-                fontSize='sm'
-                fontWeight='500'
-                color={textColor}
-                display='flex'>
-                Password<Text color={brandStars}>*</Text>
-              </FormLabel>
-              <InputGroup size='lg'>
+            {isError && (
+              <Alert status='error' mb='24px' borderRadius='15px'>
+                <AlertIcon />
+                Invalid credentials. Please try again.
+              </Alert>
+            )}
+
+            <form onSubmit={handleSubmit}>
+              <FormControl isInvalid={!!errors.email} mb='24px'>
+                <FormLabel
+                  display='flex'
+                  ms='4px'
+                  fontSize='sm'
+                  fontWeight='700'
+                  color={textColor}
+                  mb='8px'>
+                  Email<Text color={brandStars}>*</Text>
+                </FormLabel>
                 <Input
                   isRequired={true}
-                  fontSize='sm'
-                  placeholder='Min. 6 characters'
-                  name='password'
-                  size='lg'
-                  type={show ? 'text' : 'password'}
                   variant='auth'
-                  value={formData.password}
+                  fontSize='sm'
+                  ms={{ base: '0px', md: '0px' }}
+                  type='email'
+                  name='email'
+                  placeholder='mail@example.com'
+                  fontWeight='500'
+                  size='lg'
+                  value={formData.email}
                   onChange={handleChange}
-                  autoComplete='current-password'
+                  autoComplete='email'
+                  autoFocus
                 />
-                <InputRightElement display='flex' alignItems='center' mt='4px'>
-                  <Icon
-                    color={textColorSecondary}
-                    _hover={{ cursor: 'pointer' }}
-                    as={show ? RiEyeCloseLine : MdOutlineRemoveRedEye}
-                    onClick={handleClick}
+                {errors.email && (
+                  <Text color='red.500' fontSize='sm' mt='8px'>
+                    {errors.email}
+                  </Text>
+                )}
+              </FormControl>
+
+              <FormControl isInvalid={!!errors.password} mb='24px'>
+                <FormLabel
+                  ms='4px'
+                  fontSize='sm'
+                  fontWeight='700'
+                  color={textColor}
+                  display='flex'>
+                  Password<Text color={brandStars}>*</Text>
+                </FormLabel>
+                <InputGroup size='lg'>
+                  <Input
+                    isRequired={true}
+                    fontSize='sm'
+                    placeholder='Min. 6 characters'
+                    name='password'
+                    size='lg'
+                    type={show ? 'text' : 'password'}
+                    variant='auth'
+                    value={formData.password}
+                    onChange={handleChange}
+                    autoComplete='current-password'
                   />
-                </InputRightElement>
-              </InputGroup>
-              {errors.password && (
-                <Text color='red.500' fontSize='sm' mt='8px'>
-                  {errors.password}
-                </Text>
-              )}
-            </FormControl>
-            
-            <Button
-              fontSize='sm'
-              variant='brand'
-              fontWeight='500'
-              w='100%'
-              h='50'
-              mb='24px'
-              type='submit'
-              isLoading={isLoading}
-              loadingText='Signing in...'
-              spinner={<Spinner size='sm' />}>
-              Sign In
-            </Button>
-          </form>
-          
-          <Flex
-            flexDirection='column'
-            justifyContent='center'
-            alignItems='center'
-            maxW='100%'
-            mt='0px'>
-            <Text color={textColorDetails} fontWeight='400' fontSize='14px'>
-              © 2024 HaloGig Admin Panel. All rights reserved.
-            </Text>
+                  <InputRightElement display='flex' alignItems='center' mt='4px'>
+                    <Icon
+                      color={textColorSecondary}
+                      _hover={{ cursor: 'pointer' }}
+                      as={show ? RiEyeCloseLine : MdOutlineRemoveRedEye}
+                      onClick={handleClick}
+                    />
+                  </InputRightElement>
+                </InputGroup>
+                {errors.password && (
+                  <Text color='red.500' fontSize='sm' mt='8px'>
+                    {errors.password}
+                  </Text>
+                )}
+              </FormControl>
+
+              <Button
+                fontSize='sm'
+                // variant='brand'
+                fontWeight='500'
+                w='100%'
+                h='50'
+                mb='24px'
+                type='submit'
+                isLoading={isLoading}
+                style={{ background: 'linear-gradient(#c3362a 0, #92150d 74%)', color: 'white' }}
+                loadingText='Signing in...'
+                spinner={<Spinner size='sm' />}>
+                Sign In
+              </Button>
+            </form>
+
+            <Flex
+              flexDirection='column'
+              justifyContent='center'
+              alignItems='center'
+              maxW='100%'
+              mt='0px'>
+              <Text color={textColorDetails} fontWeight='400' fontSize='14px'>
+                © 2025 Halogig Admin Panel. All rights reserved.
+              </Text>
+            </Flex>
           </Flex>
-        </Flex>
+        </Box>
+
       </Flex>
     </DefaultAuth>
   );

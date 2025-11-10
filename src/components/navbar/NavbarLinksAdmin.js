@@ -53,13 +53,13 @@ export default function HeaderLinks(props) {
       flexDirection="row"
       bg={menuBg}
       flexWrap={secondary ? { base: 'wrap', md: 'nowrap' } : 'unset'}
-      p="10px"
+      p="8px"
       borderRadius="30px"
       boxShadow={shadow}
     >
       <SidebarResponsive routes={routes} />
       
-      <Button
+      {/* <Button
         variant="no-hover"
         bg="transparent"
         p="0px"
@@ -76,7 +76,7 @@ export default function HeaderLinks(props) {
           color={navbarIcon}
           as={colorMode === 'light' ? IoMdMoon : IoMdSunny}
         />
-      </Button>
+      </Button> */}
       
       <Menu>
         <MenuButton p="0px">
@@ -86,8 +86,8 @@ export default function HeaderLinks(props) {
             name={adminName}
             bg="#11047A"
             size="sm"
-            w="40px"
-            h="40px"
+            w="34px"
+            h="34px"
           />
         </MenuButton>
         <MenuList

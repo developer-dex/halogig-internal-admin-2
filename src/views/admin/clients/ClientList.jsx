@@ -155,7 +155,7 @@ export default function ClientList() {
         return { bg: 'orange.100', color: 'orange.700', border: 'orange.300' };
       case 'approved':
       case 'otpverified':
-        return { bg: 'green.100', color: 'green.700', border: 'green.300' };
+        return { bg: 'transparent', color: 'black', border: 'black.600' };
       case 'rejected':
         return { bg: 'red.100', color: 'red.700', border: 'red.300' };
       case 'under review':
@@ -171,7 +171,7 @@ export default function ClientList() {
   return (
     <Box pt={{ base: '130px', md: '80px', xl: '80px' }}>
       <Card>
-        <Box p="24px" mb="20px">
+        <Box p="12px" mb="14px">
           <Text
             color={textColor}
             fontSize="2xl"
@@ -187,74 +187,88 @@ export default function ClientList() {
             </Flex>
           ) : (
             <>
-              <Box overflowX="auto">
-                <Table variant="simple" color="gray.500">
-                  <Thead>
+              <Box
+                maxH={{ base: 'calc(100vh - 280px)', md: 'calc(100vh - 240px)', xl: 'calc(100vh - 240px)' }}
+                overflowY="auto"
+                overflowX="auto"
+                border="1px solid"
+                borderColor={borderColor}
+                borderRadius="8px"
+              >
+                <Table variant="simple" color="gray.500" minW="800px">
+                  <Thead position="sticky" top="0" zIndex="1" bg={bgColor}>
                     <Tr>
                       <Th
                         borderColor={borderColor}
-                        color="gray.400"
+                        color="black"
                         fontSize="xs"
                         fontWeight="700"
                         textTransform="uppercase"
+                        bg={bgColor}
                       >
                         FIRST NAME
                       </Th>
                       <Th
                         borderColor={borderColor}
-                        color="gray.400"
+                        color="black"
                         fontSize="xs"
                         fontWeight="700"
                         textTransform="uppercase"
+                        bg={bgColor}
                       >
                         LAST NAME
                       </Th>
                       <Th
                         borderColor={borderColor}
-                        color="gray.400"
+                        color="black"
                         fontSize="xs"
                         fontWeight="700"
                         textTransform="uppercase"
+                        bg={bgColor}
                       >
                         EMAIL
                       </Th>
                       <Th
                         borderColor={borderColor}
-                        color="gray.400"
+                        color="black"
                         fontSize="xs"
                         fontWeight="700"
                         textTransform="uppercase"
                         textAlign="center"
+                        bg={bgColor}
                       >
                         ACTION
                       </Th>
                       <Th
                         borderColor={borderColor}
-                        color="gray.400"
+                        color="black"
                         fontSize="xs"
                         fontWeight="700"
                         textTransform="uppercase"
                         textAlign="center"
+                        bg={bgColor}
                       >
                         POST PROJECT
                       </Th>
                       <Th
                         borderColor={borderColor}
-                        color="gray.400"
+                          color="black"
                         fontSize="xs"
                         fontWeight="700"
                         textTransform="uppercase"
                         textAlign="center"
+                        bg={bgColor}
                       >
                         SET-UP LINK
                       </Th>
                       <Th
                         borderColor={borderColor}
-                        color="gray.400"
+                          color="black"
                         fontSize="xs"
                         fontWeight="700"
                         textTransform="uppercase"
                         textAlign="center"
+                        bg={bgColor}
                       >
                         VIEW
                       </Th>
@@ -264,7 +278,7 @@ export default function ClientList() {
                     {clients.length === 0 ? (
                       <Tr>
                         <Td colSpan={7} textAlign="center" py="40px">
-                          <Text color="gray.400">No clients found</Text>
+                          <Text color="black">No clients found</Text>
                         </Td>
                       </Tr>
                     ) : (
@@ -315,10 +329,9 @@ export default function ClientList() {
                               {client.created_by_admin && (
                                 <Button
                                   size="sm"
-                                  bg="brand.500"
-                                  color="white"
+                                  style={{ background: 'linear-gradient(#c3362a 0, #92150d 74%)', color: 'white' }}
                                   _hover={{
-                                    bg: 'brand.600',
+                                    opacity: 0.9,
                                   }}
                                   onClick={() => handlePostProject(client)}
                                 >
@@ -332,7 +345,7 @@ export default function ClientList() {
                                   <Tooltip label={client.share_link}>
                                     <Text
                                       fontSize="xs"
-                                      color="brand.500"
+                                      color="black"
                                       cursor="pointer"
                                       textDecoration="underline"
                                       onClick={() => window.open(client.share_link, '_blank')}
@@ -351,7 +364,7 @@ export default function ClientList() {
                                   </Tooltip>
                                 </HStack>
                               ) : (
-                                <Text color="gray.400">--</Text>
+                                <Text color="black">--</Text>
                               )}
                             </Td>
                             <Td borderColor={borderColor} textAlign="center">
@@ -361,7 +374,7 @@ export default function ClientList() {
                                   icon={<MdVisibility />}
                                   size="sm"
                                   variant="ghost"
-                                  colorScheme="brand"
+                                  color="black"
                                   onClick={() => handleViewClient(client)}
                                 />
                               </Tooltip>
@@ -378,12 +391,12 @@ export default function ClientList() {
               <Flex
                 justify="space-between"
                 align="center"
-                mt="20px"
-                pt="20px"
+                mt="10px"
+                pt="10px"
                 borderTop="1px solid"
                 borderColor={borderColor}
               >
-                <Text color="gray.400" fontSize="sm">
+                <Text color="black" fontSize="sm">
                   Showing <Text as="span" fontWeight="700" color="brand.500">
                     {clients.length}
                   </Text> of {totalCount}

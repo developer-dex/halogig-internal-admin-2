@@ -112,6 +112,7 @@ export default function WebsiteData() {
 
   const textColor = useColorModeValue('secondaryGray.900', 'white');
   const borderColor = useColorModeValue('gray.200', 'whiteAlpha.100');
+  const bgColor = useColorModeValue('white', 'navy.800');
   const hoverBg = useColorModeValue('gray.50', 'whiteAlpha.50');
   const cardBg = useColorModeValue('white', 'navy.800');
 
@@ -564,13 +565,13 @@ export default function WebsiteData() {
     <Box pt={{ base: '130px', md: '80px', xl: '80px' }}>
       {/* Actions Section */}
       <Card mb="20px" bg={cardBg}>
-        <Box p="24px">
+        <Box p="12px">
           <VStack align="stretch" spacing={4}>
             <Box>
               <Text color={textColor} fontSize="2xl" fontWeight="700" mb="8px">
                 Website Data Management
               </Text>
-              <Text color="gray.400" fontSize="sm">
+              <Text color="black" fontSize="sm">
                 Manage your website data with powerful tools for upload, download, and content management
               </Text>
             </Box>
@@ -678,7 +679,7 @@ export default function WebsiteData() {
 
       {/* Filters */}
       <Card mb="20px" bg={cardBg}>
-        <Box p="24px">
+        <Box p="12px">
           <HStack spacing={4}>
             <InputGroup flex="1">
               <InputLeftElement pointerEvents="none">
@@ -704,38 +705,45 @@ export default function WebsiteData() {
 
       {/* Data Table */}
       <Card bg={cardBg}>
-        <Box p="24px">
+        <Box p="12px" mb="14px">
           {isLoading && websiteData.length === 0 ? (
             <Flex justify="center" align="center" minH="400px">
               <Spinner size="xl" color="brand.500" />
             </Flex>
           ) : websiteData.length === 0 ? (
             <Box textAlign="center" py="40px">
-              <Text fontSize="lg" color="gray.400" mb="8px">
+              <Text fontSize="lg" color="black" mb="8px">
                 No website data found
               </Text>
-              <Text fontSize="sm" color="gray.500">
+              <Text fontSize="sm" color="black">
                 Upload an Excel file to get started
               </Text>
             </Box>
           ) : (
             <>
-              <Box overflowX="auto">
-                <Table variant="simple" color="gray.500" mb="24px">
-                  <Thead>
+              <Box
+                maxH={{ base: 'calc(100vh - 280px)', md: 'calc(100vh - 240px)', xl: 'calc(100vh - 240px)' }}
+                overflowY="auto"
+                overflowX="auto"
+                border="1px solid"
+                borderColor={borderColor}
+                borderRadius="8px"
+              >
+                <Table variant="simple" color="gray.500" minW="800px">
+                  <Thead position="sticky" top="0" zIndex="1" bg={bgColor}>
                     <Tr>
-                      <Th borderColor={borderColor} color="gray.400" fontSize="xs" fontWeight="700" textTransform="uppercase">ID</Th>
-                      <Th borderColor={borderColor} color="gray.400" fontSize="xs" fontWeight="700" textTransform="uppercase">Category</Th>
-                      <Th borderColor={borderColor} color="gray.400" fontSize="xs" fontWeight="700" textTransform="uppercase">Service</Th>
-                      <Th borderColor={borderColor} color="gray.400" fontSize="xs" fontWeight="700" textTransform="uppercase">Slug URL</Th>
-                      <Th borderColor={borderColor} color="gray.400" fontSize="xs" fontWeight="700" textTransform="uppercase" textAlign="center">Operations</Th>
+                      <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" bg={bgColor}>ID</Th>
+                      <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" bg={bgColor}>Category</Th>
+                      <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" bg={bgColor}>Service</Th>
+                      <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" bg={bgColor}>Slug URL</Th>
+                      <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" textAlign="center" bg={bgColor}>Operations</Th>
                     </Tr>
                   </Thead>
                   <Tbody>
                     {websiteData.map((row) => (
                       <Tr key={row.id} _hover={{ bg: hoverBg }} transition="all 0.2s">
                         <Td borderColor={borderColor}>
-                          <Text color={textColor} fontSize="sm" fontWeight="700">
+                          <Text color="black" fontSize="sm" fontWeight="500">
                             {row.id}
                           </Text>
                         </Td>
@@ -747,14 +755,15 @@ export default function WebsiteData() {
                           )}
                         </Td>
                         <Td borderColor={borderColor}>
-                          <Text color={textColor} fontSize="sm">
+                          <Text color="black" fontSize="sm" fontWeight="500">
                             {row.service_name || '-'}
                           </Text>
                         </Td>
                         <Td borderColor={borderColor}>
                           <Text
-                            color="brand.500"
+                            color="black"
                             fontSize="sm"
+                            fontWeight="500"
                             fontFamily="monospace"
                             cursor="pointer"
                             _hover={{ textDecoration: 'underline' }}
@@ -771,7 +780,7 @@ export default function WebsiteData() {
                                 aria-label="Edit"
                                 icon={<MdEdit />}
                                 size="sm"
-                                colorScheme="brand"
+                                color="black"
                                 variant="ghost"
                                 onClick={() => handleEdit(row)}
                               />
@@ -781,7 +790,7 @@ export default function WebsiteData() {
                                 aria-label="Preview"
                                 icon={<MdLaunch />}
                                 size="sm"
-                                colorScheme="purple"
+                                color="black"
                                 variant="ghost"
                                 onClick={() => handlePreview(row)}
                               />
@@ -791,7 +800,7 @@ export default function WebsiteData() {
                                 aria-label="Delete"
                                 icon={<MdDelete />}
                                 size="sm"
-                                colorScheme="red"
+                                color="black"
                                 variant="ghost"
                                 onClick={() => {
                                   setSelectedRecord(row);
@@ -808,8 +817,8 @@ export default function WebsiteData() {
               </Box>
 
               {/* Pagination */}
-              <Flex justify="space-between" align="center" pt="20px" borderTop="1px solid" borderColor={borderColor}>
-                <Text color="gray.400" fontSize="sm">
+              <Flex justify="space-between" align="center" mt="10px" pt="10px" borderTop="1px solid" borderColor={borderColor}>
+                <Text color="black" fontSize="sm">
                   Page {currentPage} of {totalPages} ({totalCount} total)
                 </Text>
                 <HStack spacing="8px">

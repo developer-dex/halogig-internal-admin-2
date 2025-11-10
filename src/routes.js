@@ -49,10 +49,10 @@ const LogManagerPage = () => <div>Log Manager Page - Coming Soon</div>;
 const routes = [
   // Auth Routes
   {
-    name: 'Sign In',
-    layout: '/auth',
+    name: 'Dashboard',
+    layout: '/admin',
     path: '/sign-in',
-    component: <SignInCentered />,
+    // component: <SignInCentered />,
   },
   // {
   //   name: 'Main Dashboard',

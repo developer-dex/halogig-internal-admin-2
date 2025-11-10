@@ -56,7 +56,7 @@ export default function AdminNavbar(props) {
 			transitionTimingFunction='linear, linear, linear, linear'
 			alignItems={{ xl: 'center' }}
 			display={secondary ? 'block' : 'flex'}
-			minH='75px'
+			minH='60px'
 			justifyContent={{ xl: 'center' }}
 			lineHeight='25.6px'
 			mx='auto'
@@ -78,7 +78,8 @@ export default function AdminNavbar(props) {
 				lg: 'calc(100vw - 6%)',
 				xl: 'calc(100vw - 350px)',
 				'2xl': 'calc(100vw - 365px)'
-			}}>
+			}}
+			>
 			<Flex
 				w='100%'
 				flexDirection={{

@@ -56,8 +56,9 @@ export default function SiteAnalytics() {
   const exportModal = useDisclosure();
   const pageLimit = 50;
 
-  const textColor = useColorModeValue('secondaryGray.900', 'white');
+  const textColor = useColorModeValue('black', 'white');
   const borderColor = useColorModeValue('gray.200', 'whiteAlpha.100');
+  const bgColor = useColorModeValue('white', 'navy.800');
   const hoverBg = useColorModeValue('gray.50', 'whiteAlpha.50');
   const cardBg = useColorModeValue('white', 'navy.800');
 
@@ -190,7 +191,7 @@ export default function SiteAnalytics() {
     <Box pt={{ base: '130px', md: '80px', xl: '80px' }}>
       {/* Header */}
       <Card mb="20px" bg={cardBg}>
-        <Box p="24px">
+        <Box p="12px">
           <Flex justify="space-between" align="center" flexWrap="wrap" gap={4}>
             <HStack spacing={4}>
               {selectedIpAddress && (
@@ -232,33 +233,40 @@ export default function SiteAnalytics() {
 
       {/* Data Table */}
       <Card bg={cardBg}>
-        <Box p="24px">
+        <Box p="12px" mb="14px">
           {isLoading && pageAnalytics.length === 0 ? (
             <Flex justify="center" align="center" minH="400px">
               <Spinner size="xl" color="brand.500" />
             </Flex>
           ) : pageAnalytics.length === 0 ? (
             <Box textAlign="center" py="40px">
-              <Text fontSize="lg" color="gray.400" mb="8px">
+              <Text fontSize="lg" color="black" mb="8px">
                 No analytics data found
               </Text>
             </Box>
           ) : (
             <>
-              <Box overflowX="auto">
-                <Table variant="simple" color="gray.500" mb="24px">
-                  <Thead>
+              <Box
+                maxH={{ base: 'calc(100vh - 280px)', md: 'calc(100vh - 240px)', xl: 'calc(100vh - 240px)' }}
+                overflowY="auto"
+                overflowX="auto"
+                border="1px solid"
+                borderColor={borderColor}
+                borderRadius="8px"
+              >
+                <Table variant="simple" color="gray.500" minW="1200px">
+                  <Thead position="sticky" top="0" zIndex="1" bg={bgColor}>
                     <Tr>
-                      <Th borderColor={borderColor} color="gray.400" fontSize="xs" fontWeight="700" textTransform="uppercase">IP Address</Th>
-                      <Th borderColor={borderColor} color="gray.400" fontSize="xs" fontWeight="700" textTransform="uppercase" minW="180px">Location</Th>
-                      <Th borderColor={borderColor} color="gray.400" fontSize="xs" fontWeight="700" textTransform="uppercase" minW="180px">In Time</Th>
-                      <Th borderColor={borderColor} color="gray.400" fontSize="xs" fontWeight="700" textTransform="uppercase" minW="180px">Out Time</Th>
-                      <Th borderColor={borderColor} color="gray.400" fontSize="xs" fontWeight="700" textTransform="uppercase">Time Spent</Th>
-                      <Th borderColor={borderColor} color="gray.400" fontSize="xs" fontWeight="700" textTransform="uppercase">Page Load Time</Th>
-                      <Th borderColor={borderColor} color="gray.400" fontSize="xs" fontWeight="700" textTransform="uppercase">Device Type</Th>
-                      <Th borderColor={borderColor} color="gray.400" fontSize="xs" fontWeight="700" textTransform="uppercase" minW="300px">URL</Th>
+                      <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" bg={bgColor}>IP Address</Th>
+                      <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" minW="180px" bg={bgColor}>Location</Th>
+                      <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" minW="180px" bg={bgColor}>In Time</Th>
+                      <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" minW="180px" bg={bgColor}>Out Time</Th>
+                      <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" bg={bgColor}>Time Spent</Th>
+                      <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" bg={bgColor}>Page Load Time</Th>
+                      <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" bg={bgColor}>Device Type</Th>
+                      <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" minW="300px" bg={bgColor}>URL</Th>
                       {!selectedIpAddress && (
-                        <Th borderColor={borderColor} color="gray.400" fontSize="xs" fontWeight="700" textTransform="uppercase" textAlign="center">Actions</Th>
+                        <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" textAlign="center" bg={bgColor}>Actions</Th>
                       )}
                     </Tr>
                   </Thead>
@@ -312,7 +320,7 @@ export default function SiteAnalytics() {
                               href={item.url}
                               target="_blank"
                               rel="noopener noreferrer"
-                              color="brand.500"
+                              color="black"
                               fontSize="sm"
                               wordBreak="break-all"
                               whiteSpace="normal"
@@ -321,7 +329,7 @@ export default function SiteAnalytics() {
                               {item.url}
                             </Link>
                           ) : (
-                            <Text color="gray.400" fontSize="sm">--</Text>
+                            <Text color="black" fontSize="sm">--</Text>
                           )}
                         </Td>
                         {!selectedIpAddress && (
@@ -331,7 +339,7 @@ export default function SiteAnalytics() {
                                 aria-label="View IP analytics"
                                 icon={<MdVisibility />}
                                 size="sm"
-                                colorScheme="brand"
+                                color="black"
                                 variant="ghost"
                                 onClick={() => handleViewIpAnalytics(item.ip_address)}
                                 isDisabled={!item.ip_address}
@@ -346,8 +354,8 @@ export default function SiteAnalytics() {
               </Box>
 
               {/* Pagination */}
-              <Flex justify="space-between" align="center" pt="20px" borderTop="1px solid" borderColor={borderColor}>
-                <Text color="gray.400" fontSize="sm">
+              <Flex justify="space-between" align="center" mt="10px" pt="10px" borderTop="1px solid" borderColor={borderColor}>
+                <Text color="black" fontSize="sm">
                   Showing <Text as="span" fontWeight="700" color="brand.500">{pageAnalytics.length}</Text> of {totalCount}
                 </Text>
                 <HStack spacing="8px">

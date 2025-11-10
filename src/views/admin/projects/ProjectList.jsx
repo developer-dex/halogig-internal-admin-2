@@ -48,6 +48,7 @@ export default function ProjectList() {
 
   const textColor = useColorModeValue('secondaryGray.900', 'white');
   const borderColor = useColorModeValue('gray.200', 'whiteAlpha.100');
+  const bgColor = useColorModeValue('white', 'navy.800');
   const hoverBg = useColorModeValue('gray.50', 'whiteAlpha.50');
 
   const fetchProjects = async () => {
@@ -180,7 +181,7 @@ export default function ProjectList() {
       case 'pending':
         return { bg: 'orange.100', color: 'orange.700', border: 'orange.300' };
       case 'approved':
-        return { bg: 'green.100', color: 'green.700', border: 'green.300' };
+        return { bg: 'transparent', color: 'black', border: 'black.600' };
       case 'rejected':
         return { bg: 'red.100', color: 'red.700', border: 'red.300' };
       default:
@@ -193,7 +194,7 @@ export default function ProjectList() {
   return (
     <Box pt={{ base: '130px', md: '80px', xl: '80px' }}>
       <Card>
-        <Box p="24px" mb="20px">
+        <Box p="12px" mb="14px">
           <Text
             color={textColor}
             fontSize="2xl"
@@ -209,83 +210,98 @@ export default function ProjectList() {
             </Flex>
           ) : (
             <>
-              <Box overflowX="auto">
-                <Table variant="simple" color="gray.500">
-                  <Thead>
+              <Box
+                maxH={{ base: 'calc(100vh - 280px)', md: 'calc(100vh - 240px)', xl: 'calc(100vh - 240px)' }}
+                overflowY="auto"
+                overflowX="auto"
+                border="1px solid"
+                borderColor={borderColor}
+                borderRadius="8px"
+              >
+                <Table variant="simple" color="gray.500" minW="1000px">
+                  <Thead position="sticky" top="0" zIndex="1" bg={bgColor}>
                     <Tr>
                       <Th
                         borderColor={borderColor}
-                        color="gray.400"
+                        color="black"
                         fontSize="xs"
                         fontWeight="700"
                         textTransform="uppercase"
+                        bg={bgColor}
                       >
                         PROJECT TITLE
                       </Th>
                       <Th
                         borderColor={borderColor}
-                        color="gray.400"
+                        color="black"
                         fontSize="xs"
                         fontWeight="700"
                         textTransform="uppercase"
+                        bg={bgColor}
                       >
                         FIRST NAME
                       </Th>
                       <Th
                         borderColor={borderColor}
-                        color="gray.400"
+                        color="black"
                         fontSize="xs"
                         fontWeight="700"
                         textTransform="uppercase"
+                        bg={bgColor}
                       >
                         LAST NAME
                       </Th>
                       <Th
                         borderColor={borderColor}
-                        color="gray.400"
+                        color="black"
                         fontSize="xs"
                         fontWeight="700"
                         textTransform="uppercase"
+                        bg={bgColor}
                       >
                         EMAIL
                       </Th>
                       <Th
                         borderColor={borderColor}
-                        color="gray.400"
+                        color="black"
                         fontSize="xs"
                         fontWeight="700"
                         textTransform="uppercase"
                         textAlign="center"
+                        bg={bgColor}
                       >
                         PRICING MODEL
                       </Th>
                       <Th
                         borderColor={borderColor}
-                        color="gray.400"
+                        color="black"
                         fontSize="xs"
                         fontWeight="700"
                         textTransform="uppercase"
                         textAlign="center"
+                        bg={bgColor}
                       >
                         STATUS
                       </Th>
                       <Th
                         borderColor={borderColor}
-                        color="gray.400"
+                        color="black"
                         fontSize="xs"
                         fontWeight="700"
                         textTransform="uppercase"
                         textAlign="center"
+                        bg={bgColor}
                       >
                         PROJECT LINK
                       </Th>
                       <Th
                         borderColor={borderColor}
-                        color="gray.400"
+                        color="black"
                         fontSize="xs"
                         fontWeight="700"
                         textTransform="uppercase"
                         textAlign="center"
+                        bg={bgColor}
                       >
                         ACTION
                       </Th>
@@ -295,7 +311,7 @@ export default function ProjectList() {
                     {projects.length === 0 ? (
                       <Tr>
                         <Td colSpan={8} textAlign="center" py="40px">
-                          <Text color="gray.400">No projects found</Text>
+                          <Text color="black">No projects found</Text>
                         </Td>
                       </Tr>
                     ) : (
@@ -358,7 +374,7 @@ export default function ProjectList() {
                                 <Tooltip label={project.project_link}>
                                   <Text
                                     fontSize="xs"
-                                    color="brand.500"
+                                    color="black"
                                     cursor="pointer"
                                     textDecoration="underline"
                                     onClick={() => window.open(project.project_link, '_blank')}
@@ -367,7 +383,7 @@ export default function ProjectList() {
                                   </Text>
                                 </Tooltip>
                               ) : (
-                                <Text color="gray.400">--</Text>
+                                <Text color="black">--</Text>
                               )}
                             </Td>
                             <Td borderColor={borderColor} textAlign="center">
@@ -377,7 +393,7 @@ export default function ProjectList() {
                                   icon={<MdEdit />}
                                   size="sm"
                                   variant="ghost"
-                                  colorScheme="brand"
+                                  color="black"
                                   onClick={() => {
                                     // TODO: Open edit modal
                                     console.log('Edit project:', project.id);
@@ -397,12 +413,12 @@ export default function ProjectList() {
               <Flex
                 justify="space-between"
                 align="center"
-                mt="20px"
-                pt="20px"
+                mt="10px"
+                pt="10px"
                 borderTop="1px solid"
                 borderColor={borderColor}
               >
-                <Text color="gray.400" fontSize="sm">
+                <Text color="black" fontSize="sm">
                   Showing <Text as="span" fontWeight="700" color="brand.500">
                     {projects.length}
                   </Text> of {totalCount}

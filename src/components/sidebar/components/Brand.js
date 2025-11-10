@@ -11,14 +11,14 @@ import logo from "assets/img/logo/logo.png";
 
 export function SidebarBrand() {
   return (
-    <Flex align='center' direction='column'>
+    <Flex  direction='column'>
       <Image 
         src={logo} 
         alt="HaloGig Logo" 
-        h='auto' 
-        w='175px' 
-        maxH='60px'
-        my='32px' 
+        h='30px' 
+        w='180px' 
+        // maxH='60px'
+        // my='32px' 
         objectFit='contain'
       />
       <HSeparator mb='20px' />
