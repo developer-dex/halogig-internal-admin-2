@@ -40,6 +40,7 @@ import {
   clearSaveInvoiceState,
 } from '../../../features/admin/projectBidsSlice';
 import { showSuccess, showError } from '../../../helpers/messageHelper';
+import logo from '../../../assets/img/logo/logo.png';
 
 const currencyFormat = (amount, currency = 'INR') => {
   if (amount === undefined || amount === null || isNaN(amount)) return '0.00';
@@ -350,20 +351,16 @@ export default function InvoiceV2() {
               <Flex justify="space-between" align="flex-start" mb="30px">
                 {/* Logo Section */}
                 <Box>
-                  <Box 
-                    bg="black" 
-                    color="white" 
-                    px="8px" 
-                    py="4px" 
-                    display="inline-block"
-                    fontSize="18px"
-                    fontWeight="bold"
+                  <Image 
+                    src={logo} 
+                    alt="HaloGig Logo" 
+                    h="40px" 
+                    w="auto"
                     mb="8px"
-                  >
-                    TubeLight
-                  </Box>
+                    objectFit="contain"
+                  />
                   <Text fontSize="10px" color="gray.600">
-                    communication is evolution...
+                    Your Technology Partner
                   </Text>
                 </Box>
                 
@@ -381,14 +378,14 @@ export default function InvoiceV2() {
               {/* Company Details Section */}
               <Box mb="25px">
                 <Text fontSize="14px" fontWeight="bold" color="blue.600" mb="8px">
-                  Tubelight Communications Limited
+                  HaloGig Technologies Private Limited
                 </Text>
                 <VStack align="start" spacing="2px" fontSize="11px" color="gray.700">
-                  <Text>2nd & 4th Floor, Tower-II, Jeevan Bharti Corporate Park</Text>
-                  <Text>Sector 126, Noida, Gautam Budh Nagar, Uttar Pradesh</Text>
-                  <Text>201301, India</Text>
-                  <Text>PAN: AABCT9738C</Text>
-                  <Text>GSTIN: 09AABCT9738C1ZU</Text>
+                  <Text>Electronic City, Bangalore</Text>
+                  <Text>Karnataka, India</Text>
+                  <Text>560100</Text>
+                  <Text>PAN: AABCH9738C</Text>
+                  <Text>GSTIN: 29AABCH9738C1ZU</Text>
                   <Text>India</Text>
                 </VStack>
               </Box>
@@ -402,15 +399,14 @@ export default function InvoiceV2() {
                   </Text>
                   <VStack align="start" spacing="2px" fontSize="11px" color="gray.700">
                     <Text fontWeight="bold">
-                      {billing.billing_name || 'Puspa Freelancing World Private Limited'}
+                      {billing.billing_name || 'Client Company Name'}
                     </Text>
-                    <Text>Suite No: 203-204, H-143, BSI Business Park, Sector - 63, Sector 63,</Text>
-                    <Text>Noida, Gautam Buddha Nagar</Text>
-                    <Text>Noida</Text>
-                    <Text>201301 Uttar Pradesh India</Text>
-                    <Text>GSTIN: 09AABCP9738C1ZC</Text>
-                    <Text>PAN: 09AABCP97</Text>
-                    <Text>Place of Supply: Uttar Pradesh (09)</Text>
+                    <Text>{billing.billing_address || 'Client Address Line 1'}</Text>
+                    <Text>{billing.billing_state || 'State'}, {billing.billing_country || 'Country'}</Text>
+                    <Text>{billing.billing_contact_number || 'Contact Number'}</Text>
+                    <Text>{billing.billing_email || 'client@email.com'}</Text>
+                    {billing.gst_number && <Text>GSTIN: {billing.gst_number}</Text>}
+                    <Text>Place of Supply: {billing.billing_state || 'State'}</Text>
                   </VStack>
                 </Box>
 
@@ -530,22 +526,22 @@ export default function InvoiceV2() {
                 <Box mb="20px">
                   <Text fontSize="12px" fontWeight="bold" mb="8px">Notes</Text>
                   <Text fontSize="11px" color="gray.600">
-                    Thank You for your business.
+                    Thank you for choosing HaloGig Technologies as your technology partner.
                   </Text>
                 </Box>
 
                 {/* Bank Details */}
                 <Box mb="20px">
                   <Text fontSize="12px" fontWeight="bold" mb="8px">
-                    Company Name: TUBELIGHT COMMUNICATIONS LIMITED
+                    Company Name: HALOGIG TECHNOLOGIES PRIVATE LIMITED
                   </Text>
                   <Text fontSize="11px" color="gray.600" mb="4px">
-                    Bank Name: DEUTSCHE BANK
+                    Bank Name: HDFC BANK
                   </Text>
                   <HStack spacing="40px" fontSize="11px" color="gray.600">
                     <VStack align="start" spacing="2px">
-                      <Text>Account No: 010612482017</Text>
-                      <Text>RTGS/NEFT/IFSC CODE: DEUTINBBXXX</Text>
+                      <Text>Account No: 1234567890123456</Text>
+                      <Text>RTGS/NEFT/IFSC CODE: HDFC0001234</Text>
                     </VStack>
                   </HStack>
                 </Box>
