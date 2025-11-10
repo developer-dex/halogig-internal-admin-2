@@ -55,7 +55,8 @@
     "eject": "react-scripts eject",
     "predeploy": "npm run build",
     "deploy": "gh-pages -d build",
-    "preinstall": "npx npm-force-resolutions"
+    "preinstall": "npx npm-force-resolutions",
+    "prod": "npm run build && pm2 serve build 3002 --spa --name new-admin"
   },
   "resolutions": {
     "react-error-overlay": "6.0.9"
