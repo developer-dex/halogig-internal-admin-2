@@ -87,7 +87,7 @@ Community! 🎨
 
 ### Reporting Issues
 
-We use GitHub Issues as the official bug tracker for the Horizon UI. Here are
+We use GitHub Issues as the official bug tracker for the Halogig Here are
 some advices for our users that want to report an issue:
 
 1. Make sure that you are using the latest version of the Horizon UI Dashbaord.

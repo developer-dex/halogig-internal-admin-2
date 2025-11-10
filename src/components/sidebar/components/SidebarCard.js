@@ -21,7 +21,7 @@ export default function SidebarDocs() {
       bg={bgColor}
       borderRadius='30px'
       position='relative'>
-      <Flex
+      {/* <Flex
         border='5px solid'
         borderColor={borderColor}
         bg='linear-gradient(135deg, #868CFF 0%, #4318FF 100%)'
@@ -79,7 +79,7 @@ export default function SidebarDocs() {
           mx='auto'>
           Upgrade to PRO
         </Button>
-      </Link>
+      </Link> */}
     </Flex>
   );
 }

@@ -1,8 +1,9 @@
 /* eslint-disable */
-import React from "react";
+import React, { useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 // chakra imports
-import { Box, Flex, HStack, Text, useColorModeValue } from "@chakra-ui/react";
+import { Box, Flex, HStack, Text, useColorModeValue, Icon, Collapse } from "@chakra-ui/react";
+import { ChevronDownIcon, ChevronRightIcon } from "@chakra-ui/icons";
 
 export function SidebarLinks(props) {
   //   Chakra color mode
@@ -15,36 +16,87 @@ export function SidebarLinks(props) {
   let activeIcon = useColorModeValue("brand.500", "white");
   let textColor = useColorModeValue("secondaryGray.500", "white");
   let brandColor = useColorModeValue("brand.500", "brand.400");
+  let categoryColor = useColorModeValue("gray.600", "gray.300");
+  let categoryHoverBg = useColorModeValue("gray.50", "whiteAlpha.100");
 
   const { routes } = props;
+  
+  // State to manage which categories are expanded (initialize all as expanded)
+  const [expandedCategories, setExpandedCategories] = useState(() => {
+    const initialState = {};
+    routes.forEach(route => {
+      if (route.category) {
+        initialState[route.category] = true; // Default to expanded
+      }
+    });
+    return initialState;
+  });
 
   // verifies if routeName is the one active (in browser input)
   const activeRoute = (routeName) => {
     return location.pathname.includes(routeName);
   };
 
+  // Toggle category expansion
+  const toggleCategory = (categoryName) => {
+    setExpandedCategories(prev => ({
+      ...prev,
+      [categoryName]: !prev[categoryName]
+    }));
+  };
+
+  // Check if any route in category is active
+  const isCategoryActive = (items) => {
+    return items?.some(item => activeRoute(item.path?.toLowerCase()));
+  };
+
   // this function creates the links from the secondary accordions (for example auth -> sign-in -> default)
   const createLinks = (routes) => {
     return routes.map((route, index) => {
       if (route.category) {
+        const isExpanded = expandedCategories[route.category] === true;
+        const categoryActive = isCategoryActive(route.items);
+        
         return (
-          <>
-            <Text
-              fontSize={"md"}
-              color={activeColor}
-              fontWeight='bold'
-              mx='auto'
-              ps={{
-                sm: "10px",
-                xl: "16px",
-              }}
-              pt='18px'
-              pb='12px'
-              key={index}>
-              {route.name}
-            </Text>
-            {createLinks(route.items)}
-          </>
+          <Box key={index} mb="4px">
+            {/* Category Header with Dropdown */}
+            <Flex
+              align="center"
+              justify="space-between"
+              px="16px"
+              py="12px"
+              mt="18px"
+              mb="8px"
+              cursor="pointer"
+              borderRadius="8px"
+              _hover={{ bg: categoryHoverBg }}
+              onClick={() => toggleCategory(route.category)}
+            >
+              <Text
+                fontSize="sm"
+                color={categoryActive ? activeColor : categoryColor}
+                fontWeight={categoryActive ? "bold" : "600"}
+                textTransform="uppercase"
+                letterSpacing="0.5px"
+              >
+                {route.category}
+              </Text>
+              <Icon
+                as={isExpanded ? ChevronDownIcon : ChevronRightIcon}
+                color={categoryColor}
+                w="16px"
+                h="16px"
+                transition="all 0.2s"
+              />
+            </Flex>
+            
+            {/* Category Items with Collapse Animation */}
+            <Collapse in={isExpanded} animateOpacity>
+              <Box pl="8px">
+                {createLinks(route.items)}
+              </Box>
+            </Collapse>
+          </Box>
         );
       } else if (
         route.layout === "/admin" ||

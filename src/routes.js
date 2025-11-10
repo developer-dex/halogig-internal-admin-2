@@ -47,26 +47,26 @@ const SiteAnalyticsPage = () => <SiteAnalytics />;
 const LogManagerPage = () => <div>Log Manager Page - Coming Soon</div>;
 
 const routes = [
-  {
-    name: 'Main Dashboard',
-    layout: '/admin',
-    path: '/default',
-    icon: <Icon as={MdHome} width="20px" height="20px" color="inherit" />,
-    component: <MainDashboard />,
-  },
-  {
-    category: 'Main',
-    layout: '/admin',
-    items: [
-      {
-        name: 'Access Dashboard',
-        layout: '/admin',
-        path: '/dashboard',
-        icon: <Icon as={MdDashboard} width="20px" height="20px" color="inherit" />,
-        component: <MainDashboard />,
-      },
-    ],
-  },
+  // {
+  //   name: 'Main Dashboard',
+  //   layout: '/admin',
+  //   path: '/default',
+  //   icon: <Icon as={MdHome} width="20px" height="20px" color="inherit" />,
+  //   component: <MainDashboard />,
+  // },
+  // {
+  //   category: 'Main',
+  //   layout: '/admin',
+  //   items: [
+  //     {
+  //       name: 'Access Dashboard',
+  //       layout: '/admin',
+  //       path: '/dashboard',
+  //       icon: <Icon as={MdDashboard} width="20px" height="20px" color="inherit" />,
+  //       component: <MainDashboard />,
+  //     },
+  //   ],
+  // },
   {
     category: 'Management',
     layout: '/admin',
@@ -140,62 +140,6 @@ const routes = [
         component: <SiteAnalyticsPage />,
       },
     ],
-  },
-  {
-    category: 'System',
-    layout: '/admin',
-    items: [
-      {
-        name: 'Log Manager',
-        layout: '/admin',
-        path: '/logs',
-        icon: <Icon as={MdHistory} width="20px" height="20px" color="inherit" />,
-        component: <LogManagerPage />,
-      },
-    ],
-  },
-  {
-    name: 'NFT Marketplace',
-    layout: '/admin',
-    path: '/nft-marketplace',
-    icon: (
-      <Icon
-        as={MdOutlineShoppingCart}
-        width="20px"
-        height="20px"
-        color="inherit"
-      />
-    ),
-    component: <NFTMarketplace />,
-    secondary: true,
-  },
-  {
-    name: 'Data Tables',
-    layout: '/admin',
-    icon: <Icon as={MdBarChart} width="20px" height="20px" color="inherit" />,
-    path: '/data-tables',
-    component: <DataTables />,
-  },
-  {
-    name: 'Profile',
-    layout: '/admin',
-    path: '/profile',
-    icon: <Icon as={MdPerson} width="20px" height="20px" color="inherit" />,
-    component: <Profile />,
-  },
-  {
-    name: 'Sign In',
-    layout: '/auth',
-    path: '/sign-in',
-    icon: <Icon as={MdLock} width="20px" height="20px" color="inherit" />,
-    component: <SignInCentered />,
-  },
-  {
-    name: 'RTL Admin',
-    layout: '/rtl',
-    path: '/rtl-default',
-    icon: <Icon as={MdHome} width="20px" height="20px" color="inherit" />,
-    component: <RTL />,
   },
 ];
 

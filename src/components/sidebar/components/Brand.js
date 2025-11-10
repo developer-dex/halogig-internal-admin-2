@@ -1,19 +1,26 @@
 import React from "react";
 
 // Chakra imports
-import { Flex, useColorModeValue } from "@chakra-ui/react";
+import { Flex, Image } from "@chakra-ui/react";
 
 // Custom components
-import { HorizonLogo } from "components/icons/Icons";
 import { HSeparator } from "components/separator/Separator";
 
-export function SidebarBrand() {
-  //   Chakra color mode
-  let logoColor = useColorModeValue("navy.700", "white");
+// Assets
+import logo from "assets/img/logo/logo.png";
 
+export function SidebarBrand() {
   return (
     <Flex align='center' direction='column'>
-      <HorizonLogo h='26px' w='175px' my='32px' color={logoColor} />
+      <Image 
+        src={logo} 
+        alt="HaloGig Logo" 
+        h='auto' 
+        w='175px' 
+        maxH='60px'
+        my='32px' 
+        objectFit='contain'
+      />
       <HSeparator mb='20px' />
     </Flex>
   );
