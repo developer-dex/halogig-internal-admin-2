@@ -32,7 +32,7 @@ function AuthRoute({ children }) {
   const isAdminLoggedIn = localStorage.getItem('isAdminLogIn') === 'true';
 
   if (isAdminLoggedIn) {
-    return <Navigate to="/admin/default" replace />;
+    return <Navigate to="/admin/clients" replace />;
   }
 
   return children;
@@ -74,7 +74,7 @@ export default function Main() {
             path="/" 
             element={
               localStorage.getItem('isAdminLogIn') === 'true' 
-                ? <Navigate to="/admin/default" replace /> 
+                ? <Navigate to="/admin/clients" replace /> 
                 : <Navigate to="/auth/sign-in" replace />
             } 
           />

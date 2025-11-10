@@ -50,7 +50,7 @@ function SignIn() {
     // Check if user is already logged in
     const isLoggedIn = localStorage.getItem('isAdminLogIn');
     if (isLoggedIn === 'true') {
-      navigate('/admin/default');
+      navigate('/admin/clients');
     }
   }, [navigate]);
 
@@ -61,8 +61,8 @@ function SignIn() {
       localStorage.setItem('adminData', JSON.stringify(responseData.admin));
       localStorage.setItem('isAdminLogIn', 'true');
       
-      // Navigate to dashboard
-      navigate('/admin/default');
+      // Navigate to clients page
+      navigate('/admin/clients');
     }
   }, [isSuccess, responseData, navigate]);
 

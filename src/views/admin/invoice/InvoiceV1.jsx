@@ -51,7 +51,7 @@ const currencyFormat = (amount, currency = 'INR') => {
   }
 };
 
-export default function Invoice() {
+export default function InvoiceV1() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const invoiceRef = useRef(null);
