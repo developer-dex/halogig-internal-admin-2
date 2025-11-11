@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import {
   Box,
   Button,
@@ -28,7 +28,7 @@ import logo from 'assets/img/logo/logo.png';
 function SignIn() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-
+  
   const { isLoading, isSuccess, isError, responseData } = useSelector(
     (state) => state.loginDataReducer
   );
@@ -40,17 +40,17 @@ function SignIn() {
   const [errors, setErrors] = useState({});
   const [show, setShow] = useState(false);
 
-  const textColor = useColorModeValue('navy.700', 'white');
-  const textColorSecondary = 'black.400';
-  const textColorDetails = useColorModeValue('black.700', 'black.600');
-  const textColorBrand = useColorModeValue('brand.500', 'white');
-  const brandStars = useColorModeValue('red.500', 'red.500');
+  const textColor = useColorModeValue('black', 'white');
+  const textColorSecondary = 'gray.400';
+  const textColorDetails = useColorModeValue('black', 'secondaryGray.600');
+  const textColorBrand = useColorModeValue('black', 'white');
+  const brandStars = useColorModeValue('black', 'brand.400');
 
   useEffect(() => {
     // Check if user is already logged in
     const isLoggedIn = localStorage.getItem('isAdminLogIn');
     if (isLoggedIn === 'true') {
-      navigate('/admin/clients');
+      navigate('/admin/default');
     }
   }, [navigate]);
 
@@ -60,9 +60,9 @@ function SignIn() {
       localStorage.setItem('adminToken', responseData.token);
       localStorage.setItem('adminData', JSON.stringify(responseData.admin));
       localStorage.setItem('isAdminLogIn', 'true');
-
-      // Navigate to clients page
-      navigate('/admin/clients');
+      
+      // Navigate to dashboard
+      navigate('/admin/default');
     }
   }, [isSuccess, responseData, navigate]);
 
@@ -74,7 +74,7 @@ function SignIn() {
       ...prev,
       [name]: value
     }));
-
+    
     // Clear error when user starts typing
     if (errors[name]) {
       setErrors(prev => ({
@@ -86,26 +86,26 @@ function SignIn() {
 
   const validateForm = () => {
     const newErrors = {};
-
+    
     if (!formData.email) {
       newErrors.email = 'Email is required';
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
       newErrors.email = 'Please enter a valid email';
     }
-
+    
     if (!formData.password) {
       newErrors.password = 'Password is required';
     } else if (formData.password.length < 6) {
       newErrors.password = 'Password must be at least 6 characters';
     }
-
+    
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+    
     if (!validateForm()) {
       return;
     }
@@ -121,41 +121,43 @@ function SignIn() {
   };
 
   return (
-    <DefaultAuth illustrationBackground={'/img/auth/auth.png'} image={'/img/auth/auth.png'}>
+    <>
       <Flex
-        maxW={{ base: '100%', md: 'max-content' }}
+        minH='100vh'
         w='100%'
-        mx='auto'
-        h='100vh'
         alignItems='center'
         justifyContent='center'
         px={{ base: '25px', md: '0px' }}
         flexDirection='column'>
-        <Box style={{ border: '1px solid transparent', 
-        padding: '20px', 
-        borderRadius: '15px', 
-        boxShadow: '0px 0px 30px 0px #00000026',
-      }}>
+        <Box
+          w={{ base: '100%', md: 'max-content' }}
+          maxW='100%'
+          mx='auto'
+          style={{ 
+            boxShadow: '0 12px 40px rgba(0, 0, 0, 0.12)',
+            padding: '20px',
+            borderRadius: '15px'
+          }}>
           <Box textAlign='center' mb='36px'>
-            <Image
-              src={logo}
-              alt="HaloGig Logo"
-              h='auto'
-              w='180px'
+            <Image 
+              src={logo} 
+              alt="HaloGig Logo" 
+              h='auto' 
+              w='140px' 
               maxH='30px'
               mx='auto'
               mb='24px'
               objectFit='contain'
             />
-            <Heading color={textColor} fontSize='32px' mb='10px'>
+            <Heading color={textColor} fontSize='24px' mb='10px'>
               Admin Console
             </Heading>
             {/* <Text
-            color={textColorSecondary}
-            fontWeight='400'
-            fontSize='md'>
-            Enter your email and password to sign in!
-          </Text> */}
+              color={textColorSecondary}
+              fontWeight='400'
+              fontSize='md'>
+              Enter your email and password to sign in!
+            </Text> */}
           </Box>
           <Flex
             zIndex='2'
@@ -165,7 +167,7 @@ function SignIn() {
             background='transparent'
             borderRadius='15px'
             mx='auto'>
-
+            
             {isError && (
               <Alert status='error' mb='24px' borderRadius='15px'>
                 <AlertIcon />
@@ -179,7 +181,7 @@ function SignIn() {
                   display='flex'
                   ms='4px'
                   fontSize='sm'
-                  fontWeight='700'
+                  fontWeight='500'
                   color={textColor}
                   mb='8px'>
                   Email<Text color={brandStars}>*</Text>
@@ -205,12 +207,12 @@ function SignIn() {
                   </Text>
                 )}
               </FormControl>
-
+              
               <FormControl isInvalid={!!errors.password} mb='24px'>
                 <FormLabel
                   ms='4px'
                   fontSize='sm'
-                  fontWeight='700'
+                  fontWeight='500'
                   color={textColor}
                   display='flex'>
                   Password<Text color={brandStars}>*</Text>
@@ -232,7 +234,7 @@ function SignIn() {
                     <Icon
                       color={textColorSecondary}
                       _hover={{ cursor: 'pointer' }}
-                      as={show ? RiEyeCloseLine : MdOutlineRemoveRedEye}
+                      as={show ? MdOutlineRemoveRedEye: RiEyeCloseLine }
                       onClick={handleClick}
                     />
                   </InputRightElement>
@@ -243,14 +245,14 @@ function SignIn() {
                   </Text>
                 )}
               </FormControl>
-
               <Button
                 fontSize='sm'
                 // variant='brand'
                 fontWeight='500'
-                w='100%'
-                h='50'
-                mb='24px'
+                w='30%'
+                // w="fit-content"
+                h='40px'
+                mb='10px'
                 type='submit'
                 isLoading={isLoading}
                 style={{ background: 'linear-gradient(#c3362a 0, #92150d 74%)', color: 'white' }}
@@ -259,25 +261,22 @@ function SignIn() {
                 Sign In
               </Button>
             </form>
-
-            <Flex
-              flexDirection='column'
-              justifyContent='center'
-              alignItems='center'
-              maxW='100%'
-              mt='0px'>
-              <Text color={textColorDetails} fontWeight='400' fontSize='14px'>
-                © 2025 Halogig Admin Panel. All rights reserved.
-              </Text>
-            </Flex>
           </Flex>
         </Box>
-
+        
+        <Flex
+          flexDirection='column'
+          justifyContent='center'
+          alignItems='center'
+          maxW='100%'
+          mt='30px'>
+          <Text color={textColorDetails} fontWeight='400' fontSize='14px'>
+            © 2024 HaloGig Admin Panel. All rights reserved.
+          </Text>
+        </Flex>
       </Flex>
-    </DefaultAuth>
+    </>
   );
 }
 
 export default SignIn;
-
-

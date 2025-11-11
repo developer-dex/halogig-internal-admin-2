@@ -81,7 +81,7 @@ export function SidebarLinks(props) {
                   </Box>
                 )}
                 <Text
-                  fontSize="14px"
+                  fontSize="13px"
                   color={categoryActive ? activeColor : categoryColor}
                   fontWeight={categoryActive ? "bold" : "600"}
                   textTransform="uppercase"
