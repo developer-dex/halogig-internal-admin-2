@@ -55,6 +55,19 @@ const routes = [
     component: <SignInCentered />,
     hidden: true, // Hide from sidebar navigation
   },
+  {
+    category: 'Registration',
+    layout: '/admin',
+    items: [
+      {
+        name: 'Freelancers',
+        layout: '/admin',
+        path: '/freelancers',
+        icon: <Icon as={MdWork} width="20px" height="20px" color="inherit" />,
+        component: <FreelancerList />,
+      },
+    ],
+  },
   // {
   //   name: 'Main Dashboard',
   //   layout: '/admin',
@@ -80,9 +93,16 @@ const routes = [
     layout: '/admin',
     items: [
       {
-        name: 'Clients',
+        name: 'Online Clients',
         layout: '/admin',
-        path: '/clients',
+        path: '/online-clients',
+        icon: <Icon as={MdPeople} width="20px" height="20px" color="inherit" />,
+        component: <ClientList />,
+      },
+      {
+        name: 'Offline Clients',
+        layout: '/admin',
+        path: '/offline-clients',
         icon: <Icon as={MdPeople} width="20px" height="20px" color="inherit" />,
         component: <ClientList />,
       },
@@ -94,9 +114,16 @@ const routes = [
         component: <FreelancerList />,
       },
       {
-        name: 'Projects',
+        name: 'Online Projects',
         layout: '/admin',
-        path: '/projects',
+        path: '/online-projects',
+        icon: <Icon as={MdFolder} width="20px" height="20px" color="inherit" />,
+        component: <ProjectList />,
+      },
+      {
+        name: 'Offline Projects',
+        layout: '/admin',
+        path: '/offline-projects',
         icon: <Icon as={MdFolder} width="20px" height="20px" color="inherit" />,
         component: <ProjectList />,
       },
@@ -106,6 +133,39 @@ const routes = [
         path: '/project-bids',
         icon: <Icon as={MdGavel} width="20px" height="20px" color="inherit" />,
         component: <ProjectBidsPage />,
+      },
+    ],
+  },
+  {
+    category: 'Proposal',
+    layout: '/admin',
+    items: [
+      {
+        name: 'Project Bids',
+        layout: '/admin',
+        path: '/project-bids',
+        icon: <Icon as={MdGavel} width="20px" height="20px" color="inherit" />,
+        component: <ProjectBidsPage />,
+      },
+    ],
+  },
+  {
+    category: 'Marketing',
+    layout: '/admin',
+    items: [
+      {
+        name: 'Website Data',
+        layout: '/admin',
+        path: '/website-data',
+        icon: <Icon as={MdWeb} width="20px" height="20px" color="inherit" />,
+        component: <WebsiteDataPage />,
+      },
+      {
+        name: 'Site Analytics',
+        layout: '/admin',
+        path: '/site-analytics',
+        icon: <Icon as={MdAnalytics} width="20px" height="20px" color="inherit" />,
+        component: <SiteAnalyticsPage />,
       },
     ],
   },
@@ -129,26 +189,7 @@ const routes = [
       },
     ],
   },
-  {
-    category: 'Data & Analytics',
-    layout: '/admin',
-    items: [
-      {
-        name: 'Website Data',
-        layout: '/admin',
-        path: '/website-data',
-        icon: <Icon as={MdWeb} width="20px" height="20px" color="inherit" />,
-        component: <WebsiteDataPage />,
-      },
-      {
-        name: 'Site Analytics',
-        layout: '/admin',
-        path: '/site-analytics',
-        icon: <Icon as={MdAnalytics} width="20px" height="20px" color="inherit" />,
-        component: <SiteAnalyticsPage />,
-      },
-    ],
-  },
+
 ];
 
 export default routes;
