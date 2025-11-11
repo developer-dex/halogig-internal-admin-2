@@ -47,12 +47,13 @@ const SiteAnalyticsPage = () => <SiteAnalytics />;
 const LogManagerPage = () => <div>Log Manager Page - Coming Soon</div>;
 
 const routes = [
-  // Auth Routes
+  // Auth Routes (hidden from sidebar)
   {
-    name: 'Dashboard',
-    layout: '/admin',
+    name: 'Sign In',
+    layout: '/auth',
     path: '/sign-in',
-    // component: <SignInCentered />,
+    component: <SignInCentered />,
+    hidden: true, // Hide from sidebar navigation
   },
   // {
   //   name: 'Main Dashboard',

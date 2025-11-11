@@ -96,9 +96,10 @@ export function SidebarLinks(props) {
           </Box>
         );
       } else if (
-        route.layout === "/admin" ||
+        (route.layout === "/admin" ||
         route.layout === "/auth" ||
-        route.layout === "/rtl"
+        route.layout === "/rtl") &&
+        !route.hidden
       ) {
         return (
           <NavLink key={index} to={route.layout + route.path}>
