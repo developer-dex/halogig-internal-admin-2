@@ -53,14 +53,16 @@ export function SidebarLinks(props) {
       if (route.category) {
         const isExpanded = expandedCategories[route.category] === true;
         const categoryActive = isCategoryActive(route.items);
+        // Get icon from first item in category that has an icon
+        const categoryIcon = route.items?.find(item => item.icon)?.icon;
         
         return (
-          <Box key={index} mb="4px">
+          <Box key={index}>
             {/* Category Header with Dropdown */}
             <Flex
               align="center"
               justify="space-between"
-              // px="16px"
+              px="16px"
               py="2px"
               mt="8px"
               mb="8px"
@@ -69,15 +71,25 @@ export function SidebarLinks(props) {
               _hover={{ bg: categoryHoverBg }}
               onClick={() => toggleCategory(route.category)}
             >
-              <Text
-                fontSize="sm"
-                color={categoryActive ? activeColor : categoryColor}
-                fontWeight={categoryActive ? "bold" : "600"}
-                textTransform="uppercase"
-                letterSpacing="0.5px"
-              >
-                {route.category}
-              </Text>
+              <HStack spacing="8px">
+                {categoryIcon && (
+                  <Box
+                    color={categoryActive ? activeIcon : textColor}
+                    // me="2px"
+                  >
+                    {categoryIcon}
+                  </Box>
+                )}
+                <Text
+                  fontSize="14px"
+                  color={categoryActive ? activeColor : categoryColor}
+                  fontWeight={categoryActive ? "bold" : "600"}
+                  textTransform="uppercase"
+                  letterSpacing="0.5px"
+                >
+                  {route.category}
+                </Text>
+              </HStack>
               <Icon
                 as={isExpanded ? ChevronDownIcon : ChevronRightIcon}
                 color={categoryColor}
@@ -89,7 +101,7 @@ export function SidebarLinks(props) {
             
             {/* Category Items with Collapse Animation */}
             <Collapse in={isExpanded} animateOpacity>
-              <Box pl="8px">
+              <Box>
                 {createLinks(route.items)}
               </Box>
             </Collapse>
@@ -109,18 +121,20 @@ export function SidebarLinks(props) {
                   spacing={
                     activeRoute(route.path.toLowerCase()) ? "22px" : "26px"
                   }
-                  py='5px'
-                  ps='10px'>
+                  ps='16px'
+                  // py='5px'
+                  // ps='10px'>
+                  >
                   <Flex w='100%' alignItems='center' justifyContent='center'>
-                    <Box
+                    {/* <Box
                       color={
                         activeRoute(route.path.toLowerCase())
                           ? activeIcon
                           : textColor
                       }
-                      me='18px'>
+                      me='12px'>
                       {route.icon}
-                    </Box>
+                    </Box> */}
                     <Text
                       me='auto'
                       color={
@@ -128,6 +142,7 @@ export function SidebarLinks(props) {
                           ? activeColor
                           : textColor
                       }
+                      fontSize="14px"
                       fontWeight={
                         activeRoute(route.path.toLowerCase())
                           ? "bold"

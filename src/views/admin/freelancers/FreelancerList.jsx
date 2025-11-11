@@ -102,7 +102,7 @@ function FreelancerList() {
   };
 
   // Chakra color mode values (match ClientList look)
-  const textColor = useColorModeValue('secondaryGray.900', 'white');
+  const textColor = useColorModeValue('black', 'white');
   const borderColor = useColorModeValue('gray.200', 'whiteAlpha.100');
   const bgColor = useColorModeValue('white', 'navy.800');
   const hoverBg = useColorModeValue('gray.50', 'whiteAlpha.50');
@@ -111,30 +111,30 @@ function FreelancerList() {
     const statusLower = status?.toLowerCase();
     switch (statusLower) {
       case 'pending':
-        return { bg: 'orange.100', color: 'orange.700', border: 'orange.300' };
+        return { bg: 'transparent', color: 'black', border: 'black.600' };
       case 'approved':
       case 'otpverified':
         return { bg: 'transparent', color: 'black', border: 'black.600' };
       case 'rejected':
-        return { bg: 'red.100', color: 'red.700', border: 'red.300' };
+        return { bg: 'transparent', color: 'black', border: 'black.600' };
       case 'under review':
       case 'incomplete':
       case 'approval':
       case 'completed':
       case 'complete':
-        return { bg: 'blue.100', color: 'blue.700', border: 'blue.300' };
+        return { bg: 'transparent', color: 'black', border: 'black.600' };
       default:
-        return { bg: 'gray.100', color: 'gray.700', border: 'gray.300' };
+        return { bg: 'transparent', color: 'black', border: 'black.600' };
     }
   };
 
   const totalPages = Math.ceil(totalCount / pageLimit) || 1;
 
   return (
-    <Box pt={{ base: '130px', md: '80px', xl: '80px' }}>
-      <Card>
-        <Box p="12px" mb="14px">
-          <Text color={textColor} fontSize="2xl" fontWeight="700" mb="20px">
+    <Box>
+      <Card bg={bgColor}>
+        <Box p="12px">
+          <Text color={textColor} fontSize="2xl" fontWeight="700" mb="10px">
             Freelancers
           </Text>
 
@@ -145,7 +145,7 @@ function FreelancerList() {
           ) : (
             <>
               <Box
-                maxH={{ base: 'calc(100vh - 280px)', md: 'calc(100vh - 240px)', xl: 'calc(100vh - 240px)' }}
+                maxH={{ base: 'calc(100vh - 200px)', md: 'calc(100vh - 130px)', xl: 'calc(100vh - 130px)' }}
                 overflowY="auto"
                 overflowX="auto"
                 border="1px solid"
@@ -231,7 +231,7 @@ function FreelancerList() {
               </Box>
 
               {/* Pagination */}
-              <Flex justify="space-between" align="center" mt="10px" pt="10px" borderTop="1px solid" borderColor={borderColor}>
+              <Flex justify="space-between" align="center"  pt="8px">
                 <Text color="black" fontSize="sm">
                   Showing <Text as="span" fontWeight="700" color="brand.500">{rows.length}</Text> of {totalCount}
                 </Text>

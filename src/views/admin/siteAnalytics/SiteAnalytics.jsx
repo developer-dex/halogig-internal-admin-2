@@ -63,7 +63,7 @@ export default function SiteAnalytics() {
   const cardBg = useColorModeValue('white', 'navy.800');
 
   const fetchData = async () => {
-    setIsLoading(true);
+    setIsLoading(true); 
     try {
       if (selectedIpAddress) {
         const response = await dispatch(
@@ -188,10 +188,10 @@ export default function SiteAnalytics() {
   const totalPages = Math.ceil(totalCount / pageLimit) || 1;
 
   return (
-    <Box pt={{ base: '130px', md: '80px', xl: '80px' }}>
+    <Box>
       {/* Header */}
-      <Card mb="20px" bg={cardBg}>
-        <Box p="12px">
+      <Box mb="4px" >
+        <Box  ps="12px" pe="12px">
           <Flex justify="space-between" align="center" flexWrap="wrap" gap={4}>
             <HStack spacing={4}>
               {selectedIpAddress && (
@@ -204,7 +204,7 @@ export default function SiteAnalytics() {
                   Back to List
                 </Button>
               )}
-              <Text color={textColor} fontSize="2xl" fontWeight="700">
+              <Text color={textColor} fontSize="xl" fontWeight="700">
                 {selectedIpAddress ? `Analytics for IP: ${selectedIpAddress}` : 'Site Analytics'}
               </Text>
             </HStack>
@@ -219,21 +219,22 @@ export default function SiteAnalytics() {
               </Button>
               <Button
                 leftIcon={<MdGetApp />}
-                colorScheme="brand"
+                // colorScheme="brand"
+                variant="outline"
                 onClick={handleExportClick}
                 isLoading={isExporting}
                 loadingText="Exporting..."
               >
-                Export to Excel
+                Export
               </Button>
             </HStack>
           </Flex>
         </Box>
-      </Card>
+      </Box>
 
       {/* Data Table */}
       <Card bg={cardBg}>
-        <Box p="12px" mb="14px">
+        <Box p="12px">
           {isLoading && pageAnalytics.length === 0 ? (
             <Flex justify="center" align="center" minH="400px">
               <Spinner size="xl" color="brand.500" />
@@ -247,7 +248,7 @@ export default function SiteAnalytics() {
           ) : (
             <>
               <Box
-                maxH={{ base: 'calc(100vh - 280px)', md: 'calc(100vh - 240px)', xl: 'calc(100vh - 240px)' }}
+                maxH={{ base: 'calc(100vh - 200px)', md: 'calc(100vh - 130px)', xl: 'calc(100vh - 130px)' }}
                 overflowY="auto"
                 overflowX="auto"
                 border="1px solid"
@@ -354,7 +355,7 @@ export default function SiteAnalytics() {
               </Box>
 
               {/* Pagination */}
-              <Flex justify="space-between" align="center" mt="10px" pt="10px" borderTop="1px solid" borderColor={borderColor}>
+              <Flex justify="space-between" align="center"  pt="8px" borderTop="1px solid" borderColor={borderColor}>
                 <Text color="black" fontSize="sm">
                   Showing <Text as="span" fontWeight="700" color="brand.500">{pageAnalytics.length}</Text> of {totalCount}
                 </Text>

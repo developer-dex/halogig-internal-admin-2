@@ -110,7 +110,7 @@ export default function WebsiteData() {
     (state) => state.websiteData
   );
 
-  const textColor = useColorModeValue('secondaryGray.900', 'white');
+  const textColor = useColorModeValue('black', 'white');
   const borderColor = useColorModeValue('gray.200', 'whiteAlpha.100');
   const bgColor = useColorModeValue('white', 'navy.800');
   const hoverBg = useColorModeValue('gray.50', 'whiteAlpha.50');
@@ -562,88 +562,88 @@ export default function WebsiteData() {
   const totalPages = Math.ceil(totalCount / pageLimit) || 1;
 
   return (
-    <Box pt={{ base: '130px', md: '80px', xl: '80px' }}>
+    <Box>
       {/* Actions Section */}
-      <Card mb="20px" bg={cardBg}>
-        <Box p="12px">
-          <VStack align="stretch" spacing={4}>
+      <Box mb="6px">
+        <Box p="8px" ps="12px" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}> 
+          <Flex justify="space-between" align="center" mb="8px" flexWrap="wrap" gap={2}>
             <Box>
-              <Text color={textColor} fontSize="2xl" fontWeight="700" mb="8px">
+              <Text color={textColor} fontSize="xl" fontWeight="700" mb="2px">
                 Website Data Management
               </Text>
-              <Text color="black" fontSize="sm">
+              {/* <Text color="black" fontSize="s">
                 Manage your website data with powerful tools for upload, download, and content management
-              </Text>
+              </Text> */}
             </Box>
+          </Flex>
 
-            <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4}>
-              <VStack align="stretch" spacing={2}>
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept=".xlsx,.xls"
-                  onChange={handleFileSelect}
-                  style={{ display: 'none' }}
-                />
-                <Button
-                  leftIcon={<MdCloudUpload />}
-                  colorScheme="brand"
-                  onClick={() => fileInputRef.current?.click()}
-                  isLoading={uploadLoading}
-                  loadingText="Uploading..."
-                >
-                  Upload Excel
-                </Button>
-                <Button
-                  leftIcon={<MdGetApp />}
-                  colorScheme="green"
-                  onClick={handleDownloadExcel}
-                  isDisabled={isLoading || totalCount === 0}
-                >
-                  Download Excel
-                </Button>
-              </VStack>
-
-              <VStack align="stretch" spacing={2}>
-                <Button
-                  leftIcon={<MdAdd />}
-                  variant="outline"
-                  colorScheme="brand"
-                  onClick={createModal.onOpen}
-                  isDisabled={isLoading}
-                >
-                  Add New
-                </Button>
-                <HStack spacing={2}>
-                  <Button
-                    leftIcon={<MdRefresh />}
-                    variant="outline"
-                    onClick={fetchWebsiteData}
-                    isDisabled={isLoading}
-                  >
-                    Refresh
-                  </Button>
-                  <Button
-                    leftIcon={<MdDelete />}
-                    variant="outline"
-                    colorScheme="red"
-                    onClick={deleteAllModal.onOpen}
-                    isDisabled={isLoading || totalCount === 0}
-                  >
-                    Delete All
-                  </Button>
-                </HStack>
-              </VStack>
-            </SimpleGrid>
-          </VStack>
+          <Flex gap={2} flexWrap="wrap" align="center">
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".xlsx,.xls"
+              onChange={handleFileSelect}
+              style={{ display: 'none' }}
+            />
+            <Button
+              leftIcon={<MdCloudUpload />}
+              // colorScheme="brand"
+              variant="outline"
+              size="sm"
+              onClick={() => fileInputRef.current?.click()}
+              isLoading={uploadLoading}
+              loadingText="Uploading..."
+            >
+              Upload Excel
+            </Button>
+            <Button
+              leftIcon={<MdGetApp />}
+              variant="outline"
+              size="sm"
+              onClick={handleDownloadExcel}
+              isDisabled={isLoading || totalCount === 0}
+            >
+              Download Excel
+            </Button>
+            <Button
+              leftIcon={<MdAdd />}
+              variant="outline"
+              // colorScheme="brand"
+              size="sm"
+              onClick={createModal.onOpen}
+              isDisabled={isLoading}
+            >
+              Add New
+            </Button>
+            <Button
+              leftIcon={<MdRefresh />}
+              variant="outline"
+              size="sm"
+              onClick={fetchWebsiteData}
+              isDisabled={isLoading}
+            >
+              Refresh
+            </Button>
+            <Button
+              leftIcon={<MdDelete />}
+              variant="outline"
+              // colorScheme="red"
+              size="sm"
+              onClick={deleteAllModal.onOpen}
+              isDisabled={isLoading || totalCount === 0}
+            >
+              Delete All
+            </Button>
+          </Flex>
         </Box>
-      </Card>
+      </Box>
 
       {/* Upload Response Display */}
       {uploadResponse && (
         <Alert
           status={uploadResponse.success ? 'success' : 'error'}
-          mb="20px"
+          mb="10px"
+          size="sm"
           onClose={() => dispatch(clearUploadResponse())}
         >
           <AlertIcon />
@@ -678,9 +678,9 @@ export default function WebsiteData() {
       )}
 
       {/* Filters */}
-      <Card mb="20px" bg={cardBg}>
-        <Box p="12px">
-          <HStack spacing={4}>
+      <Box  bg={cardBg}>
+        <Box p="8px">
+          <HStack spacing={2}>
             <InputGroup flex="1">
               <InputLeftElement pointerEvents="none">
                 <MdSearch color="gray.300" />
@@ -689,6 +689,7 @@ export default function WebsiteData() {
                 placeholder="Search by Service Name..."
                 value={serviceFilter}
                 onChange={(e) => setServiceFilter(e.target.value)}
+                size="sm"
               />
             </InputGroup>
             {serviceFilter && (
@@ -701,11 +702,11 @@ export default function WebsiteData() {
             )}
           </HStack>
         </Box>
-      </Card>
+      </Box>
 
       {/* Data Table */}
-      <Card bg={cardBg}>
-        <Box p="12px" mb="14px">
+      <Box bg={cardBg}>
+        <Box p="12px">
           {isLoading && websiteData.length === 0 ? (
             <Flex justify="center" align="center" minH="400px">
               <Spinner size="xl" color="brand.500" />
@@ -722,7 +723,7 @@ export default function WebsiteData() {
           ) : (
             <>
               <Box
-                maxH={{ base: 'calc(100vh - 280px)', md: 'calc(100vh - 240px)', xl: 'calc(100vh - 240px)' }}
+                maxH={{ base: 'calc(100vh - 200px)', md: 'calc(100vh - 210px)', xl: 'calc(100vh - 210px)' }}
                 overflowY="auto"
                 overflowX="auto"
                 border="1px solid"
@@ -749,7 +750,7 @@ export default function WebsiteData() {
                         </Td>
                         <Td borderColor={borderColor}>
                           {row.category_name && (
-                            <Badge colorScheme="brand" px="12px" py="4px" borderRadius="full">
+                            <Badge px="12px" py="4px" borderRadius="full">
                               {row.category_name}
                             </Badge>
                           )}
@@ -817,7 +818,7 @@ export default function WebsiteData() {
               </Box>
 
               {/* Pagination */}
-              <Flex justify="space-between" align="center" mt="10px" pt="10px" borderTop="1px solid" borderColor={borderColor}>
+              <Flex justify="space-between" align="center" mt="6px" pt="6px" borderTop="1px solid" borderColor={borderColor}>
                 <Text color="black" fontSize="sm">
                   Page {currentPage} of {totalPages} ({totalCount} total)
                 </Text>
@@ -854,7 +855,7 @@ export default function WebsiteData() {
             </>
           )}
         </Box>
-      </Card>
+      </Box>
 
       {/* Upload Confirmation Modal */}
       <Modal isOpen={uploadModal.isOpen} onClose={uploadModal.onClose} isCentered>

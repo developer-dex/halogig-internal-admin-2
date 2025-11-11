@@ -488,7 +488,7 @@ export default function WebsiteDataDetails() {
 
   if (isLoading && !originalData) {
     return (
-      <Box pt={{ base: '130px', md: '80px', xl: '80px' }}>
+      <Box>
         <Flex justify="center" align="center" minH="400px">
           <Spinner size="xl" color="brand.500" />
         </Flex>
@@ -498,7 +498,7 @@ export default function WebsiteDataDetails() {
 
   if (!originalData) {
     return (
-      <Box pt={{ base: '130px', md: '80px', xl: '80px' }}>
+      <Box>
         <Alert status="error">
           <AlertIcon />
           <AlertTitle>Error</AlertTitle>
@@ -509,7 +509,7 @@ export default function WebsiteDataDetails() {
   }
 
   return (
-    <Box pt={{ base: '130px', md: '80px', xl: '80px' }}>
+    <Box>
       {/* Header */}
       <Card mb="20px" bg={cardBg}>
         <Box p="24px">

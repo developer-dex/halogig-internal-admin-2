@@ -15,13 +15,15 @@ export function SidebarBrand() {
       <Image 
         src={logo} 
         alt="HaloGig Logo" 
-        h='30px' 
-        w='180px' 
+        h='20px' 
+        w='100px' 
+        style={{ marginLeft: '16px' }}
         // maxH='60px'
         // my='32px' 
+        mb='12px'
         objectFit='contain'
       />
-      <HSeparator mb='20px' />
+      <HSeparator />
     </Flex>
   );
 }

@@ -205,7 +205,7 @@ export default function ProjectBidDetail() {
 
   if (isLoading) {
     return (
-      <Box pt={{ base: '130px', md: '80px', xl: '80px' }}>
+      <Box>
         <Flex justify="center" align="center" minH="400px">
           <Spinner size="xl" color="brand.500" />
         </Flex>
@@ -215,7 +215,7 @@ export default function ProjectBidDetail() {
 
   if (!currentBid) {
     return (
-      <Box pt={{ base: '130px', md: '80px', xl: '80px' }}>
+      <Box>
         <Card mb="20px" bg={cardBg}>
           <Box p="24px">
             <Breadcrumb>
@@ -267,7 +267,7 @@ export default function ProjectBidDetail() {
   }
 
   return (
-    <Box pt={{ base: '130px', md: '80px', xl: '80px' }}>
+    <Box>
       {/* Breadcrumb */}
       <Card mb="20px" bg={cardBg}>
         <Box p="24px">

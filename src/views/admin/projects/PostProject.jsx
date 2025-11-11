@@ -100,7 +100,7 @@ export default function PostProject() {
   };
 
   return (
-    <Box pt={{ base: '130px', md: '80px', xl: '80px' }}>
+    <Box>
       <Card>
         <Box p="24px">
           <Text color={textColor} fontSize="2xl" fontWeight="700" mb="20px">

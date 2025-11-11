@@ -46,7 +46,7 @@ export default function ProjectList() {
 
   const { isLoading: reduxLoading, responseData } = useSelector((s) => s.projectDataReducer || {});
 
-  const textColor = useColorModeValue('secondaryGray.900', 'white');
+  const textColor = useColorModeValue('black', 'white');
   const borderColor = useColorModeValue('gray.200', 'whiteAlpha.100');
   const bgColor = useColorModeValue('white', 'navy.800');
   const hoverBg = useColorModeValue('gray.50', 'whiteAlpha.50');
@@ -179,27 +179,27 @@ export default function ProjectList() {
     const statusLower = (statusText || '').toLowerCase();
     switch (statusLower) {
       case 'pending':
-        return { bg: 'orange.100', color: 'orange.700', border: 'orange.300' };
+        return { bg: 'transparent', color: 'black', border: 'black.600' };
       case 'approved':
         return { bg: 'transparent', color: 'black', border: 'black.600' };
       case 'rejected':
-        return { bg: 'red.100', color: 'red.700', border: 'red.300' };
+        return { bg: 'transparent', color: 'black', border: 'black.600' };
       default:
-        return { bg: 'gray.100', color: 'gray.700', border: 'gray.300' };
+        return { bg: 'transparent', color: 'black', border: 'black.600' };
     }
   };
 
   const totalPages = Math.ceil(totalCount / pageLimit) || 1;
 
   return (
-    <Box pt={{ base: '130px', md: '80px', xl: '80px' }}>
+    <Box>
       <Card>
-        <Box p="12px" mb="14px">
+        <Box p="12px">
           <Text
             color={textColor}
             fontSize="2xl"
             fontWeight="700"
-            mb="20px"
+            mb="8px"
           >
             Projects
           </Text>
@@ -211,7 +211,7 @@ export default function ProjectList() {
           ) : (
             <>
               <Box
-                maxH={{ base: 'calc(100vh - 280px)', md: 'calc(100vh - 240px)', xl: 'calc(100vh - 240px)' }}
+                maxH={{ base: 'calc(100vh - 200px)', md: 'calc(100vh - 130px)', xl: 'calc(100vh - 130px)' }}
                 overflowY="auto"
                 overflowX="auto"
                 border="1px solid"
@@ -413,8 +413,8 @@ export default function ProjectList() {
               <Flex
                 justify="space-between"
                 align="center"
-                mt="10px"
-                pt="10px"
+                // mt="8px"
+                pt="8px"
                 borderTop="1px solid"
                 borderColor={borderColor}
               >

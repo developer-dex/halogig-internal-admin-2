@@ -106,8 +106,8 @@ export default function AuthNavbar(props) {
           src={halogigLogo} 
           alt="HaloGig Logo" 
           h='auto' 
-          w='175px' 
-          maxH='60px'
+          w='120px' 
+          maxH='25px'
           objectFit='contain'
         />
       </Stack>
@@ -134,8 +134,8 @@ export default function AuthNavbar(props) {
           src={halogigLogo} 
           alt="HaloGig Logo" 
           h='auto' 
-          w='175px' 
-          maxH='60px'
+          w='120px' 
+          maxH='25px'
           my='32px'
           objectFit='contain'
         />

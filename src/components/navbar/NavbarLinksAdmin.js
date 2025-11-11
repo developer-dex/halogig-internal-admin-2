@@ -78,7 +78,7 @@ export default function HeaderLinks(props) {
         />
       </Button> */}
       
-      <Menu>
+      {/* <Menu>
         <MenuButton p="0px">
           <Avatar
             _hover={{ cursor: 'pointer' }}
@@ -135,7 +135,7 @@ export default function HeaderLinks(props) {
             </MenuItem>
           </Flex>
         </MenuList>
-      </Menu>
+      </Menu> */}
     </Flex>
   );
 }

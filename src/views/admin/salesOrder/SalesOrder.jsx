@@ -198,7 +198,7 @@ export default function SalesOrder() {
 
   if (isLoading) {
     return (
-      <Box pt={{ base: '130px', md: '80px', xl: '80px' }}>
+      <Box>
         <Flex justify="center" align="center" minH="400px">
           <Spinner size="xl" color="brand.500" />
         </Flex>
@@ -208,7 +208,7 @@ export default function SalesOrder() {
 
   if (!billingInfo) {
     return (
-      <Box pt={{ base: '130px', md: '80px', xl: '80px' }}>
+      <Box>
         <Card bg={cardBg}>
           <Box p="24px" textAlign="center">
             <Alert status="error" mb={4}>
@@ -245,7 +245,7 @@ export default function SalesOrder() {
     : sale.sale_order_no;
 
   return (
-    <Box pt={{ base: '130px', md: '80px', xl: '80px' }}>
+    <Box>
       {/* Breadcrumb */}
       <Card mb="20px" bg={cardBg}>
         <Box p="24px">

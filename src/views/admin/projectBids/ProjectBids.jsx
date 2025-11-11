@@ -32,7 +32,7 @@ export default function ProjectBids() {
 
   const { isLoading, bids, totalCount } = useSelector((s) => s.projectBidsReducer || {});
 
-  const textColor = useColorModeValue('secondaryGray.900', 'white');
+  const textColor = useColorModeValue('black', 'white');
   const borderColor = useColorModeValue('gray.200', 'whiteAlpha.100');
   const bgColor = useColorModeValue('white', 'navy.800');
   const hoverBg = useColorModeValue('gray.50', 'whiteAlpha.50');
@@ -62,15 +62,15 @@ export default function ProjectBids() {
       return { bg: 'transparent', color: 'black', border: 'black.600' };
     }
     if (s.includes('reject') || s.includes('rejected')) {
-      return { bg: 'red.100', color: 'red.700', border: 'red.300' };
+      return { bg: 'transparent', color: 'black', border: 'black.600' };
     }
     if (s.includes('in_progress') || s.includes('in progress')) {
-      return { bg: 'blue.100', color: 'blue.700', border: 'blue.300' };
+      return { bg: 'transparent', color: 'black', border: 'black.600' };
     }
     if (s.includes('complete') || s.includes('completed')) {
       return { bg: 'transparent', color: 'black', border: 'black.600' };
     }
-    return { bg: 'orange.100', color: 'orange.700', border: 'orange.300' };
+    return { bg: 'transparent', color: 'black', border: 'black.600' };
   };
 
   const formatDate = (dateString) => {
@@ -87,10 +87,10 @@ export default function ProjectBids() {
   };
 
   return (
-    <Box pt={{ base: '130px', md: '80px', xl: '80px' }}>
+    <Box>
       <Card>
-        <Box p="12px" mb="14px">
-          <Text color={textColor} fontSize="2xl" fontWeight="700" mb="20px">
+        <Box p="12px">
+          <Text color={textColor} fontSize="2xl" fontWeight="700" mb="8px">
             Project Bids
           </Text>
 
@@ -101,7 +101,7 @@ export default function ProjectBids() {
           ) : (
             <>
               <Box
-                maxH={{ base: 'calc(100vh - 280px)', md: 'calc(100vh - 240px)', xl: 'calc(100vh - 240px)' }}
+                maxH={{ base: 'calc(100vh - 200px)', md: 'calc(100vh - 130px)', xl: 'calc(100vh - 130px)' }}
                 overflowY="auto"
                 overflowX="auto"
                 border="1px solid"
@@ -220,7 +220,7 @@ export default function ProjectBids() {
                 </Table>
               </Box>
 
-              <Flex justify="space-between" align="center" mt="10px" pt="10px" borderTop="1px solid" borderColor={borderColor}>
+              <Flex justify="space-between" align="center"  pt="8px" borderTop="1px solid" borderColor={borderColor}>
                 <Text color="black" fontSize="sm">
                   Showing <Text as="span" fontWeight="700" color="brand.500">{rows.length}</Text> of {totalCount}
                 </Text>

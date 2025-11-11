@@ -169,7 +169,7 @@ export default function InvoiceV1() {
 
   if (isLoading) {
     return (
-      <Box pt={{ base: '130px', md: '80px', xl: '80px' }}>
+      <Box>
         <Flex justify="center" align="center" minH="400px">
           <Spinner size="xl" color="brand.500" />
         </Flex>
@@ -179,7 +179,7 @@ export default function InvoiceV1() {
 
   if (!billingInfo) {
     return (
-      <Box pt={{ base: '130px', md: '80px', xl: '80px' }}>
+      <Box>
         <Card bg={cardBg}>
           <Box p="24px" textAlign="center">
             <Alert status="error" mb={4}>
@@ -218,7 +218,7 @@ export default function InvoiceV1() {
   const totalAmount = subtotal + taxAmount;
 
   return (
-    <Box pt={{ base: '130px', md: '80px', xl: '80px' }}>
+    <Box>
       {/* Breadcrumb */}
       <Card mb="20px" bg={cardBg}>
         <Box p="24px">

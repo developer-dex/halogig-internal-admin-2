@@ -106,7 +106,7 @@ export default function ContactList() {
   }, [enrollAsData, createFormData.designation]);
 
   // Chakra color mode values
-  const textColor = useColorModeValue('secondaryGray.900', 'white');
+  const textColor = useColorModeValue('black', 'white');
   const borderColor = useColorModeValue('gray.200', 'whiteAlpha.100');
   const bgColor = useColorModeValue('white', 'navy.800');
   const hoverBg = useColorModeValue('gray.50', 'whiteAlpha.50');
@@ -414,7 +414,7 @@ export default function ContactList() {
   const totalPages = Math.ceil(totalCount / pageLimit) || 1;
 
   return (
-    <Box pt={{ base: '130px', md: '80px', xl: '80px' }}>
+    <Box>
       <Card mb={{ base: '0px', '2xl': '20px' }}>
         <Flex align="center" justify="space-between" mb="20px" p="12px">
           <Text color={textColor} fontSize="2xl" fontWeight="700">
@@ -422,7 +422,8 @@ export default function ContactList() {
           </Text>
           <Button
             leftIcon={<MdAdd />}
-            colorScheme="brand"
+            // colorScheme="brand"
+            variant="outline"
             onClick={handleOpenCreateModal}
           >
             Create User
@@ -436,14 +437,14 @@ export default function ContactList() {
         ) : (
           <>
             <Box
-              maxH={{ base: 'calc(100vh - 280px)', md: 'calc(100vh - 240px)', xl: 'calc(100vh - 240px)' }}
-              overflowY="auto"
+                maxH={{ base: 'calc(100vh - 200px)', md: 'calc(100vh - 130px)', xl: 'calc(100vh - 130px)' }}
+                overflowY="auto"
               overflowX="auto"
               border="1px solid"
               borderColor={borderColor}
               borderRadius="8px"
               mx="12px"
-              mb="12px"
+              mb="8px"
             >
               <Table variant="simple" color="gray.500" minW="1000px">
                 <Thead position="sticky" top="0" zIndex="1" bg={bgColor}>
@@ -574,7 +575,7 @@ export default function ContactList() {
               </Table>
             </Box>
 
-            <Flex justify="space-between" align="center" mt="10px" pt="10px" borderTop="1px solid" borderColor={borderColor} px="12px" pb="12px">
+            <Flex justify="space-between" align="center"  pt="8px" borderTop="1px solid" borderColor={borderColor} px="12px" pb="12px">
               <Text color="black" fontSize="sm">
                 Showing <Text as="span" fontWeight="700" color="brand.500">{contacts.length}</Text> of {totalCount}
               </Text>

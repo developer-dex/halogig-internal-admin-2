@@ -130,11 +130,12 @@ export default function Dashboard(props) {
             overflow="auto"
             position="relative"
             maxHeight="100%"
-            w={{ base: '100%', xl: 'calc( 100% - 290px )' }}
-            maxWidth={{ base: '100%', xl: 'calc( 100% - 290px )' }}
+            w={{ base: '100%', xl: 'calc(100% - 200px)' }}
+            maxWidth={{ base: '100%', xl: 'calc(100% - 200px)' }}
+            ml={{ base: '0', xl: '200px' }}
             transition="all 0.33s cubic-bezier(0.685, 0.0473, 0.346, 1)"
             transitionDuration=".2s, .2s, .35s"
-            transitionProperty="top, bottom, width"
+            transitionProperty="top, bottom, width, margin-left"
             transitionTimingFunction="linear, linear, ease"
           >
             <Portal>
@@ -154,10 +155,10 @@ export default function Dashboard(props) {
             {getRoute() ? (
               <Box
                 mx="auto"
-                p={{ base: '20px', md: '30px' }}
-                pe="20px"
+                p={{ base: '20px', md: '10px' }}
+                // pe="20px"
                 minH="100vh"
-                pt="50px"
+                // pt="50px"
               >
                 <Routes>
                   {getRoutes(routes)}
@@ -184,9 +185,9 @@ export default function Dashboard(props) {
                 </Routes>
               </Box>
             ) : null}
-            <Box>
+            {/* <Box>
               <Footer />
-            </Box>
+            </Box> */}
           </Box>
         </SidebarContext.Provider>
       </Box>
