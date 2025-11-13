@@ -90,8 +90,8 @@ export function SidebarLinks(props) {
                 <Text
                   fontSize="13px"
                   color={categoryActive ? activeColor : categoryColor}
-                  fontWeight={categoryActive ? "bold" : "600"}
-                  textTransform="uppercase"
+                  fontWeight={categoryActive ? "600" : "500"}
+                  // textTransform="uppercase"
                   letterSpacing="0.5px"
                 >
                   {route.category}
