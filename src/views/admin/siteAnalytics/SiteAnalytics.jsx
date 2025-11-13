@@ -56,9 +56,9 @@ export default function SiteAnalytics() {
   const exportModal = useDisclosure();
   const pageLimit = 50;
 
-  const textColor = useColorModeValue('black', 'white');
+  const textColor = useColorModeValue('rgb(32, 33, 36)', 'white');
   const borderColor = useColorModeValue('gray.200', 'whiteAlpha.100');
-  const bgColor = useColorModeValue('white', 'navy.800');
+    const bgColor = useColorModeValue('#F4F7FE', 'black');
   const hoverBg = useColorModeValue('gray.50', 'whiteAlpha.50');
   const cardBg = useColorModeValue('white', 'navy.800');
 
@@ -233,7 +233,7 @@ export default function SiteAnalytics() {
       </Box>
 
       {/* Data Table */}
-      <Card bg={cardBg}>
+      <Card bg={bgColor}>
         <Box p="12px">
           {isLoading && pageAnalytics.length === 0 ? (
             <Flex justify="center" align="center" minH="400px">
@@ -241,7 +241,7 @@ export default function SiteAnalytics() {
             </Flex>
           ) : pageAnalytics.length === 0 ? (
             <Box textAlign="center" py="40px">
-              <Text fontSize="lg" color="black" mb="8px">
+              <Text fontSize="lg" color={textColor} mb="8px">
                 No analytics data found
               </Text>
             </Box>
@@ -275,7 +275,7 @@ export default function SiteAnalytics() {
                     {pageAnalytics.map((item) => (
                       <Tr key={item.id || item._id} _hover={{ bg: hoverBg }} transition="all 0.2s">
                         <Td borderColor={borderColor}>
-                          <Text color={textColor} fontSize="sm" fontWeight="500" fontFamily="monospace">
+                          <Text color={textColor} fontSize="sm" fontWeight="normal" fontFamily="monospace">
                             {item.ip_address || '--'}
                           </Text>
                         </Td>
@@ -321,7 +321,7 @@ export default function SiteAnalytics() {
                               href={item.url}
                               target="_blank"
                               rel="noopener noreferrer"
-                              color="black"
+                              color={textColor}
                               fontSize="sm"
                               wordBreak="break-all"
                               whiteSpace="normal"
@@ -330,7 +330,7 @@ export default function SiteAnalytics() {
                               {item.url}
                             </Link>
                           ) : (
-                            <Text color="black" fontSize="sm">--</Text>
+                            <Text color={textColor} fontSize="sm">--</Text>
                           )}
                         </Td>
                         {!selectedIpAddress && (

@@ -54,9 +54,9 @@ export default function ClientList() {
   const pageLimit = 50;
 
   // Chakra color mode values
-  const textColor = useColorModeValue('black', 'white');
+  const textColor = useColorModeValue('rgb(32, 33, 36)', 'white');
   const borderColor = useColorModeValue('gray.200', 'whiteAlpha.100');
-  const bgColor = useColorModeValue('white', 'navy.800');
+  const bgColor = useColorModeValue('#F4F7FE', 'black');
   const hoverBg = useColorModeValue('gray.50', 'whiteAlpha.50');
 
   const fetchClients = async () => {
@@ -170,7 +170,7 @@ export default function ClientList() {
 
   return (
     <Box>
-      <Card>
+      <Card bg={bgColor}>
         <Box p="12px">
           <Text
             color={textColor}
@@ -291,17 +291,17 @@ export default function ClientList() {
                             transition="all 0.2s"
                           >
                             <Td borderColor={borderColor}>
-                              <Text color={textColor} fontSize="sm" fontWeight="700">
+                              <Text color={textColor} fontSize="sm" fontWeight="normal">
                                 {client.first_name || '--'}
                               </Text>
                             </Td>
                             <Td borderColor={borderColor}>
-                              <Text color={textColor} fontSize="sm" fontWeight="700">
+                              <Text color={textColor} fontSize="sm" fontWeight="normal">
                                 {client.last_name || '--'}
                               </Text>
                             </Td>
                             <Td borderColor={borderColor}>
-                              <Text color={textColor} fontSize="sm" fontWeight="500">
+                              <Text color={textColor} fontSize="sm" fontWeight="normal">
                                 {client.email || '--'}
                               </Text>
                             </Td>
@@ -313,7 +313,7 @@ export default function ClientList() {
                                 borderColor={statusColors.border}
                                 borderWidth="2px"
                                 borderRadius="full"
-                                fontWeight="600"
+                                fontWeight="normal"
                                 fontSize="xs"
                                 textTransform="capitalize"
                                 _hover={{
@@ -374,7 +374,7 @@ export default function ClientList() {
                                   icon={<MdVisibility />}
                                   size="sm"
                                   variant="ghost"
-                                  color="black"
+                                  style={{color: 'rgb(32, 33, 36)'}}
                                   onClick={() => handleViewClient(client)}
                                 />
                               </Tooltip>

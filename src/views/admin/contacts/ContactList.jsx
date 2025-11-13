@@ -106,9 +106,9 @@ export default function ContactList() {
   }, [enrollAsData, createFormData.designation]);
 
   // Chakra color mode values
-  const textColor = useColorModeValue('black', 'white');
+  const textColor = useColorModeValue('rgb(32, 33, 36)', 'white');
   const borderColor = useColorModeValue('gray.200', 'whiteAlpha.100');
-  const bgColor = useColorModeValue('white', 'navy.800');
+    const bgColor = useColorModeValue('#F4F7FE', 'black');
   const hoverBg = useColorModeValue('gray.50', 'whiteAlpha.50');
 
   const fetchContacts = async () => {
@@ -415,7 +415,7 @@ export default function ContactList() {
 
   return (
     <Box>
-      <Card mb={{ base: '0px', '2xl': '20px' }}>
+      <Card bg={bgColor} mb={{ base: '0px', '2xl': '20px' }}>
         <Flex align="center" justify="space-between" mb="20px" p="12px">
           <Text color={textColor} fontSize="2xl" fontWeight="700">
             Contact List
@@ -470,27 +470,27 @@ export default function ContactList() {
                     contacts.map((contact) => (
                       <Tr key={contact.id || contact._id} _hover={{ bg: hoverBg }} transition="all 0.2s">
                         <Td borderColor={borderColor}>
-                          <Text color="black" fontSize="sm" fontWeight="500">
+                          <Text color={textColor} fontSize="sm" fontWeight="normal">
                             {contact.first_name || '--'}
                           </Text>
                         </Td>
                         <Td borderColor={borderColor}>
-                          <Text color="black" fontSize="sm" fontWeight="500">
+                          <Text color={textColor} fontSize="sm" fontWeight="normal">
                             {contact.last_name || '--'}
                           </Text>
                         </Td>
                         <Td borderColor={borderColor}>
-                          <Text color="black" fontSize="sm" fontWeight="500">
+                          <Text color={textColor} fontSize="sm" fontWeight="normal">
                             {contact.email || '--'}
                           </Text>
                         </Td>
                         <Td borderColor={borderColor}>
-                          <Text color="black" fontSize="sm" fontWeight="500">
+                          <Text color={textColor} fontSize="sm" fontWeight="normal">
                             {contact.mobile || '--'}
                           </Text>
                         </Td>
                         <Td borderColor={borderColor}>
-                          <Text color="black" fontSize="sm" fontWeight="500">
+                          <Text color={textColor} fontSize="sm" fontWeight="normal">
                             {contact.company_name || '--'}
                           </Text>
                         </Td>
@@ -498,7 +498,7 @@ export default function ContactList() {
                           {contact.requirements ? (
                             <Flex align="center" gap={2} maxW="200px">
                               <Text
-                                color="black"
+                                color={textColor}
                                 fontSize="sm"
                                 fontWeight="500"
                                 noOfLines={1}
@@ -513,23 +513,23 @@ export default function ContactList() {
                                     icon={<MdMoreHoriz />}
                                     size="xs"
                                     variant="ghost"
-                                    color="black"
+                                    style={{color: 'rgb(32, 33, 36)'}}
                                     onClick={() => handleOpenReqModal(contact.requirements)}
                                   />
                                 </Tooltip>
                               )}
                             </Flex>
                           ) : (
-                            <Text color="black" fontSize="sm" fontWeight="500">--</Text>
+                            <Text color={textColor} fontSize="sm" fontWeight="normal">--</Text>
                           )}
                         </Td>
                         <Td borderColor={borderColor}>
                           {contact.notes ? (
                             <Flex align="center" gap={2} maxW="200px">
                               <Text
-                                color="black"
+                                color={textColor}
                                 fontSize="sm"
-                                fontWeight="500"
+                                fontWeight="normal"
                                 noOfLines={1}
                                 flex={1}
                               >
@@ -542,26 +542,27 @@ export default function ContactList() {
                                     icon={<MdMoreHoriz />}
                                     size="xs"
                                     variant="ghost"
-                                    color="black"
+                                    style={{ color: 'rgb(32, 33, 36)', borderColor: 'rgb(32, 33, 36)'}}
                                     onClick={() => handleOpenReqModal(contact.notes)}
                                   />
                                 </Tooltip>
                               )}
                             </Flex>
                           ) : (
-                            <Text color="black" fontSize="sm" fontWeight="500">--</Text>
+                            <Text color={textColor} fontSize="sm" fontWeight="normal">--</Text>
                           )}
                         </Td>
                         <Td borderColor={borderColor} textAlign="center">
                           {contact.is_client_added === true ? (
-                            <Badge colorScheme="green" px="12px" py="4px" borderRadius="full">
+                            <Badge  style={{color: 'rgb(32, 33, 36)', borderColor: 'rgb(32, 33, 36)'}} px="12px" py="4px" borderRadius="full">
                               Added
                             </Badge>
                           ) : (
                             <Button
                               size="sm"
                               variant="outline"
-                              colorScheme="brand"
+                              style={{color: 'rgb(32, 33, 36)', borderColor: 'rgb(32, 33, 36)'}}
+                              // colorScheme="black"
                               onClick={() => handleOpenModal(contact)}
                             >
                               ADD
@@ -576,7 +577,7 @@ export default function ContactList() {
             </Box>
 
             <Flex justify="space-between" align="center"  pt="8px" borderTop="1px solid" borderColor={borderColor} px="12px" pb="12px">
-              <Text color="black" fontSize="sm">
+                <Text color={textColor} fontSize="sm">
                 Showing <Text as="span" fontWeight="700" color="brand.500">{contacts.length}</Text> of {totalCount}
               </Text>
               <HStack spacing="8px">

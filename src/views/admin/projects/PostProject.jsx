@@ -40,7 +40,7 @@ export default function PostProject() {
 
   const textColor = useColorModeValue('secondaryGray.900', 'white');
   const borderColor = useColorModeValue('gray.200', 'whiteAlpha.100');
-  const bgColor = useColorModeValue('white', 'navy.800');
+    const bgColor = useColorModeValue('#F4F7FE', 'black');
 
   const [form, setForm] = useState({
     client_id: fromClient.clientId || fromClient.client?.id || fromClient.id || '',

@@ -46,9 +46,9 @@ export default function ProjectList() {
 
   const { isLoading: reduxLoading, responseData } = useSelector((s) => s.projectDataReducer || {});
 
-  const textColor = useColorModeValue('black', 'white');
+  const textColor = useColorModeValue('rgb(32, 33, 36)', 'white');
   const borderColor = useColorModeValue('gray.200', 'whiteAlpha.100');
-  const bgColor = useColorModeValue('white', 'navy.800');
+    const bgColor = useColorModeValue('#F4F7FE', 'black');
   const hoverBg = useColorModeValue('gray.50', 'whiteAlpha.50');
 
   const fetchProjects = async () => {
@@ -193,7 +193,7 @@ export default function ProjectList() {
 
   return (
     <Box>
-      <Card>
+      <Card bg={bgColor}>
         <Box p="12px">
           <Text
             color={textColor}
@@ -325,22 +325,22 @@ export default function ProjectList() {
                             transition="all 0.2s"
                           >
                             <Td borderColor={borderColor}>
-                              <Text color={textColor} fontSize="sm" fontWeight="700">
-                                {project.project_title || '--'}
+                              <Text color={textColor} fontSize="sm" fontWeight="normal">
+                                {project.project_title || '--'} 
                               </Text>
                             </Td>
                             <Td borderColor={borderColor}>
-                              <Text color={textColor} fontSize="sm" fontWeight="700">
+                              <Text color={textColor} fontSize="sm" fontWeight="normal">
                                 {project.User?.first_name || '--'}
                               </Text>
                             </Td>
                             <Td borderColor={borderColor}>
-                              <Text color={textColor} fontSize="sm" fontWeight="700">
+                              <Text color={textColor} fontSize="sm" fontWeight="normal">
                                 {project.User?.last_name || '--'}
                               </Text>
                             </Td>
                             <Td borderColor={borderColor}>
-                              <Text color={textColor} fontSize="sm" fontWeight="500">
+                              <Text color={textColor} fontSize="sm" fontWeight="normal">
                                 {project.User?.email || '--'}
                               </Text>
                             </Td>
@@ -357,7 +357,7 @@ export default function ProjectList() {
                                 borderColor={statusColors.border}
                                 borderWidth="2px"
                                 borderRadius="full"
-                                fontWeight="600"
+                                fontWeight="normal"
                                 fontSize="xs"
                                 textTransform="capitalize"
                                 _hover={{
@@ -393,7 +393,7 @@ export default function ProjectList() {
                                   icon={<MdEdit />}
                                   size="sm"
                                   variant="ghost"
-                                  color="black"
+                                  style={{color: 'rgb(32, 33, 36)'}}
                                   onClick={() => {
                                     // TODO: Open edit modal
                                     console.log('Edit project:', project.id);

@@ -102,9 +102,9 @@ function FreelancerList() {
   };
 
   // Chakra color mode values (match ClientList look)
-  const textColor = useColorModeValue('black', 'white');
+  const textColor = useColorModeValue('rgb(32, 33, 36)', 'white');
   const borderColor = useColorModeValue('gray.200', 'whiteAlpha.100');
-  const bgColor = useColorModeValue('white', 'navy.800');
+  const bgColor = useColorModeValue('#F4F7FE', 'black');
   const hoverBg = useColorModeValue('gray.50', 'whiteAlpha.50');
 
   const getStatusColorScheme = (status) => {
@@ -185,13 +185,13 @@ function FreelancerList() {
                         return (
                           <Tr key={fr.id} _hover={{ bg: hoverBg }} transition="all 0.2s">
                             <Td borderColor={borderColor}>
-                              <Text color={textColor} fontSize="sm" fontWeight="700">{fr.first_name || '--'}</Text>
+                              <Text color={textColor} fontSize="sm" fontWeight="normal">{fr.first_name || '--'}</Text>
                             </Td>
                             <Td borderColor={borderColor}>
-                              <Text color={textColor} fontSize="sm" fontWeight="700">{fr.last_name || '--'}</Text>
+                              <Text color={textColor} fontSize="sm" fontWeight="normal">{fr.last_name || '--'}</Text>
                             </Td>
                             <Td borderColor={borderColor}>
-                              <Text color={textColor} fontSize="sm" fontWeight="500">{fr.email || '--'}</Text>
+                              <Text color={textColor} fontSize="sm" fontWeight="normal">{fr.email || '--'}</Text>
                             </Td>
                             <Td borderColor={borderColor} textAlign="center">
                               <Button
@@ -201,7 +201,7 @@ function FreelancerList() {
                                 borderColor={statusColors.border}
                                 borderWidth="2px"
                                 borderRadius="full"
-                                fontWeight="600"
+                                fontWeight="normal"
                                 fontSize="xs"
                                 textTransform="capitalize"
                                 _hover={{ opacity: 0.8, transform: 'translateY(-2px)' }}
@@ -217,7 +217,7 @@ function FreelancerList() {
                                   icon={<MdVisibility />}
                                   size="sm"
                                   variant="ghost"
-                                  color="black"
+                                  style={{color: 'rgb(32, 33, 36)'}}
                                   onClick={() => openDetails(fr.id)}
                                 />
                               </Tooltip>

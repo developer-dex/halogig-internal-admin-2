@@ -1,6 +1,6 @@
 /* eslint-disable */
 import React, { useState } from "react";
-import { NavLink, useLocation } from "react-router-dom";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 // chakra imports
 import { Box, Flex, HStack, Text, useColorModeValue, Icon, Collapse } from "@chakra-ui/react";
 import { ChevronDownIcon, ChevronRightIcon } from "@chakra-ui/icons";
@@ -8,6 +8,7 @@ import { ChevronDownIcon, ChevronRightIcon } from "@chakra-ui/icons";
 export function SidebarLinks(props) {
   //   Chakra color mode
   let location = useLocation();
+  let navigate = useNavigate();
   let activeColor = "black";
   let inactiveColor = "black";
   let activeIcon = useColorModeValue("brand.500", "white");
@@ -17,6 +18,12 @@ export function SidebarLinks(props) {
   let categoryHoverBg = useColorModeValue("gray.50", "whiteAlpha.100");
 
   const { routes } = props;
+
+  // Handle logout - clear all localStorage and redirect to sign in
+  const handleLogout = () => {
+    localStorage.clear();
+    navigate('/auth/sign-in');
+  };
   
   // State to manage which categories are expanded (initialize all as expanded)
   const [expandedCategories, setExpandedCategories] = useState(() => {
@@ -189,7 +196,45 @@ export function SidebarLinks(props) {
     });
   };
   //  BRAND
-  return createLinks(routes);
+  return (
+    <>
+      {createLinks(routes)}
+      {/* Logout option at the end */}
+      <Box
+        as="button"
+        onClick={handleLogout}
+        w="100%"
+        borderTop="1px solid"
+        borderColor={useColorModeValue("gray.200", "whiteAlpha.200")}
+      >
+        <HStack
+          spacing="26px"
+          ps='16px'
+          py='8px'
+          _hover={{ bg: categoryHoverBg }}
+          borderRadius="8px"
+          cursor="pointer"
+        >
+          <Flex w='100%' alignItems='center' justifyContent='center'>
+            <Text
+              me='auto'
+              color={textColor}
+              fontSize="14px"
+              fontWeight="normal"
+            >
+              Logout
+            </Text>
+          </Flex>
+          <Box
+            h='36px'
+            w='4px'
+            bg="transparent"
+            borderRadius='5px'
+          />
+        </HStack>
+      </Box>
+    </>
+  );
 }
 
 export default SidebarLinks;

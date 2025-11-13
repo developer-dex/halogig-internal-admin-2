@@ -110,9 +110,9 @@ export default function WebsiteData() {
     (state) => state.websiteData
   );
 
-  const textColor = useColorModeValue('black', 'white');
+  const textColor = useColorModeValue('rgb(32, 33, 36)', 'white');
   const borderColor = useColorModeValue('gray.200', 'whiteAlpha.100');
-  const bgColor = useColorModeValue('white', 'navy.800');
+    const bgColor = useColorModeValue('#F4F7FE', 'black');
   const hoverBg = useColorModeValue('gray.50', 'whiteAlpha.50');
   const cardBg = useColorModeValue('white', 'navy.800');
 
@@ -678,7 +678,7 @@ export default function WebsiteData() {
       )}
 
       {/* Filters */}
-      <Box  bg={cardBg}>
+      <Box  bg={bgColor}>
         <Box p="8px">
           <HStack spacing={2}>
             <InputGroup flex="1">
@@ -705,7 +705,7 @@ export default function WebsiteData() {
       </Box>
 
       {/* Data Table */}
-      <Box bg={cardBg}>
+      <Box bg={bgColor}>
         <Box p="12px">
           {isLoading && websiteData.length === 0 ? (
             <Flex justify="center" align="center" minH="400px">
@@ -713,10 +713,10 @@ export default function WebsiteData() {
             </Flex>
           ) : websiteData.length === 0 ? (
             <Box textAlign="center" py="40px">
-              <Text fontSize="lg" color="black" mb="8px">
+              <Text fontSize="lg" color={textColor} mb="8px">
                 No website data found
               </Text>
-              <Text fontSize="sm" color="black">
+              <Text fontSize="sm" color={textColor}>
                 Upload an Excel file to get started
               </Text>
             </Box>
@@ -744,27 +744,27 @@ export default function WebsiteData() {
                     {websiteData.map((row) => (
                       <Tr key={row.id} _hover={{ bg: hoverBg }} transition="all 0.2s">
                         <Td borderColor={borderColor}>
-                          <Text color="black" fontSize="sm" fontWeight="500">
+                          <Text color={textColor} fontSize="sm" fontWeight="normal">
                             {row.id}
                           </Text>
                         </Td>
                         <Td borderColor={borderColor}>
                           {row.category_name && (
-                            <Badge px="12px" py="4px" borderRadius="full">
+                            <Badge px="12px" py="4px" borderRadius="full" color={textColor}  fontWeight="normal" borderColor="rgb(32, 33, 36)">
                               {row.category_name}
                             </Badge>
                           )}
                         </Td>
                         <Td borderColor={borderColor}>
-                          <Text color="black" fontSize="sm" fontWeight="500">
+                          <Text color={textColor} fontSize="sm" fontWeight="normal">
                             {row.service_name || '-'}
                           </Text>
                         </Td>
                         <Td borderColor={borderColor}>
                           <Text
-                            color="black"
+                            color={textColor}
                             fontSize="sm"
-                            fontWeight="500"
+                            fontWeight="normal"
                             fontFamily="monospace"
                             cursor="pointer"
                             _hover={{ textDecoration: 'underline' }}
@@ -781,7 +781,7 @@ export default function WebsiteData() {
                                 aria-label="Edit"
                                 icon={<MdEdit />}
                                 size="sm"
-                                color="black"
+                                style={{color: 'rgb(32, 33, 36)'}}
                                 variant="ghost"
                                 onClick={() => handleEdit(row)}
                               />
@@ -791,7 +791,7 @@ export default function WebsiteData() {
                                 aria-label="Preview"
                                 icon={<MdLaunch />}
                                 size="sm"
-                                color="black"
+                                style={{color: 'rgb(32, 33, 36)'}}
                                 variant="ghost"
                                 onClick={() => handlePreview(row)}
                               />
@@ -801,7 +801,7 @@ export default function WebsiteData() {
                                 aria-label="Delete"
                                 icon={<MdDelete />}
                                 size="sm"
-                                color="black"
+                                style={{color: 'rgb(32, 33, 36)'}}
                                 variant="ghost"
                                 onClick={() => {
                                   setSelectedRecord(row);
@@ -819,7 +819,7 @@ export default function WebsiteData() {
 
               {/* Pagination */}
               <Flex justify="space-between" align="center" mt="6px" pt="6px" borderTop="1px solid" borderColor={borderColor}>
-                <Text color="black" fontSize="sm">
+                <Text color={textColor} fontSize="sm">
                   Page {currentPage} of {totalPages} ({totalCount} total)
                 </Text>
                 <HStack spacing="8px">

@@ -17,6 +17,7 @@ import {
   MdPerson,
   MdBarChart,
   MdOutlineShoppingCart,
+  MdPowerSettingsNew,
 } from 'react-icons/md';
 
 // Admin Imports
@@ -54,6 +55,14 @@ const routes = [
     path: '/sign-in',
     component: <SignInCentered />,
     hidden: true, // Hide from sidebar navigation
+  },
+  // Dashboard at the top
+  {
+    name: 'Dashboard',
+    layout: '/admin',
+    path: '/default',
+    icon: <Icon as={MdDashboard} width="20px" height="20px" color="inherit" />,
+    component: <MainDashboard />,
   },
   {
     category: 'Registration',

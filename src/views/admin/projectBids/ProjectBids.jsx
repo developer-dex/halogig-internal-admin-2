@@ -32,9 +32,9 @@ export default function ProjectBids() {
 
   const { isLoading, bids, totalCount } = useSelector((s) => s.projectBidsReducer || {});
 
-  const textColor = useColorModeValue('black', 'white');
+  const textColor = useColorModeValue('rgb(32, 33, 36)', 'white');
   const borderColor = useColorModeValue('gray.200', 'whiteAlpha.100');
-  const bgColor = useColorModeValue('white', 'navy.800');
+    const bgColor = useColorModeValue('#F4F7FE', 'black');
   const hoverBg = useColorModeValue('gray.50', 'whiteAlpha.50');
 
   useEffect(() => {
@@ -88,7 +88,7 @@ export default function ProjectBids() {
 
   return (
     <Box>
-      <Card>
+      <Card bg={bgColor}>
         <Box p="12px">
           <Text color={textColor} fontSize="2xl" fontWeight="700" mb="8px">
             Project Bids
@@ -137,12 +137,12 @@ export default function ProjectBids() {
                         return (
                           <Tr key={bid.id || bid._id} _hover={{ bg: hoverBg }} transition="all 0.2s">
                             <Td borderColor={borderColor}>
-                              <Text color={textColor} fontSize="sm" fontWeight="700">
+                              <Text color={textColor} fontSize="sm" fontWeight="normal">
                                 #{bid.id || bid._id || '--'}
                               </Text>
                             </Td>
                             <Td borderColor={borderColor}>
-                              <Text color={textColor} fontSize="sm" fontWeight="700">
+                              <Text color={textColor} fontSize="sm" fontWeight="normal">
                                 {bid?.ClientProject?.project_title || bid?.Project?.project_title || bid?.project_title || '--'}
                               </Text>
                               <Text color="black" fontSize="xs" mt="4px">
@@ -159,7 +159,7 @@ export default function ProjectBids() {
                                   {freelancerInitial}
                                 </Avatar> */}
                                 <Box>
-                                  <Text color={textColor} fontSize="sm" fontWeight="700">
+                                  <Text color={textColor} fontSize="sm" fontWeight="normal">
                                     {freelancerName}
                                   </Text>
                                   <Text color="black" fontSize="xs">
@@ -169,12 +169,12 @@ export default function ProjectBids() {
                               </Flex>
                             </Td>
                             <Td borderColor={borderColor} textAlign="center">
-                              <Text color={textColor} fontSize="sm" fontWeight="500">
+                              <Text color={textColor} fontSize="sm" fontWeight="normal">
                                 {formatCurrency(bid?.bid_amount)}
                               </Text>
                             </Td>
                             <Td borderColor={borderColor} textAlign="center">
-                              <Text color={textColor} fontSize="sm">
+                              <Text color={textColor} fontSize="sm" fontWeight="normal">
                                 {formatDate(bid?.created_at || bid?.createdAt)}
                               </Text>
                             </Td>
@@ -186,7 +186,7 @@ export default function ProjectBids() {
                                 borderColor={statusColors.border}
                                 borderWidth="2px"
                                 borderRadius="full"
-                                fontWeight="600"
+                                fontWeight="normal"
                                 fontSize="xs"
                                 textTransform="capitalize"
                                 _hover={{ opacity: 0.9 }}
@@ -199,9 +199,9 @@ export default function ProjectBids() {
                                 <Button
                                   size="sm"
                                   bg="transparent"
-                                  color="black"
-                                  borderColor="black"
-                                  borderWidth="2px"
+                                  style={{color: 'rgb(32, 33, 36)'}}
+                                  borderColor="rgb(32, 33, 36)"
+                                  borderWidth="1px"
                                   _hover={{ opacity: 0.8 }}
                                   leftIcon={<MdVisibility />}
                                   onClick={() => {
