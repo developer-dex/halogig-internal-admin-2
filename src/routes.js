@@ -40,10 +40,11 @@ import ContactList from 'views/admin/contacts';
 import WebsiteData from 'views/admin/websiteData';
 import WebsiteDataDetails from 'views/admin/websiteData/WebsiteDataDetails';
 import SiteAnalytics from 'views/admin/siteAnalytics';
+import ChatRoom from 'views/admin/chatRoom';
 const ProjectBidsPage = () => <ProjectBids />;
 const ContactsPage = () => <ContactList />;
 const WebsiteDataPage = () => <WebsiteData />;
-const ChatRoomsPage = () => <div>Chat Rooms Page - Coming Soon</div>;
+const ChatRoomsPage = () => <ChatRoom />;
 const SiteAnalyticsPage = () => <SiteAnalytics />;
 const LogManagerPage = () => <div>Log Manager Page - Coming Soon</div>;
 
