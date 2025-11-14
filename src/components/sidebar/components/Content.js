@@ -14,15 +14,15 @@ function SidebarContent(props) {
   return (
     <Flex direction='column' height='100%' pt='15px' px="6px" borderRadius='30px'>
       <Brand />
-      <Stack direction='column' mb='auto' mt='8px'>
-        <Box >
+      <Stack direction='column' flex='1' mt='8px' minH='0'>
+        <Box flex='1' overflowY='auto'>
           <Links routes={routes} />
         </Box>
       </Stack>
 
       <Box
-        mt='60px'
-        mb='40px'
+        mt='auto'
+        mb='20px'
         borderRadius='30px'>
         <SidebarCard />
       </Box>

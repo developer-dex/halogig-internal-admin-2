@@ -429,8 +429,13 @@ export default function ChatRoom() {
             </InputGroup>
           </Box>
 
-          {/* Chat Rooms List */}
-          <Box flex="1" overflowY="auto" bg={bgColor}>
+          {/* Chat Rooms List - Scrollable area */}
+          <Box 
+            flex="1" 
+            overflowY="auto" 
+            bg={bgColor}
+            minH="0"
+          >
             {filteredChatRooms.length === 0 ? (
               <Box textAlign="center" color={textColorSecondary} p="18px 0">
                 No conversations yet

@@ -2,8 +2,9 @@
 import React, { useState } from "react";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 // chakra imports
-import { Box, Flex, HStack, Text, useColorModeValue, Icon, Collapse } from "@chakra-ui/react";
+import { Box, Flex, HStack, Text, useColorModeValue, Icon, Collapse, Button } from "@chakra-ui/react";
 import { ChevronDownIcon, ChevronRightIcon } from "@chakra-ui/icons";
+import { MdPowerSettingsNew } from "react-icons/md";
 
 export function SidebarLinks(props) {
   //   Chakra color mode
@@ -21,8 +22,15 @@ export function SidebarLinks(props) {
 
   // Handle logout - clear all localStorage and redirect to sign in
   const handleLogout = () => {
+    // Clear all session data
     localStorage.clear();
-    navigate('/auth/sign-in');
+    // Remove specific admin-related items
+    localStorage.removeItem('adminToken');
+    localStorage.removeItem('adminData');
+    localStorage.removeItem('adminAuth');
+    localStorage.removeItem('isAdminLogIn');
+    // Redirect to sign-in page
+    window.location.href = '/auth/sign-in';
   };
   
   // State to manage which categories are expanded (initialize all as expanded)
@@ -197,43 +205,39 @@ export function SidebarLinks(props) {
   };
   //  BRAND
   return (
-    <>
-      {createLinks(routes)}
+    <Flex direction='column' h='100%'>
+      <Box flex='1' overflowY='auto'>
+        {createLinks(routes)}
+      </Box>
       {/* Logout option at the end */}
       <Box
-        as="button"
-        onClick={handleLogout}
-        w="100%"
+        mt="auto"
+        pt="16px"
         borderTop="1px solid"
         borderColor={useColorModeValue("gray.200", "whiteAlpha.200")}
+        flexShrink={0}
       >
-        <HStack
-          spacing="26px"
-          ps='16px'
-          py='8px'
-          _hover={{ bg: categoryHoverBg }}
+        <Button
+          leftIcon={<MdPowerSettingsNew />}
+          w="100%"
+          justifyContent="flex-start"
+          variant="ghost"
+          color={textColor}
+          fontSize="0.95rem"
+          fontWeight="500"
+          h="40px"
           borderRadius="8px"
-          cursor="pointer"
+          px="16px"
+          _hover={{
+            bg: categoryHoverBg,
+            color: '#c3362a',
+          }}
+          onClick={handleLogout}
         >
-          <Flex w='100%' alignItems='center' justifyContent='center'>
-            <Text
-              me='auto'
-              color={textColor}
-              fontSize="14px"
-              fontWeight="normal"
-            >
-              Logout
-            </Text>
-          </Flex>
-          <Box
-            h='36px'
-            w='4px'
-            bg="transparent"
-            borderRadius='5px'
-          />
-        </HStack>
+          Logout
+        </Button>
       </Box>
-    </>
+    </Flex>
   );
 }
 
