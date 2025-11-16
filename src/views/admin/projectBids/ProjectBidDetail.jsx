@@ -60,12 +60,24 @@ import {
 } from '../../../features/admin/projectBidsSlice';
 import { showSuccess, showError } from '../../../helpers/messageHelper';
 
-export default function ProjectBidDetail() {
+export default function ProjectBidDetail({ visibleTabs = null, backRoute = '/admin/project-bids', breadcrumbLabel = 'Project Bids' }) {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { bidId } = useParams();
   const [isLoading, setIsLoading] = useState(false);
   const [activeTab, setActiveTab] = useState(0);
+  
+  // Define all available tabs
+  const allTabs = ['Client Info', 'Billing Info', 'Freelancer Info', 'Project Info', 'Bid Info', 'SOW', 'Milestones'];
+  
+  // Determine which tabs to show
+  const tabsToShow = visibleTabs || allTabs;
+  
+  // Map tab names to indices for activeTab
+  const tabIndexMap = tabsToShow.reduce((acc, tab, index) => {
+    acc[tab] = index;
+    return acc;
+  }, {});
 
   // Get data from Redux store
   const { currentBid, isApprovingMilestone, approveMilestoneSuccess, approveMilestoneError } = 
@@ -228,10 +240,10 @@ export default function ProjectBidDetail() {
                 </BreadcrumbLink>
               </BreadcrumbItem>
               <BreadcrumbItem>
-                <BreadcrumbLink href="/admin/project-bids">
+                <BreadcrumbLink href={backRoute}>
                   <HStack spacing={1}>
                     <MdAssignment />
-                    <Text>Project Bids</Text>
+                    <Text>{breadcrumbLabel}</Text>
                   </HStack>
                 </BreadcrumbLink>
               </BreadcrumbItem>
@@ -256,9 +268,9 @@ export default function ProjectBidDetail() {
             <Button
               leftIcon={<MdArrowBack />}
               colorScheme="brand"
-              onClick={() => navigate('/admin/project-bids')}
+              onClick={() => navigate(backRoute)}
             >
-              Back to Project Bids
+              Back to {breadcrumbLabel}
             </Button>
           </Box>
         </Card>
@@ -282,10 +294,10 @@ export default function ProjectBidDetail() {
                 </BreadcrumbLink>
               </BreadcrumbItem>
               <BreadcrumbItem>
-                <BreadcrumbLink href="/admin/project-bids">
+                <BreadcrumbLink href={backRoute}>
                   <HStack spacing={1}>
                     <MdAssignment />
-                    <Text>Project Bids</Text>
+                    <Text>{breadcrumbLabel}</Text>
                   </HStack>
                 </BreadcrumbLink>
               </BreadcrumbItem>
@@ -301,9 +313,9 @@ export default function ProjectBidDetail() {
             <Button
               leftIcon={<MdArrowBack />}
               variant="outline"
-              onClick={() => navigate('/admin/project-bids')}
+              onClick={() => navigate(backRoute)}
             >
-              Back to Project Bids
+              Back to {breadcrumbLabel}
             </Button>
           </Flex>
         </Box>
@@ -314,18 +326,18 @@ export default function ProjectBidDetail() {
         <Box p="24px">
           <Tabs index={activeTab} onChange={setActiveTab} variant="enclosed" colorScheme="brand">
             <TabList>
-              <Tab>Client Info</Tab>
-              <Tab>Billing Info</Tab>
-              <Tab>Freelancer Info</Tab>
-              <Tab>Project Info</Tab>
-              <Tab>Bid Info</Tab>
-              <Tab>SOW</Tab>
-              <Tab>Milestones</Tab>
+              {tabsToShow.includes('Client Info') && <Tab>Client Info</Tab>}
+              {tabsToShow.includes('Billing Info') && <Tab>Billing Info</Tab>}
+              {tabsToShow.includes('Freelancer Info') && <Tab>Freelancer Info</Tab>}
+              {tabsToShow.includes('Project Info') && <Tab>Project Info</Tab>}
+              {tabsToShow.includes('Bid Info') && <Tab>Bid Info</Tab>}
+              {tabsToShow.includes('SOW') && <Tab>SOW</Tab>}
+              {tabsToShow.includes('Milestones') && <Tab>Milestones</Tab>}
             </TabList>
 
             <TabPanels>
               {/* Client Info Tab */}
-              <TabPanel>
+              {tabsToShow.includes('Client Info') && <TabPanel>
                 <VStack align="start" spacing={6}>
                   <HStack spacing={3}>
                     <MdPerson size="24px" color="var(--chakra-colors-brand-500)" />
@@ -377,10 +389,10 @@ export default function ProjectBidDetail() {
                     )}
                   </SimpleGrid>
                 </VStack>
-              </TabPanel>
+              </TabPanel>}
 
               {/* Billing Info Tab */}
-              <TabPanel>
+              {tabsToShow.includes('Billing Info') && <TabPanel>
                 <VStack align="start" spacing={6}>
                   <HStack spacing={3}>
                     <MdAttachMoney size="24px" color="var(--chakra-colors-brand-500)" />
@@ -448,10 +460,10 @@ export default function ProjectBidDetail() {
                     </Box>
                   )}
                 </VStack>
-              </TabPanel>
+              </TabPanel>}
 
               {/* Freelancer Info Tab */}
-              <TabPanel>
+              {tabsToShow.includes('Freelancer Info') && <TabPanel>
                 <VStack align="start" spacing={6}>
                   <HStack spacing={3}>
                     <MdPerson size="24px" color="var(--chakra-colors-brand-500)" />
@@ -541,10 +553,10 @@ export default function ProjectBidDetail() {
                     )}
                   </SimpleGrid>
                 </VStack>
-              </TabPanel>
+              </TabPanel>}
 
               {/* Project Info Tab */}
-              <TabPanel>
+              {tabsToShow.includes('Project Info') && <TabPanel>
                 <VStack align="start" spacing={6}>
                   <HStack spacing={3}>
                     <MdWork size="24px" color="var(--chakra-colors-brand-500)" />
@@ -612,10 +624,10 @@ export default function ProjectBidDetail() {
                     )}
                   </SimpleGrid>
                 </VStack>
-              </TabPanel>
+              </TabPanel>}
 
               {/* Bid Info Tab */}
-              <TabPanel>
+              {tabsToShow.includes('Bid Info') && <TabPanel>
                 <VStack align="start" spacing={6}>
                   <HStack spacing={3}>
                     <MdInfo size="24px" color="var(--chakra-colors-brand-500)" />
@@ -669,10 +681,10 @@ export default function ProjectBidDetail() {
                     )}
                   </SimpleGrid>
                 </VStack>
-              </TabPanel>
+              </TabPanel>}
 
               {/* SOW Tab */}
-              <TabPanel>
+              {tabsToShow.includes('SOW') && <TabPanel>
                 {currentBid.sow ? (
                   <VStack align="start" spacing={6}>
                     <HStack spacing={3}>
@@ -745,10 +757,10 @@ export default function ProjectBidDetail() {
                     </Text>
                   </Box>
                 )}
-              </TabPanel>
+              </TabPanel>}
 
               {/* Milestones Tab */}
-              <TabPanel>
+              {tabsToShow.includes('Milestones') && <TabPanel>
                 {currentBid.sow?.milestones && currentBid.sow.milestones.length > 0 ? (
                   <VStack align="start" spacing={6}>
                     <HStack spacing={3}>
@@ -895,7 +907,7 @@ export default function ProjectBidDetail() {
                     </Text>
                   </Box>
                 )}
-              </TabPanel>
+              </TabPanel>}
             </TabPanels>
           </Tabs>
         </Box>

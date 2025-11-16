@@ -18,6 +18,7 @@ import {
   MdBarChart,
   MdOutlineShoppingCart,
   MdPowerSettingsNew,
+  MdAttachMoney,
 } from 'react-icons/md';
 
 // Admin Imports
@@ -28,6 +29,8 @@ import DataTables from 'views/admin/dataTables';
 import RTL from 'views/admin/rtl';
 import PostProject from 'views/admin/projects';
 import ProjectBids from 'views/admin/projectBids';
+import ProjectFinance from 'views/admin/projectBids/ProjectFinance';
+import ProjectDelivery from 'views/admin/projectBids/ProjectDelivery';
 
 // Auth Imports
 import SignInCentered from 'views/auth/signIn';
@@ -42,6 +45,8 @@ import WebsiteDataDetails from 'views/admin/websiteData/WebsiteDataDetails';
 import SiteAnalytics from 'views/admin/siteAnalytics';
 import ChatRoom from 'views/admin/chatRoom';
 const ProjectBidsPage = () => <ProjectBids />;
+const ProjectFinancePage = () => <ProjectFinance />;
+const ProjectDeliveryPage = () => <ProjectDelivery />;
 const ContactsPage = () => <ContactList />;
 const WebsiteDataPage = () => <WebsiteData />;
 const ChatRoomsPage = () => <ChatRoom />;
@@ -156,6 +161,20 @@ const routes = [
         path: '/project-bids',
         icon: <Icon as={MdGavel} width="20px" height="20px" color="inherit" />,
         component: <ProjectBidsPage />,
+      },
+      {
+        name: 'Project Finance',
+        layout: '/admin',
+        path: '/project-finance',
+        icon: <Icon as={MdAttachMoney} width="20px" height="20px" color="inherit" />,
+        component: <ProjectFinancePage />,
+      },
+      {
+        name: 'Project Delivery',
+        layout: '/admin',
+        path: '/project-delivery',
+        icon: <Icon as={MdWork} width="20px" height="20px" color="inherit" />,
+        component: <ProjectDeliveryPage />,
       },
     ],
   },

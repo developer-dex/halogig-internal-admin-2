@@ -10,6 +10,9 @@ import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import routes from 'routes.js';
 import WebsiteDataDetails from 'views/admin/websiteData/WebsiteDataDetails';
 import ProjectBidDetail from 'views/admin/projectBids/ProjectBidDetail';
+import ProjectBidDetailWrapper from 'views/admin/projectBids/ProjectBidDetailWrapper';
+import ProjectFinanceDetail from 'views/admin/projectBids/ProjectFinanceDetail';
+import ProjectDeliveryDetail from 'views/admin/projectBids/ProjectDeliveryDetail';
 import SalesOrder from 'views/admin/salesOrder';
 import Invoice from 'views/admin/invoice';
 
@@ -168,7 +171,15 @@ export default function Dashboard(props) {
                   />
                   <Route
                     path="/project-bids/:bidId/details"
-                    element={<ProjectBidDetail />}
+                    element={<ProjectBidDetailWrapper />}
+                  />
+                  <Route
+                    path="/project-finance/:bidId/details"
+                    element={<ProjectFinanceDetail />}
+                  />
+                  <Route
+                    path="/project-delivery/:bidId/details"
+                    element={<ProjectDeliveryDetail />}
                   />
                   <Route
                     path="/salesorder/:milestoneId/:projectbidId"
