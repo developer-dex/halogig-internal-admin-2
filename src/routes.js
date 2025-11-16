@@ -173,7 +173,7 @@ const routes = [
         name: 'Project Delivery',
         layout: '/admin',
         path: '/project-delivery',
-        icon: <Icon as={MdWork} width="20px" height="20px" color="inherit" />,
+        icon: <Icon as={MdWork} width="20px" height="20px" color="inherit " />,
         component: <ProjectDeliveryPage />,
       },
     ],

@@ -26,7 +26,6 @@ import {
   Flex,
   HStack,
   Tooltip,
-  Link,
 } from '@chakra-ui/react';
 import {
   MdArrowBack,
@@ -255,17 +254,22 @@ export default function SiteAnalytics() {
                 borderColor={borderColor}
                 borderRadius="8px"
               >
-                <Table variant="simple" color="gray.500" minW="1200px">
+                <Table variant="simple" color="gray.500" minW="1400px">
                   <Thead position="sticky" top="0" zIndex="1" bg={bgColor}>
                     <Tr>
+                      <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" bg={bgColor}>Date</Th>
                       <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" bg={bgColor}>IP Address</Th>
                       <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" minW="180px" bg={bgColor}>Location</Th>
-                      <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" minW="180px" bg={bgColor}>In Time</Th>
-                      <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" minW="180px" bg={bgColor}>Out Time</Th>
-                      <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" bg={bgColor}>Time Spent</Th>
+                      <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" bg={bgColor}>User Type</Th>
+                      <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" bg={bgColor}>In Time</Th>
+                      <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" bg={bgColor}>Out Time</Th>
                       <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" bg={bgColor}>Page Load Time</Th>
                       <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" bg={bgColor}>Device Type</Th>
-                      <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" minW="300px" bg={bgColor}>URL</Th>
+                      <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" bg={bgColor}>Telecom Provider</Th>
+                      <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" bg={bgColor}>Browser</Th>
+                      <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" bg={bgColor}>Source</Th>
+                      <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" bg={bgColor}>Role</Th>
+                      <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" bg={bgColor}>Industry</Th>
                       {!selectedIpAddress && (
                         <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" textAlign="center" bg={bgColor}>Actions</Th>
                       )}
@@ -274,65 +278,91 @@ export default function SiteAnalytics() {
                   <Tbody>
                     {pageAnalytics.map((item) => (
                       <Tr key={item.id || item._id} _hover={{ bg: hoverBg }} transition="all 0.2s">
+                        {/* Date - extracted from In time */}
+                        <Td borderColor={borderColor}>
+                          <Text color={textColor} fontSize="sm" whiteSpace="normal">
+                            {item.start_time
+                              ? moment(item.start_time).format('DD-MM-YYYY')
+                              : '--'}
+                          </Text>
+                        </Td>
+                        {/* IP Address */}
                         <Td borderColor={borderColor}>
                           <Text color={textColor} fontSize="sm" fontWeight="normal" fontFamily="monospace">
                             {item.ip_address || '--'}
                           </Text>
                         </Td>
+                        {/* Location */}
                         <Td borderColor={borderColor}>
                           <Text color={textColor} fontSize="sm" whiteSpace="normal" wordBreak="break-word">
                             {item.location || '--'}
                           </Text>
                         </Td>
+                        {/* User Type - Static "guest" */}
+                        <Td borderColor={borderColor}>
+                          <Text color={textColor} fontSize="sm">
+                            guest
+                          </Text>
+                        </Td>
+                        {/* In Time - Only time, not date */}
                         <Td borderColor={borderColor}>
                           <Text color={textColor} fontSize="sm" whiteSpace="normal">
                             {item.start_time
-                              ? moment(item.start_time).format('DD-MM-YYYY h:mm:ss A')
+                              ? moment(item.start_time).format('h:mm:ss A')
                               : '--'}
                           </Text>
                         </Td>
+                        {/* Out Time - Only time, not date */}
                         <Td borderColor={borderColor}>
                           <Text color={textColor} fontSize="sm" whiteSpace="normal">
                             {item.end_time
-                              ? moment(item.end_time).format('DD-MM-YYYY h:mm:ss A')
+                              ? moment(item.end_time).format('h:mm:ss A')
                               : '--'}
                           </Text>
                         </Td>
-                        <Td borderColor={borderColor}>
-                          <Text color={textColor} fontSize="sm">
-                            {item.time_spent
-                              ? moment.duration(item.time_spent, 'seconds').format('m [min] s [sec]')
-                              : '--'}
-                          </Text>
-                        </Td>
+                        {/* Page Load Time */}
                         <Td borderColor={borderColor}>
                           <Text color={textColor} fontSize="sm">
                             {item.page_load_time ? `${item.page_load_time} sec` : '--'}
                           </Text>
                         </Td>
+                        {/* Device Type */}
                         <Td borderColor={borderColor}>
                           <Text color={textColor} fontSize="sm">
                             {item.device_type || '--'}
                           </Text>
                         </Td>
+                        {/* Telecom Provider */}
                         <Td borderColor={borderColor}>
-                          {item.url ? (
-                            <Link
-                              href={item.url}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              color={textColor}
-                              fontSize="sm"
-                              wordBreak="break-all"
-                              whiteSpace="normal"
-                              _hover={{ textDecoration: 'underline' }}
-                            >
-                              {item.url}
-                            </Link>
-                          ) : (
-                            <Text color={textColor} fontSize="sm">--</Text>
-                          )}
+                          <Text color={textColor} fontSize="sm">
+                            {item.telecom_provider || '--'}
+                          </Text>
                         </Td>
+                        {/* Browser */}
+                        <Td borderColor={borderColor}>
+                          <Text color={textColor} fontSize="sm">
+                            {item.browser || '--'}
+                          </Text>
+                        </Td>
+                        {/* Source - Static "web" */}
+                        <Td borderColor={borderColor}>
+                          <Text color={textColor} fontSize="sm">
+                            web
+                          </Text>
+                        </Td>
+                        {/* Role - Static "founder" */}
+                        <Td borderColor={borderColor}>
+                          <Text color={textColor} fontSize="sm">
+                            founder
+                          </Text>
+                        </Td>
+                        {/* Industry - Static value */}
+                        <Td borderColor={borderColor}>
+                          <Text color={textColor} fontSize="sm">
+                            --
+                          </Text>
+                        </Td>
+                        {/* Actions - Eye button */}
                         {!selectedIpAddress && (
                           <Td borderColor={borderColor} textAlign="center">
                             <Tooltip label="View IP Analytics">
