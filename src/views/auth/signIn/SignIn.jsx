@@ -125,6 +125,7 @@ function SignIn() {
       <Flex
         minH='100vh'
         w='100%'
+        bg='#F4F7FE'
         alignItems='center'
         justifyContent='center'
         px={{ base: '25px', md: '0px' }}
@@ -149,8 +150,8 @@ function SignIn() {
               mb='24px'
               objectFit='contain'
             />
-            <Heading color={textColor} fontSize='24px' mb='10px'>
-              Admin Console
+            <Heading color={textColor} fontSize='20px' mb='10px'>
+            Brain In Progress
             </Heading>
             {/* <Text
               color={textColorSecondary}
@@ -184,7 +185,7 @@ function SignIn() {
                   fontWeight='500'
                   color={textColor}
                   mb='8px'>
-                  Email<Text color={brandStars}>*</Text>
+                  Login<Text color={brandStars}>*</Text>
                 </FormLabel>
                 <Input
                   isRequired={true}
