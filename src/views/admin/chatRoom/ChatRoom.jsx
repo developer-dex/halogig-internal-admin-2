@@ -29,6 +29,10 @@ import {
   FormLabel,
   InputGroup,
   InputRightElement,
+  Menu,
+  MenuButton,
+  MenuList,
+  MenuItem,
 } from '@chakra-ui/react';
 import {
   MdAdd,
@@ -40,6 +44,9 @@ import {
   MdArrowBack,
   MdSearch,
   MdClose,
+  MdMoreVert,
+  MdCheckCircle,
+  MdBlock,
 } from 'react-icons/md';
 import {
   getAllUsers,
@@ -51,6 +58,7 @@ import {
   setCurrentChatRoom,
   clearCurrentChatRoom,
   addMessage,
+  updateChatRoomStatus,
 } from '../../../features/admin/chatManagementSlice';
 import socketService from '../../../services/socket.service';
 import { showSuccess, showError } from '../../../helpers/messageHelper';
@@ -237,6 +245,17 @@ export default function ChatRoom() {
     dispatch(deleteMessage(messageId));
   };
 
+  const handleStatusChange = async (roomId, newStatus, e) => {
+    e.stopPropagation(); // Prevent room selection when clicking menu
+    try {
+      await dispatch(updateChatRoomStatus({ roomId, status: newStatus })).unwrap();
+      // Refresh the chat rooms list after status update
+      dispatch(getAdminChatRooms({ page: currentPage, limit: 50 }));
+    } catch (error) {
+      console.error('Failed to update status:', error);
+    }
+  };
+
   const handleKeyPress = (event) => {
     if (event.key === 'Enter' && !event.shiftKey) {
       event.preventDefault();
@@ -271,12 +290,42 @@ export default function ChatRoom() {
   const getLastMessagePreview = (room) => {
     if (room?.lastMessage) {
       const message = room.lastMessage.message;
-      if (typeof message === 'string') {
+      if (message && typeof message === 'string' && message.trim() !== '') {
+        // Truncate message if longer than 30 characters
         return message.length > 30 ? message.substring(0, 30) + '...' : message;
       }
+      // If message exists but is empty or not a string, show generic message
       return 'Message';
     }
+    // No last message available
     return 'No messages yet';
+  };
+
+  const getRoomDisplayName = (room) => {
+    if (room?.name) {
+      return room.name;
+    }
+    
+    // If no name, get member first names and join with "&"
+    if (room?.members && room.members.length > 0) {
+      const memberNames = room.members
+        .map((member) => member.user?.first_name || '')
+        .filter((name) => name.trim() !== '');
+      
+      if (memberNames.length === 0) {
+        return 'Individual Chat';
+      }
+      if (memberNames.length === 1) {
+        return memberNames[0];
+      }
+      if (memberNames.length === 2) {
+        return memberNames.join(' & ');
+      }
+      // If more than 2 members, show first two with "&" and count
+      return `${memberNames[0]} & ${memberNames[1]} & ${memberNames.length - 2} other${memberNames.length - 2 > 1 ? 's' : ''}`;
+    }
+    
+    return 'Individual Chat';
   };
 
   const toggleUserSelection = (user) => {
@@ -455,14 +504,35 @@ export default function ChatRoom() {
                 >
                   <Flex justify="space-between" align="flex-start">
                     <VStack align="flex-start" spacing="4px" flex="1" minW="0">
-                      <Text
-                        color={textColor}
-                        fontSize="1rem"
-                        fontWeight="600"
-                        noOfLines={1}
-                      >
-                        {room.name}
-                      </Text>
+                      <HStack spacing="8px" align="center">
+                        <Text
+                          color={textColor}
+                          fontSize="1rem"
+                          fontWeight="600"
+                          noOfLines={1}
+                        >
+                          {getRoomDisplayName(room)}
+                        </Text>
+                        {room.status && (
+                          <Badge
+                            colorScheme={
+                              room.status === 'active' 
+                                ? 'green' 
+                                : room.status === 'suspended' 
+                                ? 'red' 
+                                : room.status === 'inactive'
+                                ? 'gray'
+                                : 'blue'
+                            }
+                            fontSize="0.7rem"
+                            borderRadius="4px"
+                            px="6px"
+                            py="2px"
+                          >
+                            {room.status}
+                          </Badge>
+                        )}
+                      </HStack>
                       <Text
                         color={textColorSecondary}
                         fontSize="0.88rem"
@@ -471,27 +541,77 @@ export default function ChatRoom() {
                         {getLastMessagePreview(room)}
                       </Text>
                     </VStack>
-                    <VStack align="flex-end" spacing="2px" ml="8px" minW="48px">
-                      <Text color="gray.400" fontSize="0.75rem">
-                        {room.lastMessage && formatTime(room.lastMessage.created_at)}
-                      </Text>
-                      {room.unreadCount > 0 && (
-                        <Badge
-                          bg="brand.500"
-                          color="white"
-                          borderRadius="full"
-                          fontSize="0.72rem"
-                          minW="18px"
-                          minH="18px"
-                          display="flex"
-                          align="center"
-                          justify="center"
-                          px="6px"
+                    <HStack spacing="8px" align="flex-end">
+                      <VStack align="flex-end" spacing="2px" ml="8px" minW="48px">
+                        <Text color="gray.400" fontSize="0.75rem">
+                          {room.lastMessage && formatTime(room.lastMessage.created_at)}
+                        </Text>
+                        {room.unreadCount > 0 && (
+                          <Badge
+                            bg="brand.500"
+                            color="white"
+                            borderRadius="full"
+                            fontSize="0.72rem"
+                            minW="18px"
+                            minH="18px"
+                            display="flex"
+                            align="center"
+                            justify="center"
+                            px="6px"
+                          >
+                            {room.unreadCount}
+                          </Badge>
+                        )}
+                      </VStack>
+                      <Menu>
+                        <MenuButton
+                          as={IconButton}
+                          aria-label="Options"
+                          icon={<MdMoreVert />}
+                          variant="ghost"
+                          size="sm"
+                          color={textColorSecondary}
+                          fontSize="18px"
+                          w="32px"
+                          h="32px"
+                          minW="32px"
+                          onClick={(e) => e.stopPropagation()}
+                          _hover={{
+                            bg: hoverBg,
+                            color: textColor,
+                          }}
+                        />
+                        <MenuList
+                          bg={bgColor}
+                          borderColor={borderColor}
+                          boxShadow="0 4px 12px rgba(0,0,0,0.1)"
+                          minW="180px"
                         >
-                          {room.unreadCount}
-                        </Badge>
-                      )}
-                    </VStack>
+                          <MenuItem
+                            icon={<MdCheckCircle />}
+                            onClick={(e) => handleStatusChange(room.id, 'active', e)}
+                            isDisabled={room.status === 'active'}
+                            bg={bgColor}
+                            _hover={{ bg: hoverBg }}
+                            color={room.status === 'active' ? textColorSecondary : 'green.500'}
+                            fontSize="0.9rem"
+                          >
+                            {room.status === 'active' ? 'Already Active' : 'Set as Active'}
+                          </MenuItem>
+                          <MenuItem
+                            icon={<MdBlock />}
+                            onClick={(e) => handleStatusChange(room.id, 'suspended', e)}
+                            isDisabled={room.status === 'suspended'}
+                            bg={bgColor}
+                            _hover={{ bg: hoverBg }}
+                            color={room.status === 'suspended' ? textColorSecondary : 'red.500'}
+                            fontSize="0.9rem"
+                          >
+                            {room.status === 'suspended' ? 'Already Suspended' : 'Suspend'}
+                          </MenuItem>
+                        </MenuList>
+                      </Menu>
+                    </HStack>
                   </Flex>
                 </Box>
               ))
@@ -559,13 +679,13 @@ export default function ChatRoom() {
                       size="md"
                       bg="linear-gradient(135deg, #c3362a 0%, #92150d 100%)"
                       color="white"
-                      name={currentChatRoom.name}
+                      name={getRoomDisplayName(currentChatRoom)}
                     >
-                      {currentChatRoom.name?.[0]?.toUpperCase()}
+                      {getRoomDisplayName(currentChatRoom)?.[0]?.toUpperCase()}
                     </Avatar>
                     <VStack align="flex-start" spacing="0">
                       <Text color={textColor} fontSize="1.1rem" fontWeight="700">
-                        {currentChatRoom.name}
+                        {getRoomDisplayName(currentChatRoom)}
                       </Text>
                       <Text color="green.500" fontSize="0.85rem">
                         {currentChatRoom.memberCount || 0} Member

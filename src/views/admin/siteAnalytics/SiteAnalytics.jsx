@@ -57,12 +57,12 @@ export default function SiteAnalytics() {
 
   const textColor = useColorModeValue('rgb(32, 33, 36)', 'white');
   const borderColor = useColorModeValue('gray.200', 'whiteAlpha.100');
-    const bgColor = useColorModeValue('#F4F7FE', 'black');
+  const bgColor = useColorModeValue('#F4F7FE', 'black');
   const hoverBg = useColorModeValue('gray.50', 'whiteAlpha.50');
   const cardBg = useColorModeValue('white', 'navy.800');
 
   const fetchData = async () => {
-    setIsLoading(true); 
+    setIsLoading(true);
     try {
       if (selectedIpAddress) {
         const response = await dispatch(
@@ -154,7 +154,7 @@ export default function SiteAnalytics() {
         const ws = XLSX.utils.json_to_sheet(excelData);
 
         // Add worksheet to workbook
-        XLSX.utils.book_append_sheet(wb, ws, 'Site Analytics');
+        XLSX.utils.book_append_sheet(wb, ws, 'Visitor Analytics');
 
         // Generate filename with date range
         const fileName = `site_analytics_${moment(fromDate).format('YYYY-MM-DD')}_to_${moment(toDate).format('YYYY-MM-DD')}.xlsx`;
@@ -190,7 +190,7 @@ export default function SiteAnalytics() {
     <Box>
       {/* Header */}
       <Box mb="4px" >
-        <Box  ps="12px" pe="12px">
+        <Box ps="12px" pe="12px">
           <Flex justify="space-between" align="center" flexWrap="wrap" gap={4}>
             <HStack spacing={4}>
               {selectedIpAddress && (
@@ -204,7 +204,7 @@ export default function SiteAnalytics() {
                 </Button>
               )}
               <Text color={textColor} fontSize="xl" fontWeight="700">
-                {selectedIpAddress ? `Analytics for IP: ${selectedIpAddress}` : 'Site Analytics'}
+                {selectedIpAddress ? `Analytics for IP: ${selectedIpAddress}` : 'Visitor Analytics'}
               </Text>
             </HStack>
             <HStack spacing={2}>
@@ -385,7 +385,7 @@ export default function SiteAnalytics() {
               </Box>
 
               {/* Pagination */}
-              <Flex justify="space-between" align="center"  pt="8px" borderTop="1px solid" borderColor={borderColor}>
+              <Flex justify="space-between" align="center" pt="8px" borderTop="1px solid" borderColor={borderColor}>
                 <Text color="black" fontSize="sm">
                   Showing <Text as="span" fontWeight="700" color="brand.500">{pageAnalytics.length}</Text> of {totalCount}
                 </Text>

@@ -44,12 +44,14 @@ import WebsiteData from 'views/admin/websiteData';
 import WebsiteDataDetails from 'views/admin/websiteData/WebsiteDataDetails';
 import SiteAnalytics from 'views/admin/siteAnalytics';
 import ChatRoom from 'views/admin/chatRoom';
+import UserChatRoom from 'views/admin/userChatRoom';
 const ProjectBidsPage = () => <ProjectBids />;
 const ProjectFinancePage = () => <ProjectFinance />;
 const ProjectDeliveryPage = () => <ProjectDelivery />;
 const ContactsPage = () => <ContactList />;
 const WebsiteDataPage = () => <WebsiteData />;
 const ChatRoomsPage = () => <ChatRoom />;
+const UserChatRoomsPage = () => <UserChatRoom />;
 const SiteAnalyticsPage = () => <SiteAnalytics />;
 const LogManagerPage = () => <div>Log Manager Page - Coming Soon</div>;
 
@@ -190,7 +192,7 @@ const routes = [
         component: <WebsiteDataPage />,
       },
       {
-        name: 'Site Analytics',
+        name: 'Visitor Analytics',
         layout: '/admin',
         path: '/site-analytics',
         icon: <Icon as={MdAnalytics} width="20px" height="20px" color="inherit" />,
@@ -216,6 +218,13 @@ const routes = [
         icon: <Icon as={MdChat} width="20px" height="20px" color="inherit" />,
         component: <ChatRoomsPage />,
       },
+      // {
+      //   name: 'User Chat Rooms',
+      //   layout: '/admin',
+      //   path: '/user-chat-rooms',
+      //   icon: <Icon as={MdChat} width="20px" height="20px" color="inherit" />,
+      //   component: <UserChatRoomsPage />,
+      // },
     ],
   },
 

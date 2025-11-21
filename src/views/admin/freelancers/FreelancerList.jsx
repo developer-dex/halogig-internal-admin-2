@@ -48,7 +48,7 @@ function FreelancerList() {
   const detailsModal = useDisclosure();
   const statusModal = useDisclosure();
   const [selectedStatus, setSelectedStatus] = useState('');
-  const statusOptions = ['Pending', 'Approved', 'Rejected', 'Under Review'];
+  const statusOptions = ['Pending', 'Approved', 'Rejected', 'Under Review', 'Suspended'];
 
   const {
     isLoading,

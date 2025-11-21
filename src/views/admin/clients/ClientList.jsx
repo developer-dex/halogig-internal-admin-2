@@ -50,7 +50,7 @@ export default function ClientList() {
   const [selectedClient, setSelectedClient] = useState(null);
   const [selectedStatus, setSelectedStatus] = useState('');
   
-  const statusOptions = ['Pending', 'Approved', 'Rejected', 'Under Review'];
+  const statusOptions = ['Pending', 'Approved', 'Rejected', 'Under Review', 'Suspended'];
   const pageLimit = 50;
 
   // Chakra color mode values

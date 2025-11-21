@@ -31,6 +31,8 @@ export const apiEndPoints = {
   GET_ALL_USERS: "admin/user",
   CREATE_CHAT_ROOM: "admin/chat/rooms",
   GET_ADMIN_CHAT_ROOMS: "admin/chat/rooms",
+  GET_USER_CHAT_ROOMS: "admin/chat-room/not-created-by-admin",
+  UPDATE_CHAT_ROOM_STATUS: "admin/chat-room",
   GET_CHAT_ROOM_MESSAGES: "admin/chat/rooms",
   SEND_MESSAGE: "chat/rooms",
   DELETE_MESSAGE: "chat/messages",

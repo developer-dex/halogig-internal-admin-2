@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { apiEndPoints } from "../../config/path";
 import { showError, showSuccess } from "../../helpers/messageHelper";
-import { getApi, postApi, deleteApi } from "../../services/api";
+import { getApi, postApi, deleteApi, patchApi } from "../../services/api";
 
 const initialState = {
     isLoading: false,
@@ -10,10 +10,12 @@ const initialState = {
     responseCode: 0,
     responseData: {},
     chatRooms: [],
+    userChatRooms: [],
     currentChatRoom: null,
     messages: [],
     users: [],
     totalCount: 0,
+    userChatRoomsTotalCount: 0,
 };
 
 // Get all users for room creation
@@ -111,6 +113,35 @@ export const getChatRoomDetails = createAsyncThunk(
             return payload;
         } catch (error) {
             showError(error.response?.data?.message || "Failed to fetch room details");
+            return rejectWithValue(error.response?.data);
+        }
+    }
+);
+
+// Get user chat rooms (not created by admin)
+export const getUserChatRooms = createAsyncThunk(
+    "/chat/getUserChatRooms",
+    async (_, { rejectWithValue }) => {
+        try {
+            const payload = await getApi(apiEndPoints.GET_USER_CHAT_ROOMS);
+            return payload;
+        } catch (error) {
+            showError(error.response?.data?.message || "Failed to fetch user chat rooms");
+            return rejectWithValue(error.response?.data);
+        }
+    }
+);
+
+// Update chat room status
+export const updateChatRoomStatus = createAsyncThunk(
+    "/chat/updateChatRoomStatus",
+    async ({ roomId, status }, { rejectWithValue }) => {
+        try {
+            const payload = await patchApi(`${apiEndPoints.UPDATE_CHAT_ROOM_STATUS}/${roomId}/status`, { status });
+            showSuccess(`Chat room ${status === 'active' ? 'activated' : 'suspended'} successfully!`);
+            return { payload, roomId, status };
+        } catch (error) {
+            showError(error.response?.data?.message || "Failed to update chat room status");
             return rejectWithValue(error.response?.data);
         }
     }
@@ -250,6 +281,50 @@ export const chatManagementSlice = createSlice({
                 state.responseCode = payload?.status;
             })
             .addCase(getChatRoomDetails.rejected, (state) => {
+                state.isLoading = false;
+                state.isError = true;
+            })
+            
+            // Get user chat rooms
+            .addCase(getUserChatRooms.pending, (state) => {
+                state.isLoading = true;
+                state.isError = false;
+            })
+            .addCase(getUserChatRooms.fulfilled, (state, { payload }) => {
+                state.isLoading = false;
+                state.isSuccess = true;
+                state.userChatRooms = payload?.data?.data || [];
+                state.userChatRoomsTotalCount = payload?.data?.data?.length || 0;
+                state.responseCode = payload?.status;
+            })
+            .addCase(getUserChatRooms.rejected, (state) => {
+                state.isLoading = false;
+                state.isError = true;
+            })
+            
+            // Update chat room status
+            .addCase(updateChatRoomStatus.pending, (state) => {
+                state.isLoading = true;
+                state.isError = false;
+            })
+            .addCase(updateChatRoomStatus.fulfilled, (state, { payload }) => {
+                state.isLoading = false;
+                state.isSuccess = true;
+                // Update the status in the userChatRooms array
+                const roomId = payload.roomId;
+                const newStatus = payload.status;
+                const roomIndex = state.userChatRooms.findIndex(room => room.id === roomId);
+                if (roomIndex !== -1) {
+                    state.userChatRooms[roomIndex].status = newStatus;
+                }
+                // Also update in chatRooms array (for admin chat rooms)
+                const adminRoomIndex = state.chatRooms.findIndex(room => room.id === roomId);
+                if (adminRoomIndex !== -1) {
+                    state.chatRooms[adminRoomIndex].status = newStatus;
+                }
+                state.responseCode = payload?.payload?.status;
+            })
+            .addCase(updateChatRoomStatus.rejected, (state) => {
                 state.isLoading = false;
                 state.isError = true;
             });
