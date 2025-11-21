@@ -125,7 +125,7 @@ function SignIn() {
       <Flex
         minH='100vh'
         w='100%'
-        bg='#F4F7FE'
+        bg='#F2F6FC'
         alignItems='center'
         justifyContent='center'
         px={{ base: '25px', md: '0px' }}
