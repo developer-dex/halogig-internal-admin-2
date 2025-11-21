@@ -163,14 +163,27 @@ const routes = [
         path: '/project-bids',
         icon: <Icon as={MdGavel} width="20px" height="20px" color="inherit" />,
         component: <ProjectBidsPage />,
-      },
+      }
+    ],
+  },
+  {
+    category: 'Finance',
+    layout: '/admin',
+    items: [
+     
       {
         name: 'Project Finance',
         layout: '/admin',
         path: '/project-finance',
         icon: <Icon as={MdAttachMoney} width="20px" height="20px" color="inherit" />,
         component: <ProjectFinancePage />,
-      },
+      }
+    ],
+  },
+  {
+    category: 'Delivery',
+    layout: '/admin',
+    items: [
       {
         name: 'Project Delivery',
         layout: '/admin',
