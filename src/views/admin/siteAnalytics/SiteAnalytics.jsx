@@ -133,20 +133,28 @@ export default function SiteAnalytics() {
 
         // Transform data for Excel
         const excelData = data.map((item) => ({
+          Date: item.start_time
+            ? moment(item.start_time).format('DD-MM-YYYY')
+            : '--',
           'IP Address': item.ip_address || '--',
           Location: item.location || '--',
+          'User Type': 'guest',
           'In Time': item.start_time
-            ? moment(item.start_time).format('DD-MM-YYYY h:mm:ss A')
+            ? moment(item.start_time).format('h:mm:ss A')
             : '--',
           'Out Time': item.end_time
-            ? moment(item.end_time).format('DD-MM-YYYY h:mm:ss A')
+            ? moment(item.end_time).format('h:mm:ss A')
             : '--',
           'Time Spent': item.time_spent
             ? moment.duration(item.time_spent, 'seconds').format('m [min] s [sec]')
             : '--',
-          'Page Load Time': item.page_load_time ? `${item.page_load_time} sec` : '--',
+          'Page Load Time': item.page_load_time ? `${Math.abs(item.page_load_time)} sec` : '--',
           'Device Type': item.device_type || '--',
-          URL: item.url || '--',
+          'Telecom Provider': item.telecom_provider || '--',
+          Browser: item.browser || '--',
+          Source: 'web',
+          Role: 'founder',
+          Industry: '--',
         }));
 
         // Create workbook and worksheet
@@ -263,6 +271,7 @@ export default function SiteAnalytics() {
                       <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" bg={bgColor}>User Type</Th>
                       <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" bg={bgColor}>In Time</Th>
                       <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" bg={bgColor}>Out Time</Th>
+                      <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" bg={bgColor}>Time Spent</Th>
                       <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" bg={bgColor}>Page Load Time</Th>
                       <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" bg={bgColor}>Device Type</Th>
                       <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" bg={bgColor}>Telecom Provider</Th>
@@ -320,10 +329,18 @@ export default function SiteAnalytics() {
                               : '--'}
                           </Text>
                         </Td>
+                        {/* Time Spent */}
+                        <Td borderColor={borderColor}>
+                          <Text color={textColor} fontSize="sm">
+                            {item.time_spent
+                              ? moment.duration(item.time_spent, 'seconds').format('m [min] s [sec]')
+                              : '--'}
+                          </Text>
+                        </Td>
                         {/* Page Load Time */}
                         <Td borderColor={borderColor}>
                           <Text color={textColor} fontSize="sm">
-                            {item.page_load_time ? `${item.page_load_time} sec` : '--'}
+                            {item.page_load_time ? `${Math.abs(item.page_load_time)} sec` : '--'}
                           </Text>
                         </Td>
                         {/* Device Type */}
