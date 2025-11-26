@@ -153,8 +153,8 @@ export default function SiteAnalytics() {
           'Telecom Provider': item.telecom_provider || '--',
           Browser: item.browser || '--',
           Source: 'web',
-          Role: 'founder',
-          Industry: '--',
+          Role: item.role || '--',
+          Industry: item.industry_name || '--',
         }));
 
         // Create workbook and worksheet
@@ -367,16 +367,16 @@ export default function SiteAnalytics() {
                             web
                           </Text>
                         </Td>
-                        {/* Role - Static "founder" */}
+                        {/* Role */}
                         <Td borderColor={borderColor}>
                           <Text color={textColor} fontSize="sm">
-                            founder
+                            {item.role || '--'}
                           </Text>
                         </Td>
-                        {/* Industry - Static value */}
+                        {/* Industry */}
                         <Td borderColor={borderColor}>
                           <Text color={textColor} fontSize="sm">
-                            --
+                            {item.industry_name || '--'}
                           </Text>
                         </Td>
                         {/* Actions - Eye button */}
