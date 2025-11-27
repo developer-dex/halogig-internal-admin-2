@@ -138,6 +138,7 @@ export default function SiteAnalytics() {
             : '--',
           'IP Address': item.ip_address || '--',
           Location: item.location || '--',
+          'Page Visit': item.url || '--',
           'User Type': 'guest',
           'In Time': item.start_time
             ? moment(item.start_time).format('h:mm:ss A')
@@ -267,7 +268,8 @@ export default function SiteAnalytics() {
                     <Tr>
                       <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" bg={bgColor}>Date</Th>
                       <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" bg={bgColor}>IP Address</Th>
-                      <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" minW="180px" bg={bgColor}>Location</Th>
+                      <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" minW="120px" bg={bgColor}>Location</Th>
+                      <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" minW="400px" bg={bgColor}>Page Visit</Th>
                       <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" bg={bgColor}>User Type</Th>
                       <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" bg={bgColor}>In Time</Th>
                       <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" bg={bgColor}>Out Time</Th>
@@ -288,8 +290,8 @@ export default function SiteAnalytics() {
                     {pageAnalytics.map((item) => (
                       <Tr key={item.id || item._id} _hover={{ bg: hoverBg }} transition="all 0.2s">
                         {/* Date - extracted from In time */}
-                        <Td borderColor={borderColor}>
-                          <Text color={textColor} fontSize="sm" whiteSpace="normal">
+                        <Td borderColor={borderColor} minW="120px">
+                          <Text color={textColor} fontSize="sm" whiteSpace="nowrap">
                             {item.start_time
                               ? moment(item.start_time).format('DD-MM-YYYY')
                               : '--'}
@@ -302,10 +304,25 @@ export default function SiteAnalytics() {
                           </Text>
                         </Td>
                         {/* Location */}
-                        <Td borderColor={borderColor}>
-                          <Text color={textColor} fontSize="sm" whiteSpace="normal" wordBreak="break-word">
+                        <Td borderColor={borderColor} maxW="150px">
+                          <Text color={textColor} fontSize="sm" whiteSpace="normal" wordBreak="break-word" noOfLines={2}>
                             {item.location || '--'}
                           </Text>
+                        </Td>
+                        {/* Page Visit */}
+                        <Td borderColor={borderColor} maxW="450px">
+                          <Tooltip label={item.url || ''} placement="top">
+                            <Text
+                              color={textColor}
+                              fontSize="sm"
+                              whiteSpace="normal"
+                              wordBreak="break-word"
+                              noOfLines={3}
+                              cursor="pointer"
+                            >
+                              {item.url || '--'}
+                            </Text>
+                          </Tooltip>
                         </Td>
                         {/* User Type - Static "guest" */}
                         <Td borderColor={borderColor}>
