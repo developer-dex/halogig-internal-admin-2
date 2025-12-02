@@ -34,6 +34,7 @@ import ProjectDelivery from 'views/admin/projectBids/ProjectDelivery';
 
 // Auth Imports
 import SignInCentered from 'views/auth/signIn';
+import VerifyOtp from 'views/auth/verifyOtp';
 
 // Admin Page Imports
 import ClientList from 'views/admin/clients';
@@ -62,6 +63,13 @@ const routes = [
     layout: '/auth',
     path: '/sign-in',
     component: <SignInCentered />,
+    hidden: true, // Hide from sidebar navigation
+  },
+  {
+    name: 'Verify OTP',
+    layout: '/auth',
+    path: '/verify-otp',
+    component: <VerifyOtp />,
     hidden: true, // Hide from sidebar navigation
   },
   // Dashboard at the top
@@ -109,15 +117,9 @@ const routes = [
     category: 'Management',
     layout: '/admin',
     items: [
+  
       {
-        name: 'Online Clients',
-        layout: '/admin',
-        path: '/online-clients',
-        icon: <Icon as={MdPeople} width="20px" height="20px" color="inherit" />,
-        component: <ClientList />,
-      },
-      {
-        name: 'Offline Clients',
+        name: 'Clients',
         layout: '/admin',
         path: '/offline-clients',
         icon: <Icon as={MdPeople} width="20px" height="20px" color="inherit" />,

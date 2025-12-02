@@ -55,8 +55,15 @@ function SignIn() {
   }, [navigate]);
 
   useEffect(() => {
-    if (isSuccess && responseData?.token) {
-      // Store token and admin data in localStorage
+    if (isSuccess && responseData?.requiresOtp) {
+      // Store OTP temporarily for verification
+      localStorage.setItem('tempOtp', responseData.otp);
+      localStorage.setItem('tempEmail', responseData.email);
+      
+      // Navigate to OTP verification page
+      navigate('/auth/verify-otp', { state: { email: responseData.email } });
+    } else if (isSuccess && responseData?.token) {
+      // Direct login (if 2FA is disabled or bypassed)
       localStorage.setItem('adminToken', responseData.token);
       localStorage.setItem('adminData', JSON.stringify(responseData.admin));
       localStorage.setItem('isAdminLogIn', 'true');

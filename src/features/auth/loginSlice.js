@@ -19,13 +19,34 @@ export const adminLogin = createAsyncThunk(
       const valuesData = { ...values };
       const payload = await authPostApi(apiEndPoints.ADMIN_LOGIN, valuesData);
       
-      if (payload?.data?.data?.token) {
+      if (payload?.data?.data?.requiresOtp) {
+        showSuccess("OTP sent to your email!");
+      } else if (payload?.data?.data?.token) {
         showSuccess("Login successful!");
       }
       
       return payload;
     } catch (e) {
       showError(e.response?.data?.message || "Login failed");
+      throw e;
+    }
+  }
+);
+
+export const verifyOtp = createAsyncThunk(
+  "/verifyOtp",
+  async (values) => {
+    try {
+      const valuesData = { ...values };
+      const payload = await authPostApi(apiEndPoints.ADMIN_VERIFY_OTP, valuesData);
+      
+      if (payload?.data?.data?.token) {
+        showSuccess("Login successful!");
+      }
+      
+      return payload;
+    } catch (e) {
+      showError(e.response?.data?.message || "Invalid or expired OTP");
       throw e;
     }
   }
@@ -73,6 +94,23 @@ export const loginDataSlice = createSlice({
         state.token = payload && payload.data.data.token;
       })
       .addCase(adminLogin.rejected, (state) => {
+        state.isLoading = false;
+        state.isError = true;
+        state.isSuccess = false;
+      })
+      .addCase(verifyOtp.pending, (state) => {
+        state.isLoading = true;
+        state.isError = false;
+        state.isSuccess = false;
+      })
+      .addCase(verifyOtp.fulfilled, (state, { payload }) => {
+        state.isLoading = false;
+        state.isSuccess = true;
+        state.responseCode = payload && payload.status;
+        state.responseData = payload && payload.data.data;
+        state.token = payload && payload.data.data.token;
+      })
+      .addCase(verifyOtp.rejected, (state) => {
         state.isLoading = false;
         state.isError = true;
         state.isSuccess = false;
