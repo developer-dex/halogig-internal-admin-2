@@ -31,7 +31,6 @@ import {
   MdArrowBack,
   MdRefresh,
   MdGetApp,
-  MdVisibility,
   MdChevronLeft,
   MdChevronRight,
 } from 'react-icons/md';
@@ -139,7 +138,7 @@ export default function SiteAnalytics() {
           'IP Address': item.ip_address || '--',
           Location: item.location || '--',
           'Page Visit': item.url || '--',
-          'User Type': 'guest',
+          'User Type': item.user_type || 'guest',
           'In Time': item.start_time
             ? moment(item.start_time).format('h:mm:ss A')
             : '--',
@@ -281,9 +280,6 @@ export default function SiteAnalytics() {
                       <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" bg={bgColor}>Source</Th>
                       <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" bg={bgColor}>Role</Th>
                       <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" bg={bgColor}>Industry</Th>
-                      {!selectedIpAddress && (
-                        <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" textAlign="center" bg={bgColor}>Actions</Th>
-                      )}
                     </Tr>
                   </Thead>
                   <Tbody>
@@ -299,9 +295,33 @@ export default function SiteAnalytics() {
                         </Td>
                         {/* IP Address */}
                         <Td borderColor={borderColor}>
-                          <Text color={textColor} fontSize="sm" fontWeight="normal" fontFamily="monospace">
-                            {item.ip_address || '--'}
-                          </Text>
+                          {item.ip_address ? (
+                            <Tooltip label="View IP Analytics" hasArrow>
+                              <Text
+                                color={selectedIpAddress ? textColor : 'brand.500'}
+                                fontSize="sm"
+                                fontWeight="normal"
+                                fontFamily="monospace"
+                                cursor={selectedIpAddress ? 'default' : 'pointer'}
+                                _hover={
+                                  selectedIpAddress
+                                    ? {}
+                                    : { textDecoration: 'underline' }
+                                }
+                                onClick={
+                                  selectedIpAddress
+                                    ? undefined
+                                    : () => handleViewIpAnalytics(item.ip_address)
+                                }
+                              >
+                                {item.ip_address}
+                              </Text>
+                            </Tooltip>
+                          ) : (
+                            <Text color={textColor} fontSize="sm" fontWeight="normal" fontFamily="monospace">
+                              --
+                            </Text>
+                          )}
                         </Td>
                         {/* Location */}
                         <Td borderColor={borderColor} maxW="150px">
@@ -327,7 +347,7 @@ export default function SiteAnalytics() {
                         {/* User Type - Static "guest" */}
                         <Td borderColor={borderColor}>
                           <Text color={textColor} fontSize="sm">
-                            guest
+                            {item.user_type || 'guest'}
                           </Text>
                         </Td>
                         {/* In Time - Only time, not date */}
@@ -396,22 +416,6 @@ export default function SiteAnalytics() {
                             {item.industry_name || '--'}
                           </Text>
                         </Td>
-                        {/* Actions - Eye button */}
-                        {!selectedIpAddress && (
-                          <Td borderColor={borderColor} textAlign="center">
-                            <Tooltip label="View IP Analytics">
-                              <IconButton
-                                aria-label="View IP analytics"
-                                icon={<MdVisibility />}
-                                size="sm"
-                                color="black"
-                                variant="ghost"
-                                onClick={() => handleViewIpAnalytics(item.ip_address)}
-                                isDisabled={!item.ip_address}
-                              />
-                            </Tooltip>
-                          </Td>
-                        )}
                       </Tr>
                     ))}
                   </Tbody>
