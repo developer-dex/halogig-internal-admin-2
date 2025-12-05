@@ -28,7 +28,7 @@ import logo from 'assets/img/logo/logo.png';
 function SignIn() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  
+
   const { isLoading, isSuccess, isError, responseData } = useSelector(
     (state) => state.loginDataReducer
   );
@@ -59,7 +59,7 @@ function SignIn() {
       // Store OTP temporarily for verification
       localStorage.setItem('tempOtp', responseData.otp);
       localStorage.setItem('tempEmail', responseData.email);
-      
+
       // Navigate to OTP verification page
       navigate('/auth/verify-otp', { state: { email: responseData.email } });
     } else if (isSuccess && responseData?.token) {
@@ -67,7 +67,7 @@ function SignIn() {
       localStorage.setItem('adminToken', responseData.token);
       localStorage.setItem('adminData', JSON.stringify(responseData.admin));
       localStorage.setItem('isAdminLogIn', 'true');
-      
+
       // Navigate to dashboard
       navigate('/admin/default');
     }
@@ -81,7 +81,7 @@ function SignIn() {
       ...prev,
       [name]: value
     }));
-    
+
     // Clear error when user starts typing
     if (errors[name]) {
       setErrors(prev => ({
@@ -93,26 +93,26 @@ function SignIn() {
 
   const validateForm = () => {
     const newErrors = {};
-    
+
     if (!formData.email) {
       newErrors.email = 'Email is required';
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
       newErrors.email = 'Please enter a valid email';
     }
-    
+
     if (!formData.password) {
       newErrors.password = 'Password is required';
     } else if (formData.password.length < 6) {
       newErrors.password = 'Password must be at least 6 characters';
     }
-    
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       return;
     }
@@ -132,7 +132,7 @@ function SignIn() {
       <Flex
         minH='100vh'
         w='100%'
-        bg='#F2F6FC'
+        bg='#ffffff'
         alignItems='center'
         justifyContent='center'
         px={{ base: '25px', md: '0px' }}
@@ -141,24 +141,24 @@ function SignIn() {
           w={{ base: '100%', md: 'max-content' }}
           maxW='100%'
           mx='auto'
-          style={{ 
+          style={{
             boxShadow: '0 12px 40px rgba(0, 0, 0, 0.12)',
             padding: '20px',
             borderRadius: '15px'
           }}>
           <Box textAlign='center' mb='36px'>
-            <Image 
-              src={logo} 
-              alt="HaloGig Logo" 
-              h='auto' 
-              w='140px' 
+            <Image
+              src={logo}
+              alt="HaloGig Logo"
+              h='auto'
+              w='140px'
               maxH='30px'
               mx='auto'
               mb='24px'
               objectFit='contain'
             />
             <Heading color={textColor} fontSize='20px' mb='10px'>
-            Brain In Progress
+              Brain In Progress
             </Heading>
             {/* <Text
               color={textColorSecondary}
@@ -175,7 +175,7 @@ function SignIn() {
             background='transparent'
             borderRadius='15px'
             mx='auto'>
-            
+
             {isError && (
               <Alert status='error' mb='24px' borderRadius='15px'>
                 <AlertIcon />
@@ -215,7 +215,7 @@ function SignIn() {
                   </Text>
                 )}
               </FormControl>
-              
+
               <FormControl isInvalid={!!errors.password} mb='24px'>
                 <FormLabel
                   ms='4px'
@@ -242,7 +242,7 @@ function SignIn() {
                     <Icon
                       color={textColorSecondary}
                       _hover={{ cursor: 'pointer' }}
-                      as={show ? MdOutlineRemoveRedEye: RiEyeCloseLine }
+                      as={show ? MdOutlineRemoveRedEye : RiEyeCloseLine}
                       onClick={handleClick}
                     />
                   </InputRightElement>
@@ -253,25 +253,27 @@ function SignIn() {
                   </Text>
                 )}
               </FormControl>
-              <Button
-                fontSize='sm'
-                // variant='brand'
-                fontWeight='500'
-                w='30%'
-                // w="fit-content"
-                h='40px'
-                mb='10px'
-                type='submit'
-                isLoading={isLoading}
-                style={{ background: 'linear-gradient(#c3362a 0, #92150d 74%)', color: 'white' }}
-                loadingText='Signing in...'
-                spinner={<Spinner size='sm' />}>
-                Sign In
-              </Button>
+              <div style={{ display: 'flex', justifyContent: 'center' }}>
+                <Button
+                  fontSize='sm'
+                  // variant='brand'
+                  fontWeight='500'
+                  w='30%'
+                  // w="fit-content"
+                  h='40px'
+                  mb='10px'
+                  type='submit'
+                  isLoading={isLoading}
+                  style={{ background: 'linear-gradient(#c3362a 0, #92150d 74%)', color: 'white' }}
+                  loadingText='Signing in...'
+                  spinner={<Spinner size='sm' />}>
+                  Sign In
+                </Button>
+              </div>
             </form>
           </Flex>
         </Box>
-        
+
         <Flex
           flexDirection='column'
           justifyContent='center'
