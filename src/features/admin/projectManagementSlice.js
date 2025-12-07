@@ -51,17 +51,16 @@ export const updateProject = createAsyncThunk(
 
 export const updateProjectStatus = createAsyncThunk(
     "/updateProjectStatus",
-    async ({ projectId, currentApprovedStatus }) => {
+    async ({ projectId, status }) => {
         try {
-            const newApprovedStatus = !currentApprovedStatus;
-            const payload = await patchApi(`${apiEndPoints.UPDATE_PROJECT_STATUS}/${projectId}/status`, { approved_by_admin: newApprovedStatus });
-            return { projectId, newApprovedStatus };
+            const payload = await patchApi(`${apiEndPoints.UPDATE_PROJECT_STATUS}/${projectId}/status`, { status });
+            return { projectId, status };
         } catch (e) {
             console.error('Status Update API Error:', e);
             if (e.response && e.response.data) {
                 showError(e.response.data.message);
             } else {
-                showError('Failed to update project approval status');
+                showError('Failed to update project status');
             }
             throw e;
         }
