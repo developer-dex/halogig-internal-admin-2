@@ -19,8 +19,10 @@ instance.interceptors.request.use(
       config.headers.authorization = `Bearer ${adminToken}`;
     }
     
-    // Set default headers
+    // Set default headers (but don't override Content-Type for FormData)
+    if (!(config.data instanceof FormData)) {
     config.headers.Accept = "application/json";
+    }
     config.headers["Accept-Language"] = "en";
     
     return config;

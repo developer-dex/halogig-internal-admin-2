@@ -9,6 +9,8 @@ import { dropdownDataReducer } from "../features/admin/dropdownDataSlice";
 import { projectBidsReducer } from "../features/admin/projectBidsSlice";
 import { loginDataReducer } from "../features/auth/loginSlice";
 import { websiteDataReducer } from "../features/admin/websiteDataSlice";
+import { blogReducer } from "../features/admin/blogSlice";
+import { emailDomainAnalysisReducer } from "../features/admin/emailDomainAnalysisSlice";
 
 const store = configureStore({
   reducer: {
@@ -22,6 +24,8 @@ const store = configureStore({
     projectBidsReducer:projectBidsReducer,
     loginDataReducer:loginDataReducer,
     websiteData:websiteDataReducer,
+    blog: blogReducer,
+    emailDomainAnalysis: emailDomainAnalysisReducer,
   },
   middleware: getDefaultMiddleware =>
     getDefaultMiddleware({

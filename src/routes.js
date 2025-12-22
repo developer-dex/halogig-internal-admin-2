@@ -19,6 +19,8 @@ import {
   MdOutlineShoppingCart,
   MdPowerSettingsNew,
   MdAttachMoney,
+  MdArticle,
+  MdScience,
 } from 'react-icons/md';
 
 // Admin Imports
@@ -46,6 +48,8 @@ import WebsiteDataDetails from 'views/admin/websiteData/WebsiteDataDetails';
 import SiteAnalytics from 'views/admin/siteAnalytics';
 import ChatRoom from 'views/admin/chatRoom';
 import UserChatRoom from 'views/admin/userChatRoom';
+import Blog from 'views/admin/blog';
+import EmailDomainAnalysis from 'views/admin/ai';
 const ProjectBidsPage = () => <ProjectBids />;
 const ProjectFinancePage = () => <ProjectFinance />;
 const ProjectDeliveryPage = () => <ProjectDelivery />;
@@ -54,6 +58,7 @@ const WebsiteDataPage = () => <WebsiteData />;
 const ChatRoomsPage = () => <ChatRoom />;
 const UserChatRoomsPage = () => <UserChatRoom />;
 const SiteAnalyticsPage = () => <SiteAnalytics />;
+const BlogPage = () => <Blog />;
 const LogManagerPage = () => <div>Log Manager Page - Coming Soon</div>;
 
 const routes = [
@@ -207,11 +212,31 @@ const routes = [
         component: <WebsiteDataPage />,
       },
       {
+        name: 'Blog',
+        layout: '/admin',
+        path: '/blog',
+        icon: <Icon as={MdArticle} width="20px" height="20px" color="inherit" />,
+        component: <BlogPage />,
+      },
+      {
         name: 'Visitor Analytics',
         layout: '/admin',
         path: '/site-analytics',
         icon: <Icon as={MdAnalytics} width="20px" height="20px" color="inherit" />,
         component: <SiteAnalyticsPage />,
+      },
+    ],
+  },
+  {
+    category: 'AI',
+    layout: '/admin',
+    items: [
+      {
+        name: 'Email Domain Analysis',
+        layout: '/admin',
+        path: '/ai/email-domain-analysis',
+        icon: <Icon as={MdScience} width="20px" height="20px" color="inherit" />,
+        component: <EmailDomainAnalysis />,
       },
     ],
   },

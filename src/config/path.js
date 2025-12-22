@@ -58,4 +58,21 @@ export const apiEndPoints = {
   // Freelancer Max Values endpoints
   UPDATE_MAX_PROPOSAL_VALUE: "admin/freelancer",
   UPDATE_MAX_DELIVERY_IN_PROGRESS: "admin/freelancer",
+
+  // Blog endpoints
+  CREATE_BLOG: "admin/blog",
+  GET_ALL_BLOGS: "admin/blogs",
+  GET_BLOG_BY_ID: "admin/blog",
+  UPDATE_BLOG: "admin/blog",
+  DELETE_BLOG: "admin/blog",
+
+  // AI endpoints
+  GET_EMAIL_DOMAIN_ANALYSIS: "admin/email-domain-analysis",
+  GET_UNIQUE_SPECIAL_CATEGORY: "admin/unique-special-category",
+  GET_ALL_CATEGORIES: "admin/categories",
+  GET_SUB_CATEGORIES_BY_CATEGORY: "admin/sub-categories",
+  GET_BATCH_NAME: "admin/batch-name",
+  GET_HTML_TEMPLATE: "admin/html-template",
+  GET_WEBSITE_DATA_SLUG: "admin/website-data-slug",
+  CAMPAIGN_SEND: "campaign/send",
 };
