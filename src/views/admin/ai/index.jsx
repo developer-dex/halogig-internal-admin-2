@@ -12,6 +12,7 @@ import {
 } from "@chakra-ui/react";
 import ProcessEmails from "./ProcessEmails";
 import GenerateEmails from "./GenerateEmails";
+import EmailSent from "./EmailSent";
 
 const EmailDomainAnalysis = () => {
   const textColor = useColorModeValue("rgb(32, 33, 36)", "white");
@@ -29,6 +30,7 @@ const EmailDomainAnalysis = () => {
             <TabList>
               <Tab>Process Emails</Tab>
               <Tab>Generate Emails</Tab>
+              <Tab>Email Sent</Tab>
             </TabList>
 
             <TabPanels>
@@ -40,6 +42,11 @@ const EmailDomainAnalysis = () => {
               {/* Generate Emails Tab */}
               <TabPanel px={0} pt={4}>
                 <GenerateEmails />
+              </TabPanel>
+
+              {/* Email Sent Tab */}
+              <TabPanel px={0} pt={4}>
+                <EmailSent />
               </TabPanel>
             </TabPanels>
           </Tabs>

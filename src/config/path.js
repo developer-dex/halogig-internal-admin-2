@@ -75,4 +75,5 @@ export const apiEndPoints = {
   GET_HTML_TEMPLATE: "admin/html-template",
   GET_WEBSITE_DATA_SLUG: "admin/website-data-slug",
   CAMPAIGN_SEND: "campaign/send",
+  GET_EMAIL_CAMPAIGNS: "admin/email-campaigns",
 };

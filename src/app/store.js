@@ -11,6 +11,7 @@ import { loginDataReducer } from "../features/auth/loginSlice";
 import { websiteDataReducer } from "../features/admin/websiteDataSlice";
 import { blogReducer } from "../features/admin/blogSlice";
 import { emailDomainAnalysisReducer } from "../features/admin/emailDomainAnalysisSlice";
+import { emailCampaignsReducer } from "../features/admin/emailCampaignsSlice";
 
 const store = configureStore({
   reducer: {
@@ -26,6 +27,7 @@ const store = configureStore({
     websiteData:websiteDataReducer,
     blog: blogReducer,
     emailDomainAnalysis: emailDomainAnalysisReducer,
+    emailCampaigns: emailCampaignsReducer,
   },
   middleware: getDefaultMiddleware =>
     getDefaultMiddleware({
