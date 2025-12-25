@@ -36,9 +36,16 @@ const initialState = {
 // Removed TypeScript type annotations
 export const freelancerData = createAsyncThunk(
     "/freelancerData",
-    async ({ page, pageLimit }) => { // Updated to accept page and pageLimit
+    async ({ page, pageLimit, status, excludeStatus }) => { // Updated to accept page, pageLimit, status, and excludeStatus
         try {
-            const payload = await getApi(`${apiEndPoints.GET_FRELANCER_DATA}?page=${page}&limit=${pageLimit}`); // Updated API call
+            let url = `${apiEndPoints.GET_FRELANCER_DATA}?page=${page}&limit=${pageLimit}`;
+            if (status) {
+                url += `&status=${status}`;
+            }
+            if (excludeStatus) {
+                url += `&excludeStatus=${excludeStatus}`;
+            }
+            const payload = await getApi(url); // Updated API call
             return payload;
         } catch (e) {
             showError(e.response.data.message);

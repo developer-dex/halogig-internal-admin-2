@@ -5,6 +5,7 @@ import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { Box, Flex, HStack, Text, useColorModeValue, Icon, Collapse, Button } from "@chakra-ui/react";
 import { ChevronDownIcon, ChevronRightIcon } from "@chakra-ui/icons";
 import { MdPowerSettingsNew } from "react-icons/md";
+import { useSelector } from "react-redux";
 
 export function SidebarLinks(props) {
   //   Chakra color mode
@@ -19,6 +20,9 @@ export function SidebarLinks(props) {
   let categoryHoverBg = useColorModeValue("gray.50", "whiteAlpha.100");
 
   const { routes } = props;
+
+  // Get pending view counts from Redux store
+  const { freelancer: freelancerCount, client: clientCount } = useSelector((state) => state.pendingViewCounts || { freelancer: 0, client: 0 });
 
   // Handle logout - clear all localStorage and redirect to sign in
   const handleLogout = () => {
@@ -45,7 +49,15 @@ export function SidebarLinks(props) {
   });
 
   // verifies if routeName is the one active (in browser input)
-  const activeRoute = (routeName) => {
+  const activeRoute = (routeName, fullPath) => {
+    // For exact path matching, use the full path
+    if (fullPath) {
+      const currentPath = location.pathname;
+      const routeFullPath = fullPath.toLowerCase();
+      // Check for exact match or if current path starts with route path followed by / or end of string
+      return currentPath === routeFullPath || currentPath.startsWith(routeFullPath + '/');
+    }
+    // Fallback to includes for backward compatibility
     return location.pathname.includes(routeName);
   };
 
@@ -58,8 +70,11 @@ export function SidebarLinks(props) {
   };
 
   // Check if any route in category is active
-  const isCategoryActive = (items) => {
-    return items?.some(item => activeRoute(item.path?.toLowerCase()));
+  const isCategoryActive = (items, layout) => {
+    return items?.some(item => {
+      const itemFullPath = layout + item.path;
+      return activeRoute(item.path?.toLowerCase(), itemFullPath);
+    });
   };
 
   // this function creates the links from the secondary accordions (for example auth -> sign-in -> default)
@@ -67,7 +82,7 @@ export function SidebarLinks(props) {
     return routes.map((route, index) => {
       if (route.category) {
         const isExpanded = expandedCategories[route.category] === true;
-        const categoryActive = isCategoryActive(route.items);
+        const categoryActive = isCategoryActive(route.items, route.layout);
         // Get icon from first item in category that has an icon
         const categoryIcon = route.items?.find(item => item.icon)?.icon;
         
@@ -117,7 +132,96 @@ export function SidebarLinks(props) {
             {/* Category Items with Collapse Animation */}
             <Collapse in={isExpanded} animateOpacity>
               <Box>
-                {createLinks(route.items)}
+                {route.items?.map((item, itemIndex) => {
+                  const isFreelancers = item.name === 'Freelancers' && (item.path === '/freelancers' || item.path === '/freelancers-management');
+                  const isClients = item.name === 'Clients' && (item.path === '/offline-clients' || item.path === '/clients');
+                  const showRedDot = (isFreelancers && freelancerCount > 0) || (isClients && clientCount > 0);
+                  
+                  const itemFullPath = item.layout + item.path;
+                  const isItemActive = activeRoute(item.path?.toLowerCase(), itemFullPath);
+                  
+                  return (
+                    <NavLink key={itemIndex} to={itemFullPath}>
+                      {item.icon ? (
+                        <Box>
+                          <HStack
+                            spacing={isItemActive ? "22px" : "26px"}
+                            ps='16px'
+                          >
+                            <Flex w='100%' alignItems='center' justifyContent='space-between'>
+                              <Text
+                                me='auto'
+                                color={
+                                  isItemActive
+                                    ? activeColor
+                                    : textColor
+                                }
+                                fontSize="14px"
+                                fontWeight={
+                                  isItemActive
+                                    ? "bold"
+                                    : "normal"
+                                }>
+                                {item.name}
+                              </Text>
+                              {showRedDot && (
+                                <Box
+                                  bg="red.500"
+                                  borderRadius="full"
+                                  w="10px"
+                                  h="10px"
+                                  minW="10px"
+                                  flexShrink={0}
+                                  boxShadow="0 0 0 2px white, 0 0 0 3px rgba(229, 62, 62, 0.3)"
+                                />
+                              )}
+                            </Flex>
+                            <Box
+                              h='36px'
+                              w='4px'
+                              bg="transparent"
+                              borderRadius='5px'
+                            />
+                          </HStack>
+                        </Box>
+                      ) : (
+                        <Box>
+                          <HStack
+                            spacing={isItemActive ? "22px" : "26px"}
+                            py='5px'
+                            ps='10px'>
+                            <Flex w='100%' alignItems='center' justifyContent='space-between'>
+                              <Text
+                                me='auto'
+                                color={
+                                  isItemActive
+                                    ? activeColor
+                                    : inactiveColor
+                                }
+                                fontWeight={
+                                  isItemActive ? "bold" : "normal"
+                                }>
+                                {item.name}
+                              </Text>
+                              {showRedDot && (
+                                <Box
+                                  bg="red.500"
+                                  borderRadius="full"
+                                  w="10px"
+                                  h="10px"
+                                  minW="10px"
+                                  flexShrink={0}
+                                  boxShadow="0 0 0 2px white, 0 0 0 3px rgba(229, 62, 62, 0.3)"
+                                />
+                              )}
+                            </Flex>
+                            <Box h='36px' w='4px' bg='transparent' borderRadius='5px' />
+                          </HStack>
+                        </Box>
+                      )}
+                    </NavLink>
+                  );
+                })}
               </Box>
             </Collapse>
           </Box>
@@ -128,22 +232,29 @@ export function SidebarLinks(props) {
         route.layout === "/rtl") &&
         !route.hidden
       ) {
+        const isFreelancers = route.name === 'Freelancers' && (route.path === '/freelancers' || route.path === '/freelancers-management');
+        const isClients = route.name === 'Clients' && (route.path === '/offline-clients' || route.path === '/clients');
+        const showRedDot = (isFreelancers && freelancerCount > 0) || (isClients && clientCount > 0);
+        
+        const routeFullPath = route.layout + route.path;
+        const isRouteActive = activeRoute(route.path.toLowerCase(), routeFullPath);
+        
         return (
-          <NavLink key={index} to={route.layout + route.path}>
+          <NavLink key={index} to={routeFullPath}>
             {route.icon ? (
               <Box>
                 <HStack
                   spacing={
-                    activeRoute(route.path.toLowerCase()) ? "22px" : "26px"
+                    isRouteActive ? "22px" : "26px"
                   }
                   ps='16px'
                   // py='5px'
                   // ps='10px'>
                   >
-                  <Flex w='100%' alignItems='center' justifyContent='center'>
+                  <Flex w='100%' alignItems='center' justifyContent='space-between'>
                     {/* <Box
                       color={
-                        activeRoute(route.path.toLowerCase())
+                        isRouteActive
                           ? activeIcon
                           : textColor
                       }
@@ -153,18 +264,29 @@ export function SidebarLinks(props) {
                     <Text
                       me='auto'
                       color={
-                        activeRoute(route.path.toLowerCase())
+                        isRouteActive
                           ? activeColor
                           : textColor
                       }
                       fontSize="14px"
                       fontWeight={
-                        activeRoute(route.path.toLowerCase())
+                        isRouteActive
                           ? "bold"
                           : "normal"
                       }>
                       {route.name}
                     </Text>
+                    {showRedDot && (
+                      <Box
+                        bg="red.500"
+                        borderRadius="full"
+                        w="10px"
+                        h="10px"
+                        minW="10px"
+                        flexShrink={0}
+                        boxShadow="0 0 0 2px white, 0 0 0 3px rgba(229, 62, 62, 0.3)"
+                      />
+                    )}
                   </Flex>
                   <Box
                     h='36px'
@@ -178,22 +300,35 @@ export function SidebarLinks(props) {
               <Box>
                 <HStack
                   spacing={
-                    activeRoute(route.path.toLowerCase()) ? "22px" : "26px"
+                    isRouteActive ? "22px" : "26px"
                   }
                   py='5px'
                   ps='10px'>
-                  <Text
-                    me='auto'
-                    color={
-                      activeRoute(route.path.toLowerCase())
-                        ? activeColor
-                        : inactiveColor
-                    }
-                    fontWeight={
-                      activeRoute(route.path.toLowerCase()) ? "bold" : "normal"
-                    }>
-                    {route.name}
-                  </Text>
+                  <Flex w='100%' alignItems='center' justifyContent='space-between'>
+                    <Text
+                      me='auto'
+                      color={
+                        isRouteActive
+                          ? activeColor
+                          : inactiveColor
+                      }
+                      fontWeight={
+                        isRouteActive ? "bold" : "normal"
+                      }>
+                      {route.name}
+                    </Text>
+                    {showRedDot && (
+                      <Box
+                        bg="red.500"
+                        borderRadius="full"
+                        w="10px"
+                        h="10px"
+                        minW="10px"
+                        flexShrink={0}
+                        boxShadow="0 0 0 2px white, 0 0 0 3px rgba(229, 62, 62, 0.3)"
+                      />
+                    )}
+                  </Flex>
                   <Box h='36px' w='4px' bg='transparent' borderRadius='5px' />
                 </HStack>
               </Box>

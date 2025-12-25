@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { apiEndPoints } from "../../config/path";
 import { showError } from "../../helpers/messageHelper";
-import { getApi, patchApi, postApi } from "../../services/api";
+import { getApi, patchApi, postApi, deleteApi } from "../../services/api";
 
 
 // Removed TypeScript type annotations
@@ -97,6 +97,19 @@ export const createUserByAdmin = createAsyncThunk(
     }
 );
 
+export const deleteContactUsByAdmin = createAsyncThunk(
+    "/deleteContactUsByAdmin",
+    async (contactUsId) => {
+        try {
+            const payload = await deleteApi(`${apiEndPoints.DELETE_CONTACT_US_BY_ADMIN}/${contactUsId}/delete`);
+            return payload;
+        } catch (e) {
+            showError(e.response?.data?.message || 'Failed to delete contact');
+            throw e;
+        }
+    }
+);
+
 export const contactDataSlice = createSlice({
     name: "contactData",
     initialState,
@@ -178,6 +191,18 @@ export const contactDataSlice = createSlice({
             state.responseData = payload?.data?.data || {};
         })
         .addCase(createUserByAdmin.rejected, (state) => {
+            state.isLoading = false;
+            state.isError = true;
+        })
+        .addCase(deleteContactUsByAdmin.pending, (state) => {
+            state.isLoading = true;
+        })
+        .addCase(deleteContactUsByAdmin.fulfilled, (state, { payload }) => {
+            state.isLoading = false;
+            state.isSuccess = true;
+            state.responseCode = payload?.status;
+        })
+        .addCase(deleteContactUsByAdmin.rejected, (state) => {
             state.isLoading = false;
             state.isError = true;
         })

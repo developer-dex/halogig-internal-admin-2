@@ -133,7 +133,7 @@ const routes = [
       {
         name: 'Freelancers',
         layout: '/admin',
-        path: '/freelancers',
+        path: '/freelancers-management',
         icon: <Icon as={MdWork} width="20px" height="20px" color="inherit" />,
         component: <FreelancerList />,
       },

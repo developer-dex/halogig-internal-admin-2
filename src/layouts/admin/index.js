@@ -5,9 +5,11 @@ import Footer from 'components/footer/FooterAdmin.js';
 import Navbar from 'components/navbar/NavbarAdmin.js';
 import Sidebar from 'components/sidebar/Sidebar.js';
 import { SidebarContext } from 'contexts/SidebarContext';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
 import routes from 'routes.js';
+import { getPendingViewCounts } from '../../features/admin/pendingViewCountsSlice';
 import WebsiteDataDetails from 'views/admin/websiteData/WebsiteDataDetails';
 import ProjectBidDetail from 'views/admin/projectBids/ProjectBidDetail';
 import ProjectBidDetailWrapper from 'views/admin/projectBids/ProjectBidDetailWrapper';
@@ -20,9 +22,15 @@ import Invoice from 'views/admin/invoice';
 export default function Dashboard(props) {
   const { ...rest } = props;
   const location = useLocation();
+  const dispatch = useDispatch();
   // states and functions
   const [fixed] = useState(false);
   const [toggleSidebar, setToggleSidebar] = useState(false);
+
+  // Fetch pending view counts when admin layout loads
+  useEffect(() => {
+    dispatch(getPendingViewCounts());
+  }, [dispatch]);
   // functions for changing the states from components
   const getRoute = () => {
     return window.location.pathname !== '/admin/full-screen-maps';

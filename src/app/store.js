@@ -12,6 +12,7 @@ import { websiteDataReducer } from "../features/admin/websiteDataSlice";
 import { blogReducer } from "../features/admin/blogSlice";
 import { emailDomainAnalysisReducer } from "../features/admin/emailDomainAnalysisSlice";
 import { emailCampaignsReducer } from "../features/admin/emailCampaignsSlice";
+import { pendingViewCountsReducer } from "../features/admin/pendingViewCountsSlice";
 
 const store = configureStore({
   reducer: {
@@ -28,6 +29,7 @@ const store = configureStore({
     blog: blogReducer,
     emailDomainAnalysis: emailDomainAnalysisReducer,
     emailCampaigns: emailCampaignsReducer,
+    pendingViewCounts: pendingViewCountsReducer,
   },
   middleware: getDefaultMiddleware =>
     getDefaultMiddleware({

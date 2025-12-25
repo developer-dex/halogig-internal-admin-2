@@ -35,7 +35,7 @@ import {
   Tooltip,
   Badge,
 } from '@chakra-ui/react';
-import { MdAdd, MdMoreHoriz, MdChevronLeft, MdChevronRight } from 'react-icons/md';
+import { MdAdd, MdMoreHoriz, MdChevronLeft, MdChevronRight, MdDelete } from 'react-icons/md';
 import PhoneInput from 'react-phone-input-2';
 import 'react-phone-input-2/lib/material.css';
 import { Country, State, City } from 'country-state-city';
@@ -46,6 +46,7 @@ import {
   getIndustryData,
   createUserByAdmin,
   updateClientStatusInContactUsByAdmin,
+  deleteContactUsByAdmin,
 } from '../../../features/admin/contactUsManagementSlice';
 import { showSuccess, showError } from '../../../helpers/messageHelper';
 
@@ -66,10 +67,13 @@ export default function ContactList() {
   const { isOpen: isAddModalOpen, onOpen: onAddModalOpen, onClose: onAddModalClose } = useDisclosure();
   const { isOpen: isReqModalOpen, onOpen: onReqModalOpen, onClose: onReqModalClose } = useDisclosure();
   const { isOpen: isCreateModalOpen, onOpen: onCreateModalOpen, onClose: onCreateModalClose } = useDisclosure();
+  const { isOpen: isDeleteModalOpen, onOpen: onDeleteModalOpen, onClose: onDeleteModalClose } = useDisclosure();
 
   const [selectedContact, setSelectedContact] = useState(null);
   const [selectedReq, setSelectedReq] = useState('');
   const [isCreatingUser, setIsCreatingUser] = useState(false);
+  const [contactToDelete, setContactToDelete] = useState(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const [formData, setFormData] = useState({
     first_name: '',
@@ -411,6 +415,42 @@ export default function ContactList() {
     }
   };
 
+  const handleDeleteClick = (contact) => {
+    setContactToDelete(contact);
+    onDeleteModalOpen();
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!contactToDelete) return;
+
+    try {
+      setIsDeleting(true);
+      const contactUsId = contactToDelete.id || contactToDelete._id;
+      const response = await dispatch(deleteContactUsByAdmin(contactUsId));
+
+      if (response.payload && response.payload.status === 200) {
+        showSuccess('Contact deleted successfully');
+        onDeleteModalClose();
+        setContactToDelete(null);
+        fetchContacts();
+      } else {
+        const errorMessage = response.payload?.data?.message || 'Failed to delete contact. Please try again.';
+        showError(errorMessage);
+      }
+    } catch (error) {
+      console.error('Error deleting contact:', error);
+      const errorMessage = error.response?.data?.message || error.message || 'Failed to delete contact. Please try again.';
+      showError(errorMessage);
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  const handleDeleteCancel = () => {
+    onDeleteModalClose();
+    setContactToDelete(null);
+  };
+
   const totalPages = Math.ceil(totalCount / pageLimit) || 1;
 
   return (
@@ -457,12 +497,13 @@ export default function ContactList() {
                     <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" bg={bgColor}>Requirements</Th>
                     <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" bg={bgColor}>Notes</Th>
                     <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" textAlign="center" bg={bgColor}>Action</Th>
+                    <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" textAlign="center" bg={bgColor}>Delete</Th>
                   </Tr>
                 </Thead>
                 <Tbody>
                   {contacts.length === 0 ? (
                     <Tr>
-                      <Td colSpan={8} textAlign="center" py="40px">
+                      <Td colSpan={9} textAlign="center" py="40px">
                         <Text color="black">No contacts found</Text>
                       </Td>
                     </Tr>
@@ -568,6 +609,16 @@ export default function ContactList() {
                               ADD
                             </Button>
                           )}
+                        </Td>
+                        <Td borderColor={borderColor} textAlign="center">
+                          <IconButton
+                            aria-label="Delete contact"
+                            icon={<MdDelete />}
+                            size="sm"
+                            colorScheme="red"
+                            variant="ghost"
+                            onClick={() => handleDeleteClick(contact)}
+                          />
                         </Td>
                       </Tr>
                     ))
@@ -835,6 +886,38 @@ export default function ContactList() {
               }
             >
               Create
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+
+      {/* Delete Confirmation Modal */}
+      <Modal isOpen={isDeleteModalOpen} onClose={handleDeleteCancel} isCentered>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Delete Contact</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <Text>
+              Are you sure you want to delete this contact? This action cannot be undone.
+            </Text>
+            {contactToDelete && (
+              <Text mt={2} fontWeight="semibold" color={textColor}>
+                {contactToDelete.first_name} {contactToDelete.last_name} ({contactToDelete.email})
+              </Text>
+            )}
+          </ModalBody>
+          <ModalFooter>
+            <Button variant="ghost" mr={3} onClick={handleDeleteCancel} isDisabled={isDeleting}>
+              No
+            </Button>
+            <Button
+              colorScheme="red"
+              onClick={handleDeleteConfirm}
+              isLoading={isDeleting}
+              loadingText="Deleting..."
+            >
+              Yes
             </Button>
           </ModalFooter>
         </ModalContent>

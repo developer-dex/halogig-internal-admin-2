@@ -30,7 +30,7 @@ import {
 import { MdVisibility, MdChevronLeft, MdChevronRight } from 'react-icons/md';
 import { useDispatch, useSelector } from 'react-redux';
 import { MdRefresh } from 'react-icons/md';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { statusChange } from '../../../features/admin/clientManagementSlice';
 import { showError, showSuccess } from '../../../helpers/messageHelper';
 import {
@@ -41,6 +41,7 @@ import {
 function FreelancerList() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const location = useLocation();
   const [page, setPage] = useState(1);
   const [pageLimit, setPageLimit] = useState(50);
   const [selectedFreelancer, setSelectedFreelancer] = useState(null);
@@ -49,6 +50,14 @@ function FreelancerList() {
   const statusModal = useDisclosure();
   const [selectedStatus, setSelectedStatus] = useState('');
   const statusOptions = ['Pending', 'Approved', 'Rejected', 'Under Review', 'Suspended'];
+
+  // Determine if this is the Management -> Freelancers page (approved only)
+  // Registration -> Freelancers is at /freelancers, Management -> Freelancers is at /freelancers-management
+  const isManagementPage = location.pathname === '/admin/freelancers-management';
+  
+  // Set filters: Management page shows only approved, Registration shows all others (exclude approved)
+  const statusFilter = isManagementPage ? 'approved' : null;
+  const excludeStatusFilter = !isManagementPage ? 'approved' : null;
 
   const {
     isLoading,
@@ -66,8 +75,8 @@ function FreelancerList() {
   }, [responseData]);
 
   useEffect(() => {
-    dispatch(freelancerData({ page, pageLimit }));
-  }, [dispatch, page, pageLimit]);
+    dispatch(freelancerData({ page, pageLimit, status: statusFilter, excludeStatus: excludeStatusFilter }));
+  }, [dispatch, page, pageLimit, statusFilter, excludeStatusFilter]);
 
   const openDetails = (userId) => {
     setSelectedFreelancer(userId);
@@ -92,8 +101,8 @@ function FreelancerList() {
     try {
       await dispatch(statusChange({ id: selectedFreelancer.id, apiData: { status: selectedStatus } }));
       showSuccess('Status updated successfully');
-      // refetch
-      dispatch(freelancerData({ page, pageLimit }));
+      // refetch with current filters
+      dispatch(freelancerData({ page, pageLimit, status: statusFilter, excludeStatus: excludeStatusFilter }));
     } catch (e) {
       showError('Failed to update status');
     } finally {
@@ -152,36 +161,69 @@ function FreelancerList() {
                 borderColor={borderColor}
                 borderRadius="8px"
               >
-                <Table variant="simple" color="gray.500" minW="800px">
+                <Table variant="simple" color="gray.500" minW="1000px">
                   <Thead position="sticky" top="0" zIndex="1" bg={bgColor}>
                     <Tr>
                       <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" bg={bgColor}>
-                        FIRST NAME
+                        First Name
                       </Th>
                       <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" bg={bgColor}>
-                        LAST NAME
+                        Last Name
                       </Th>
                       <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" bg={bgColor}>
-                        EMAIL
+                        Sub Categories
+                      </Th>
+                      <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" bg={bgColor}>
+                        Location
+                      </Th>
+                      <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" bg={bgColor}>
+                        Last Login
                       </Th>
                       <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" textAlign="center" bg={bgColor}>
-                        STATUS
+                        Status
                       </Th>
                       <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" textAlign="center" bg={bgColor}>
-                        VIEW
+                        View
                       </Th>
                     </Tr>
                   </Thead>
                   <Tbody>
                     {rows.length === 0 ? (
                       <Tr>
-                        <Td colSpan={5} textAlign="center" py="40px">
+                        <Td colSpan={7} textAlign="center" py="40px">
                           <Text color="black">No freelancers found</Text>
                         </Td>
                       </Tr>
                     ) : (
                       rows.map((fr) => {
+                        // Format sub categories
+                        const subCategories = Array.isArray(fr.sub_category_names) && fr.sub_category_names.length > 0
+                          ? fr.sub_category_names.join(', ')
+                          : '--';
+
+                        // Format location
+                        const location = [fr.city, fr.country].filter(Boolean).join(' - ') || '--';
+
+                        // Format last login
+                        const lastLoginDate = fr.freelancer_last_login || fr.last_login;
+                        let lastLogin = '--';
+                        if (lastLoginDate) {
+                          try {
+                            const date = new Date(lastLoginDate);
+                            lastLogin = date.toLocaleDateString('en-US', {
+                              year: 'numeric',
+                              month: 'short',
+                              day: 'numeric',
+                              hour: '2-digit',
+                              minute: '2-digit',
+                            });
+                          } catch (e) {
+                            lastLogin = '--';
+                          }
+                        }
+
                         const statusColors = getStatusColorScheme(fr.status);
+
                         return (
                           <Tr key={fr.id} _hover={{ bg: hoverBg }} transition="all 0.2s">
                             <Td borderColor={borderColor}>
@@ -191,7 +233,13 @@ function FreelancerList() {
                               <Text color={textColor} fontSize="sm" fontWeight="normal">{fr.last_name || '--'}</Text>
                             </Td>
                             <Td borderColor={borderColor}>
-                              <Text color={textColor} fontSize="sm" fontWeight="normal">{fr.email || '--'}</Text>
+                              <Text color={textColor} fontSize="sm" fontWeight="normal">{subCategories}</Text>
+                            </Td>
+                            <Td borderColor={borderColor}>
+                              <Text color={textColor} fontSize="sm" fontWeight="normal">{location}</Text>
+                            </Td>
+                            <Td borderColor={borderColor}>
+                              <Text color={textColor} fontSize="sm" fontWeight="normal">{lastLogin}</Text>
                             </Td>
                             <Td borderColor={borderColor} textAlign="center">
                               <Button

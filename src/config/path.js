@@ -14,6 +14,7 @@ export const apiEndPoints = {
   GET_INDUSTRY:"industry",
   UPDATE_CLIENT_STATUS_IN_CONTACT_US_BY_ADMIN:"admin/update-client-status",
   CREATE_USER_BY_ADMIN:"admin/create-user",
+  DELETE_CONTACT_US_BY_ADMIN:"admin/contact-us",
   GET_SITE_ANALYTICS:"admin/page-analytics",
   GET_IP_ANALYTICS:"admin/ip-analytics",
   GET_CLIENT_PROJECTS: "admin/projects",
@@ -76,4 +77,7 @@ export const apiEndPoints = {
   GET_WEBSITE_DATA_SLUG: "admin/website-data-slug",
   CAMPAIGN_SEND: "campaign/send",
   GET_EMAIL_CAMPAIGNS: "admin/email-campaigns",
+  
+  // Pending view counts endpoint
+  GET_PENDING_VIEW_COUNTS: "admin/pending-view-counts",
 };
