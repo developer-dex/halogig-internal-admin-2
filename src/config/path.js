@@ -24,6 +24,7 @@ export const apiEndPoints = {
   GET_INDUSTRIES: "industry",
   UPDATE_PROJECT: "admin/project",
   UPDATE_PROJECT_STATUS: "admin/project",
+  CREATE_CLIENT_PROJECT: "admin/client-project",
   
   // Project Bids endpoints
   GET_ALL_PROJECT_BIDS: "admin/project-bids",
@@ -80,4 +81,7 @@ export const apiEndPoints = {
   
   // Pending view counts endpoint
   GET_PENDING_VIEW_COUNTS: "admin/pending-view-counts",
+  
+  // Freelancer Payments endpoint
+  GET_ALL_FREELANCER_PAYMENTS: "admin/freelancer-payments",
 };

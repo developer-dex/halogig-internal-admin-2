@@ -38,7 +38,7 @@ import {
   SimpleGrid,
   FormHelperText,
 } from '@chakra-ui/react';
-import { MdChevronLeft, MdChevronRight, MdEdit, MdVisibility } from 'react-icons/md';
+import { MdChevronLeft, MdChevronRight, MdEdit, MdVisibility, MdContentCopy } from 'react-icons/md';
 import { projectData, updateProjectStatus, updateProject } from '../../../features/admin/projectManagementSlice';
 import { 
   fetchCategories, 
@@ -48,6 +48,7 @@ import {
   clearSubcategories 
 } from '../../../features/admin/dropdownDataSlice';
 import { showError, showSuccess } from '../../../helpers/messageHelper';
+import { copyToClipboard } from '../../../utils/utils';
 
 export default function ProjectList() {
   const dispatch = useDispatch();
@@ -446,6 +447,19 @@ export default function ProjectList() {
     }
   };
 
+  const handleCopyLink = async (link) => {
+    if (!link) {
+      showError('No link available to copy');
+      return;
+    }
+    try {
+      await copyToClipboard(link);
+      showSuccess('Project link copied to clipboard');
+    } catch (error) {
+      showError('Failed to copy link');
+    }
+  };
+
   const totalPages = Math.ceil(totalCount / pageLimit) || 1;
 
   return (
@@ -551,12 +565,23 @@ export default function ProjectList() {
                       >
                         ACTION
                       </Th>
+                      <Th
+                        borderColor={borderColor}
+                        color="black"
+                        fontSize="xs"
+                        fontWeight="700"
+                        textTransform="uppercase"
+                        textAlign="center"
+                        bg={bgColor}
+                      >
+                        COPY LINK
+                      </Th>
                     </Tr>
                   </Thead>
                   <Tbody>
                     {projects.length === 0 ? (
                       <Tr>
-                        <Td colSpan={7} textAlign="center" py="40px">
+                        <Td colSpan={8} textAlign="center" py="40px">
                           <Text color="black">No projects found</Text>
                         </Td>
                       </Tr>
@@ -626,6 +651,23 @@ export default function ProjectList() {
                                   onClick={() => handleEditClick(project)}
                                 />
                               </Tooltip>
+                            </Td>
+                            <Td borderColor={borderColor} textAlign="center">
+                              {project.created_by_admin && project.client_project_link ? (
+                                <Tooltip label="Copy project link">
+                                  <Button
+                                    size="sm"
+                                    leftIcon={<MdContentCopy />}
+                                    variant="outline"
+                                    colorScheme="brand"
+                                    onClick={() => handleCopyLink(project.client_project_link)}
+                                  >
+                                    Copy link
+                                  </Button>
+                                </Tooltip>
+                              ) : (
+                                <Text color="gray.400" fontSize="sm">--</Text>
+                              )}
                             </Td>
                           </Tr>
                         );

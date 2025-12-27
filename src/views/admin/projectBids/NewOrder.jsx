@@ -23,7 +23,7 @@ import { MdChevronLeft, MdChevronRight, MdVisibility } from 'react-icons/md';
 import { getAllProjectBids } from '../../../features/admin/projectBidsSlice';
 import { useNavigate } from 'react-router-dom';
 
-export default function ProjectFinance() {
+export default function NewOrder() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState(1);
@@ -90,7 +90,7 @@ export default function ProjectFinance() {
       <Card bg={bgColor}>
         <Box p="12px">
           <Text color={textColor} fontSize="2xl" fontWeight="700" mb="8px">
-            Project Finance
+            New Order
           </Text>
 
           {isLoading && rows.length === 0 ? (
@@ -107,13 +107,19 @@ export default function ProjectFinance() {
                 borderColor={borderColor}
                 borderRadius="8px"
               >
-                <Table variant="simple" color="gray.500" minW="1000px">
+                <Table variant="simple" color="gray.500" minW="1400px">
                   <Thead position="sticky" top="0" zIndex="1" bg={bgColor}>
                     <Tr>
                       <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" bg={bgColor}>BID ID</Th>
                       <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" bg={bgColor}>PROJECT</Th>
                       <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" bg={bgColor}>FREELANCER</Th>
-                      <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" textAlign="center" bg={bgColor}>BID AMOUNT</Th>
+                      <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" textAlign="center" bg={bgColor}>ORDER VALUE</Th>
+                      <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" textAlign="center" bg={bgColor}>SERVICE CHARGE</Th>
+                      <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" textAlign="center" bg={bgColor}>TAX</Th>
+                      <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" textAlign="center" bg={bgColor}>FINAL AMOUNT</Th>
+                      <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" bg={bgColor}>CLIENT'S LOCATION</Th>
+                      <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" bg={bgColor}>PRICING MODEL</Th>
+                      <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" bg={bgColor}>PAYMENT ID</Th>
                       <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" textAlign="center" bg={bgColor}>SUBMITTED</Th>
                       <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" textAlign="center" bg={bgColor}>STATUS</Th>
                       <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" textAlign="center" bg={bgColor}>VIEW</Th>
@@ -122,7 +128,7 @@ export default function ProjectFinance() {
                   <Tbody>
                     {rows.length === 0 ? (
                       <Tr>
-                        <Td colSpan={7} textAlign="center" py="40px">
+                        <Td colSpan={13} textAlign="center" py="40px">
                           <Text color="black">No bids found</Text>
                         </Td>
                       </Tr>
@@ -131,6 +137,22 @@ export default function ProjectFinance() {
                         const statusText = getStatusText(bid);
                         const statusColors = getStatusColors(statusText);
                         const freelancerName = `${bid?.freelancer?.first_name || ''} ${bid?.freelancer?.last_name || ''}`.trim() || '--';
+                        
+                        // Service Charge: admin_amount if exists, otherwise amount
+                        const serviceCharge = bid?.first_milestone?.admin_amount 
+                          ? parseFloat(bid.first_milestone.admin_amount)
+                          : (bid?.first_milestone?.amount ? parseFloat(bid.first_milestone.amount) : null);
+                        
+                        // Client's Location: freelancer.city and freelancer.country
+                        const clientLocation = [bid?.freelancer?.city, bid?.freelancer?.country]
+                          .filter(Boolean)
+                          .join(', ') || '--';
+                        
+                        // Pricing Model: ClientProject.model_engagement
+                        const pricingModel = bid?.ClientProject?.model_engagement || '--';
+                        
+                        // Payment ID: first_milestone_transaction.payment_id
+                        const paymentId = bid?.first_milestone_transaction?.payment_id || '--';
                         
                         return (
                           <Tr key={bid.id || bid._id} _hover={{ bg: hoverBg }} transition="all 0.2s">
@@ -160,6 +182,36 @@ export default function ProjectFinance() {
                             <Td borderColor={borderColor} textAlign="center">
                               <Text color={textColor} fontSize="sm" fontWeight="normal">
                                 {formatCurrency(bid?.bid_amount)}
+                              </Text>
+                            </Td>
+                            <Td borderColor={borderColor} textAlign="center">
+                              <Text color={textColor} fontSize="sm" fontWeight="normal">
+                                {serviceCharge !== null ? formatCurrency(serviceCharge) : '--'}
+                              </Text>
+                            </Td>
+                            <Td borderColor={borderColor} textAlign="center">
+                              <Text color={textColor} fontSize="sm" fontWeight="normal">
+                                --
+                              </Text>
+                            </Td>
+                            <Td borderColor={borderColor} textAlign="center">
+                              <Text color={textColor} fontSize="sm" fontWeight="normal">
+                                --
+                              </Text>
+                            </Td>
+                            <Td borderColor={borderColor}>
+                              <Text color={textColor} fontSize="sm" fontWeight="normal">
+                                {clientLocation}
+                              </Text>
+                            </Td>
+                            <Td borderColor={borderColor}>
+                              <Text color={textColor} fontSize="sm" fontWeight="normal" textTransform="capitalize">
+                                {pricingModel}
+                              </Text>
+                            </Td>
+                            <Td borderColor={borderColor}>
+                              <Text color={textColor} fontSize="sm" fontWeight="normal">
+                                {paymentId}
                               </Text>
                             </Td>
                             <Td borderColor={borderColor} textAlign="center">

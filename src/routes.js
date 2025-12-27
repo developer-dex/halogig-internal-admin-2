@@ -31,7 +31,9 @@ import DataTables from 'views/admin/dataTables';
 import RTL from 'views/admin/rtl';
 import PostProject from 'views/admin/projects';
 import ProjectBids from 'views/admin/projectBids';
-import ProjectFinance from 'views/admin/projectBids/ProjectFinance';
+import NewOrder from 'views/admin/projectBids/NewOrder';
+import Payments from 'views/admin/projectBids/Payments';
+import FreelancerPayments from 'views/admin/projectBids/FreelancerPayments';
 import ProjectDelivery from 'views/admin/projectBids/ProjectDelivery';
 
 // Auth Imports
@@ -51,7 +53,9 @@ import UserChatRoom from 'views/admin/userChatRoom';
 import Blog from 'views/admin/blog';
 import EmailDomainAnalysis from 'views/admin/ai';
 const ProjectBidsPage = () => <ProjectBids />;
-const ProjectFinancePage = () => <ProjectFinance />;
+const NewOrderPage = () => <NewOrder />;
+const PaymentsPage = () => <Payments />;
+const FreelancerPaymentsPage = () => <FreelancerPayments />;
 const ProjectDeliveryPage = () => <ProjectDelivery />;
 const ContactsPage = () => <ContactList />;
 const WebsiteDataPage = () => <WebsiteData />;
@@ -179,11 +183,25 @@ const routes = [
     items: [
      
       {
-        name: 'Project Finance',
+        name: 'New Order',
         layout: '/admin',
-        path: '/project-finance',
+        path: '/new-order',
         icon: <Icon as={MdAttachMoney} width="20px" height="20px" color="inherit" />,
-        component: <ProjectFinancePage />,
+        component: <NewOrderPage />,
+      },
+      {
+        name: 'Payments',
+        layout: '/admin',
+        path: '/payments',
+        icon: <Icon as={MdAttachMoney} width="20px" height="20px" color="inherit" />,
+        component: <PaymentsPage />,
+      },
+      {
+        name: 'Freelancer Payments',
+        layout: '/admin',
+        path: '/freelancer-payments',
+        icon: <Icon as={MdAttachMoney} width="20px" height="20px" color="inherit" />,
+        component: <FreelancerPaymentsPage />,
       }
     ],
   },

@@ -13,10 +13,11 @@ import { getPendingViewCounts } from '../../features/admin/pendingViewCountsSlic
 import WebsiteDataDetails from 'views/admin/websiteData/WebsiteDataDetails';
 import ProjectBidDetail from 'views/admin/projectBids/ProjectBidDetail';
 import ProjectBidDetailWrapper from 'views/admin/projectBids/ProjectBidDetailWrapper';
-import ProjectFinanceDetail from 'views/admin/projectBids/ProjectFinanceDetail';
+import NewOrderDetail from 'views/admin/projectBids/NewOrderDetail';
 import ProjectDeliveryDetail from 'views/admin/projectBids/ProjectDeliveryDetail';
 import SalesOrder from 'views/admin/salesOrder';
 import Invoice from 'views/admin/invoice';
+import CreateClientProject from 'views/admin/projects/CreateClientProject';
 
 // Custom Chakra theme
 export default function Dashboard(props) {
@@ -183,7 +184,7 @@ export default function Dashboard(props) {
                   />
                   <Route
                     path="/project-finance/:bidId/details"
-                    element={<ProjectFinanceDetail />}
+                    element={<NewOrderDetail />}
                   />
                   <Route
                     path="/project-delivery/:bidId/details"
@@ -196,6 +197,10 @@ export default function Dashboard(props) {
                   <Route
                     path="/invoice/:milestoneId/:projectbidId"
                     element={<Invoice />}
+                  />
+                  <Route
+                    path="/create-client-project"
+                    element={<CreateClientProject />}
                   />
                   <Route
                     path="/"

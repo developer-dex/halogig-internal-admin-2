@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { apiEndPoints } from "../../config/path";
 import { showError } from "../../helpers/messageHelper";
-import { getApi, postApi } from "../../services/api";
+import { getApi, postApi, patchApi } from "../../services/api";
 
 const initialState = {
   isLoading: false,
@@ -19,6 +19,15 @@ const initialState = {
   isApprovingMilestone: false,
   approveMilestoneSuccess: false,
   approveMilestoneError: false,
+  isUpdatingBid: false,
+  updateBidSuccess: false,
+  updateBidError: false,
+  isApprovingBid: false,
+  approveBidSuccess: false,
+  approveBidError: false,
+  isUpdatingMilestone: false,
+  updateMilestoneSuccess: false,
+  updateMilestoneError: false,
 };
 
 // Get all project bids (admin view)
@@ -112,6 +121,48 @@ export const approveMilestoneByAdmin = createAsyncThunk(
   }
 );
 
+// Update project bid by admin
+export const updateProjectBid = createAsyncThunk(
+  "/updateProjectBid",
+  async ({ projectBidId, bidData }) => {
+    try {
+      const payload = await patchApi(`admin/project-bid/${projectBidId}/update`, bidData);
+      return payload;
+    } catch (e) {
+      showError(e.response?.data?.message || "Failed to update project bid");
+      throw e;
+    }
+  }
+);
+
+// Approve project bid by admin
+export const approveProjectBidByAdmin = createAsyncThunk(
+  "/approveProjectBidByAdmin",
+  async (projectBidId) => {
+    try {
+      const payload = await postApi(`admin/project-bid/${projectBidId}/approved-by-admin`, {});
+      return payload;
+    } catch (e) {
+      showError(e.response?.data?.message || "Failed to approve project bid");
+      throw e;
+    }
+  }
+);
+
+// Update milestone by admin
+export const updateMilestoneByAdmin = createAsyncThunk(
+  "/updateMilestoneByAdmin",
+  async ({ milestoneId, data }) => {
+    try {
+      const payload = await patchApi(`admin/project-bid/milestone/${milestoneId}/update`, data);
+      return payload;
+    } catch (e) {
+      showError(e.response?.data?.message || "Failed to update milestone");
+      throw e;
+    }
+  }
+);
+
 export const projectBidsSlice = createSlice({
   name: "projectBids",
   initialState,
@@ -138,6 +189,21 @@ export const projectBidsSlice = createSlice({
       state.isApprovingMilestone = false;
       state.approveMilestoneSuccess = false;
       state.approveMilestoneError = false;
+    },
+    clearUpdateBidState: (state) => {
+      state.isUpdatingBid = false;
+      state.updateBidSuccess = false;
+      state.updateBidError = false;
+    },
+    clearApproveBidState: (state) => {
+      state.isApprovingBid = false;
+      state.approveBidSuccess = false;
+      state.approveBidError = false;
+    },
+    clearUpdateMilestoneState: (state) => {
+      state.isUpdatingMilestone = false;
+      state.updateMilestoneSuccess = false;
+      state.updateMilestoneError = false;
     },
   },
   extraReducers: (builder) => {
@@ -241,9 +307,57 @@ export const projectBidsSlice = createSlice({
         state.isApprovingMilestone = false;
         state.approveMilestoneError = true;
         state.approveMilestoneSuccess = false;
+      })
+      // UpdateProjectBid
+      .addCase(updateProjectBid.pending, (state) => {
+        state.isUpdatingBid = true;
+        state.updateBidError = false;
+        state.updateBidSuccess = false;
+      })
+      .addCase(updateProjectBid.fulfilled, (state, { payload }) => {
+        state.isUpdatingBid = false;
+        state.updateBidSuccess = true;
+        state.responseCode = payload?.status;
+      })
+      .addCase(updateProjectBid.rejected, (state) => {
+        state.isUpdatingBid = false;
+        state.updateBidError = true;
+        state.updateBidSuccess = false;
+      })
+      // ApproveProjectBidByAdmin
+      .addCase(approveProjectBidByAdmin.pending, (state) => {
+        state.isApprovingBid = true;
+        state.approveBidError = false;
+        state.approveBidSuccess = false;
+      })
+      .addCase(approveProjectBidByAdmin.fulfilled, (state, { payload }) => {
+        state.isApprovingBid = false;
+        state.approveBidSuccess = true;
+        state.responseCode = payload?.status;
+      })
+      .addCase(approveProjectBidByAdmin.rejected, (state) => {
+        state.isApprovingBid = false;
+        state.approveBidError = true;
+        state.approveBidSuccess = false;
+      })
+      // UpdateMilestoneByAdmin
+      .addCase(updateMilestoneByAdmin.pending, (state) => {
+        state.isUpdatingMilestone = true;
+        state.updateMilestoneError = false;
+        state.updateMilestoneSuccess = false;
+      })
+      .addCase(updateMilestoneByAdmin.fulfilled, (state, { payload }) => {
+        state.isUpdatingMilestone = false;
+        state.updateMilestoneSuccess = true;
+        state.responseCode = payload?.status;
+      })
+      .addCase(updateMilestoneByAdmin.rejected, (state) => {
+        state.isUpdatingMilestone = false;
+        state.updateMilestoneError = true;
+        state.updateMilestoneSuccess = false;
       });
   },
 });
 
-export const { clearProjectBidsState, clearCurrentBid, clearSaveInvoiceState, clearApproveMilestoneState } = projectBidsSlice.actions;
+export const { clearProjectBidsState, clearCurrentBid, clearSaveInvoiceState, clearApproveMilestoneState, clearUpdateBidState, clearApproveBidState, clearUpdateMilestoneState } = projectBidsSlice.actions;
 export const projectBidsReducer = projectBidsSlice.reducer;
