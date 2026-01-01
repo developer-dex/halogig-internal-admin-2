@@ -56,6 +56,7 @@ import Blog from 'views/admin/blog';
 import EmailDomainAnalysis from 'views/admin/ai';
 import FreelancerTickets from 'views/admin/freelancerTickets';
 import ClientTickets from 'views/admin/clientTickets';
+import HalogigTestimonials from 'views/admin/testimonials';
 const ProjectBidsPage = () => <ProjectBids />;
 const HalogigBidsPage = () => <HalogigBids />;
 const NewOrderPage = () => <NewOrder />;
@@ -314,6 +315,19 @@ const routes = [
         path: '/client-tickets',
         icon: <Icon as={MdSupport} width="20px" height="20px" color="inherit" />,
         component: <ClientTickets />,
+      },
+    ],
+  },
+  {
+    category: 'Testimonial',
+    layout: '/admin',
+    items: [
+      {
+        name: 'Halogig',
+        layout: '/admin',
+        path: '/testimonials/halogig',
+        icon: <Icon as={MdArticle} width="20px" height="20px" color="inherit" />,
+        component: <HalogigTestimonials />,
       },
     ],
   },

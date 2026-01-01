@@ -15,6 +15,7 @@ import { emailCampaignsReducer } from "../features/admin/emailCampaignsSlice";
 import { pendingViewCountsReducer } from "../features/admin/pendingViewCountsSlice";
 import { freelancerPaymentsReducer } from "../features/admin/freelancerPaymentsSlice";
 import { disputeManagementReducer } from "../features/admin/disputeManagementSlice";
+import { testimonialReducer } from "../features/admin/testimonialSlice";
 
 const store = configureStore({
   reducer: {
@@ -34,6 +35,7 @@ const store = configureStore({
     pendingViewCounts: pendingViewCountsReducer,
     freelancerPayments: freelancerPaymentsReducer,
     disputeManagement: disputeManagementReducer,
+    testimonial: testimonialReducer,
   },
   middleware: getDefaultMiddleware =>
     getDefaultMiddleware({

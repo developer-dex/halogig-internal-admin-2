@@ -87,4 +87,9 @@ export const apiEndPoints = {
   
   // Disputes endpoint
   GET_DISPUTES_BY_TYPE: "admin/disputes",
+  
+  // Testimonial endpoints
+  CREATE_TESTIMONIAL: "admin/testimonial",
+  GET_ALL_TESTIMONIALS: "admin/testimonials",
+  DELETE_TESTIMONIAL: "admin/testimonial",
 };
