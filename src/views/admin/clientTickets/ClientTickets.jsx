@@ -1,0 +1,332 @@
+import React, { useEffect, useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import {
+  Box,
+  Table,
+  Thead,
+  Tbody,
+  Tr,
+  Th,
+  Td,
+  Text,
+  useColorModeValue,
+  Spinner,
+  Flex,
+  Card,
+  HStack,
+  IconButton,
+  Badge,
+  Button,
+  Tooltip,
+} from '@chakra-ui/react';
+import { 
+  MdChevronLeft,
+  MdChevronRight,
+  MdVisibility,
+} from 'react-icons/md';
+import { getDisputesByType } from '../../../features/admin/disputeManagementSlice';
+import { showError } from '../../../helpers/messageHelper';
+import { config } from '../../../config/config';
+
+export default function ClientTickets() {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const [currentPage, setCurrentPage] = useState(1);
+  const [disputes, setDisputes] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [totalCount, setTotalCount] = useState(0);
+  
+  const pageLimit = 50;
+
+  // Chakra color mode values
+  const textColor = useColorModeValue('rgb(32, 33, 36)', 'white');
+  const borderColor = useColorModeValue('gray.200', 'whiteAlpha.100');
+  const bgColor = useColorModeValue('#F4F7FE', 'black');
+  const hoverBg = useColorModeValue('gray.50', 'whiteAlpha.50');
+
+  const fetchDisputes = async () => {
+    setIsLoading(true);
+    try {
+      const response = await dispatch(getDisputesByType({
+        type: 'client',
+        page: currentPage,
+        limit: pageLimit
+      }));
+      if (response.payload?.data?.data) {
+        setDisputes(response.payload.data.data.disputes || []);
+        setTotalCount(response.payload.data.data.total_count || 0);
+      }
+    } catch (error) {
+      showError('Failed to fetch disputes');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchDisputes();
+  }, [currentPage]);
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+  };
+
+  const formatDate = (dateString) => {
+    if (!dateString) return '--';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    });
+  };
+
+  const formatAmount = (amount) => {
+    if (!amount) return '--';
+    return `$${parseFloat(amount).toFixed(2)}`;
+  };
+
+  const getStatusColorScheme = (status) => {
+    const statusLower = status?.toLowerCase();
+    switch (statusLower) {
+      case 'pending':
+        return { bg: 'yellow.100', color: 'yellow.800' };
+      case 'resolved':
+        return { bg: 'green.100', color: 'green.800' };
+      case 'rejected':
+        return { bg: 'red.100', color: 'red.800' };
+      default:
+        return { bg: 'gray.100', color: 'gray.800' };
+    }
+  };
+
+  const totalPages = Math.ceil(totalCount / pageLimit);
+
+  const handleViewDetails = (projectBidId) => {
+    if (projectBidId) {
+      navigate(`/admin/project-finance/${projectBidId}/details`);
+    }
+  };
+
+  return (
+    <Box>
+      <Card bg={bgColor}>
+        <Box p="12px">
+          <Text
+            color={textColor}
+            fontSize="2xl"
+            fontWeight="700"
+            mb="8px"
+          >
+            Clients Tickets
+          </Text>
+
+          {isLoading && disputes.length === 0 ? (
+            <Flex justify="center" align="center" minH="600px">
+              <Spinner size="xl" color="brand.500" />
+            </Flex>
+          ) : (
+            <>
+              <Box
+                maxH={{ base: 'calc(100vh - 200px)', md: 'calc(100vh - 130px)', xl: 'calc(100vh - 130px)' }}
+                overflowY="auto"
+                overflowX="auto"
+                border="1px solid"
+                borderColor={borderColor}
+                borderRadius="8px"
+              >
+                <Table variant="simple" color="gray.500" minW="800px">
+                  <Thead position="sticky" top="0" zIndex="1" bg={bgColor}>
+                    <Tr>
+                      <Th
+                        borderColor={borderColor}
+                        color="black"
+                        fontSize="xs"
+                        fontWeight="700"
+                        textTransform="uppercase"
+                        bg={bgColor}
+                      >
+                        DISPUTE UUID
+                      </Th>
+                      <Th
+                        borderColor={borderColor}
+                        color="black"
+                        fontSize="xs"
+                        fontWeight="700"
+                        textTransform="uppercase"
+                        bg={bgColor}
+                      >
+                        PROJECT TITLE
+                      </Th>
+                      <Th
+                        borderColor={borderColor}
+                        color="black"
+                        fontSize="xs"
+                        fontWeight="700"
+                        textTransform="uppercase"
+                        textAlign="center"
+                        bg={bgColor}
+                      >
+                        AMOUNT
+                      </Th>
+                      <Th
+                        borderColor={borderColor}
+                        color="black"
+                        fontSize="xs"
+                        fontWeight="700"
+                        textTransform="uppercase"
+                        textAlign="center"
+                        bg={bgColor}
+                      >
+                        STATUS
+                      </Th>
+                      <Th
+                        borderColor={borderColor}
+                        color="black"
+                        fontSize="xs"
+                        fontWeight="700"
+                        textTransform="uppercase"
+                        textAlign="center"
+                        bg={bgColor}
+                      >
+                        RAISED ON
+                      </Th>
+                      <Th
+                        borderColor={borderColor}
+                        color="black"
+                        fontSize="xs"
+                        fontWeight="700"
+                        textTransform="uppercase"
+                        textAlign="center"
+                        bg={bgColor}
+                      >
+                        VIEW
+                      </Th>
+                    </Tr>
+                  </Thead>
+                  <Tbody>
+                    {disputes.length === 0 ? (
+                      <Tr>
+                        <Td colSpan={6} textAlign="center" py="40px">
+                          <Text color="black">No disputes found</Text>
+                        </Td>
+                      </Tr>
+                    ) : (
+                      disputes.map((dispute) => {
+                        const statusColors = getStatusColorScheme(dispute.status);
+                        return (
+                          <Tr
+                            key={dispute.dispute_uuid}
+                            _hover={{ bg: hoverBg }}
+                            transition="all 0.2s"
+                          >
+                            <Td borderColor={borderColor}>
+                              <Text color={textColor} fontSize="sm" fontWeight="normal">
+                                {dispute.dispute_uuid || '--'}
+                              </Text>
+                            </Td>
+                            <Td borderColor={borderColor}>
+                              <Text color={textColor} fontSize="sm" fontWeight="normal">
+                                {dispute.project_title || '--'}
+                              </Text>
+                            </Td>
+                            <Td borderColor={borderColor} textAlign="center">
+                              <Text color={textColor} fontSize="sm" fontWeight="normal">
+                                {formatAmount(dispute.amount)}
+                              </Text>
+                            </Td>
+                            <Td borderColor={borderColor} textAlign="center">
+                              <Badge
+                                bg={statusColors.bg}
+                                color={statusColors.color}
+                                px="12px"
+                                py="4px"
+                                borderRadius="full"
+                                fontSize="xs"
+                                textTransform="capitalize"
+                              >
+                                {dispute.status || 'Pending'}
+                              </Badge>
+                            </Td>
+                            <Td borderColor={borderColor} textAlign="center">
+                              <Text color={textColor} fontSize="sm" fontWeight="normal">
+                                {formatDate(dispute.raised_on)}
+                              </Text>
+                            </Td>
+                            <Td borderColor={borderColor} textAlign="center">
+                              <Tooltip label="View Project Finance Details">
+                                <IconButton
+                                  aria-label="View details"
+                                  icon={<MdVisibility />}
+                                  size="sm"
+                                  variant="ghost"
+                                  style={{ color: 'rgb(32, 33, 36)' }}
+                                  onClick={() => handleViewDetails(dispute.project_bid_id)}
+                                  isDisabled={!dispute.project_bid_id}
+                                />
+                              </Tooltip>
+                            </Td>
+                          </Tr>
+                        );
+                      })
+                    )}
+                  </Tbody>
+                </Table>
+              </Box>
+
+              {/* Pagination */}
+              <Flex
+                justify="space-between"
+                align="center"
+                pt="8px"
+                borderTop="1px solid"
+                borderColor={borderColor}
+              >
+                <Text color="black" fontSize="sm">
+                  Showing <Text as="span" fontWeight="700" color="brand.500">
+                    {disputes.length}
+                  </Text> of {totalCount}
+                </Text>
+                
+                <HStack spacing="8px">
+                  <IconButton
+                    aria-label="Previous page"
+                    icon={<MdChevronLeft />}
+                    size="sm"
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    isDisabled={currentPage === 1}
+                    variant="outline"
+                  />
+                  
+                  {Array.from({ length: totalPages }, (_, i) => i + 1)
+                    .slice(0, 10)
+                    .map((page) => (
+                      <Button
+                        key={page}
+                        size="sm"
+                        variant={currentPage === page ? 'solid' : 'outline'}
+                        colorScheme={currentPage === page ? 'brand' : 'gray'}
+                        onClick={() => handlePageChange(page)}
+                      >
+                        {page}
+                      </Button>
+                    ))}
+                  
+                  <IconButton
+                    aria-label="Next page"
+                    icon={<MdChevronRight />}
+                    size="sm"
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    isDisabled={currentPage === totalPages}
+                    variant="outline"
+                  />
+                </HStack>
+              </Flex>
+            </>
+          )}
+        </Box>
+      </Card>
+    </Box>
+  );
+}

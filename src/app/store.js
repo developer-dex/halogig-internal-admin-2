@@ -14,6 +14,7 @@ import { emailDomainAnalysisReducer } from "../features/admin/emailDomainAnalysi
 import { emailCampaignsReducer } from "../features/admin/emailCampaignsSlice";
 import { pendingViewCountsReducer } from "../features/admin/pendingViewCountsSlice";
 import { freelancerPaymentsReducer } from "../features/admin/freelancerPaymentsSlice";
+import { disputeManagementReducer } from "../features/admin/disputeManagementSlice";
 
 const store = configureStore({
   reducer: {
@@ -32,6 +33,7 @@ const store = configureStore({
     emailCampaigns: emailCampaignsReducer,
     pendingViewCounts: pendingViewCountsReducer,
     freelancerPayments: freelancerPaymentsReducer,
+    disputeManagement: disputeManagementReducer,
   },
   middleware: getDefaultMiddleware =>
     getDefaultMiddleware({

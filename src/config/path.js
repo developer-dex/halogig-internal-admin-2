@@ -84,4 +84,7 @@ export const apiEndPoints = {
   
   // Freelancer Payments endpoint
   GET_ALL_FREELANCER_PAYMENTS: "admin/freelancer-payments",
+  
+  // Disputes endpoint
+  GET_DISPUTES_BY_TYPE: "admin/disputes",
 };

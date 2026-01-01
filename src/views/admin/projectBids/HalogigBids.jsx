@@ -24,7 +24,7 @@ import { MdChevronLeft, MdChevronRight, MdVisibility } from 'react-icons/md';
 import { getAllProjectBids } from '../../../features/admin/projectBidsSlice';
 import { useNavigate } from 'react-router-dom';
 
-export default function ProjectBids() {
+export default function HalogigBids() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState(1);
@@ -34,11 +34,11 @@ export default function ProjectBids() {
 
   const textColor = useColorModeValue('rgb(32, 33, 36)', 'white');
   const borderColor = useColorModeValue('gray.200', 'whiteAlpha.100');
-    const bgColor = useColorModeValue('#F4F7FE', 'black');
+  const bgColor = useColorModeValue('#F4F7FE', 'black');
   const hoverBg = useColorModeValue('gray.50', 'whiteAlpha.50');
 
   useEffect(() => {
-    dispatch(getAllProjectBids({ page: currentPage, pageLimit, byAdmin: false }));
+    dispatch(getAllProjectBids({ page: currentPage, pageLimit, byAdmin: true }));
   }, [dispatch, currentPage]);
 
   const rows = useMemo(() => Array.isArray(bids) ? bids : [], [bids]);
@@ -91,7 +91,7 @@ export default function ProjectBids() {
       <Card bg={bgColor}>
         <Box p="12px">
           <Text color={textColor} fontSize="2xl" fontWeight="700" mb="8px">
-            Project Bids
+            Halogig Bids
           </Text>
 
           {isLoading && rows.length === 0 ? (
@@ -151,13 +151,6 @@ export default function ProjectBids() {
                             </Td>
                             <Td borderColor={borderColor}>
                               <Flex align="center" gap={3}>
-                                {/* <Avatar
-                                  size="sm"
-                                  src={bid?.freelancer?.profile_image}
-                                  name={freelancerName}
-                                >
-                                  {freelancerInitial}
-                                </Avatar> */}
                                 <Box>
                                   <Text color={textColor} fontSize="sm" fontWeight="normal">
                                     {freelancerName}
@@ -220,7 +213,7 @@ export default function ProjectBids() {
                 </Table>
               </Box>
 
-              <Flex justify="space-between" align="center"  pt="8px" borderTop="1px solid" borderColor={borderColor}>
+              <Flex justify="space-between" align="center" pt="8px" borderTop="1px solid" borderColor={borderColor}>
                 <Text color="black" fontSize="sm">
                   Showing <Text as="span" fontWeight="700" color="brand.500">{rows.length}</Text> of {totalCount}
                 </Text>
@@ -241,5 +234,4 @@ export default function ProjectBids() {
     </Box>
   );
 }
-
 

@@ -21,6 +21,7 @@ import {
   MdAttachMoney,
   MdArticle,
   MdScience,
+  MdSupport,
 } from 'react-icons/md';
 
 // Admin Imports
@@ -31,6 +32,7 @@ import DataTables from 'views/admin/dataTables';
 import RTL from 'views/admin/rtl';
 import PostProject from 'views/admin/projects';
 import ProjectBids from 'views/admin/projectBids';
+import HalogigBids from 'views/admin/projectBids/HalogigBids';
 import NewOrder from 'views/admin/projectBids/NewOrder';
 import Payments from 'views/admin/projectBids/Payments';
 import FreelancerPayments from 'views/admin/projectBids/FreelancerPayments';
@@ -52,7 +54,10 @@ import ChatRoom from 'views/admin/chatRoom';
 import UserChatRoom from 'views/admin/userChatRoom';
 import Blog from 'views/admin/blog';
 import EmailDomainAnalysis from 'views/admin/ai';
+import FreelancerTickets from 'views/admin/freelancerTickets';
+import ClientTickets from 'views/admin/clientTickets';
 const ProjectBidsPage = () => <ProjectBids />;
+const HalogigBidsPage = () => <HalogigBids />;
 const NewOrderPage = () => <NewOrder />;
 const PaymentsPage = () => <Payments />;
 const FreelancerPaymentsPage = () => <FreelancerPayments />;
@@ -174,6 +179,13 @@ const routes = [
         path: '/project-bids',
         icon: <Icon as={MdGavel} width="20px" height="20px" color="inherit" />,
         component: <ProjectBidsPage />,
+      },
+      {
+        name: 'Halogig Bids',
+        layout: '/admin',
+        path: '/halogig-bids',
+        icon: <Icon as={MdGavel} width="20px" height="20px" color="inherit" />,
+        component: <HalogigBidsPage />,
       }
     ],
   },
@@ -283,6 +295,26 @@ const routes = [
       //   icon: <Icon as={MdChat} width="20px" height="20px" color="inherit" />,
       //   component: <UserChatRoomsPage />,
       // },
+    ],
+  },
+  {
+    category: 'Customer Service',
+    layout: '/admin',
+    items: [
+      {
+        name: 'Freelancer Tickets',
+        layout: '/admin',
+        path: '/freelancer-tickets',
+        icon: <Icon as={MdSupport} width="20px" height="20px" color="inherit" />,
+        component: <FreelancerTickets />,
+      },
+      {
+        name: 'Clients Tickets',
+        layout: '/admin',
+        path: '/client-tickets',
+        icon: <Icon as={MdSupport} width="20px" height="20px" color="inherit" />,
+        component: <ClientTickets />,
+      },
     ],
   },
 
