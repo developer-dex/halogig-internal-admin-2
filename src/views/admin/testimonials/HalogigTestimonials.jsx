@@ -36,10 +36,12 @@ import {
   MdChevronLeft,
   MdChevronRight,
   MdDelete,
+  MdEdit,
 } from 'react-icons/md';
 import {
   createTestimonial,
   getAllTestimonials,
+  updateTestimonial,
   deleteTestimonial,
 } from '../../../features/admin/testimonialSlice';
 import { showError, showSuccess } from '../../../helpers/messageHelper';
@@ -54,8 +56,11 @@ export default function HalogigTestimonials() {
   const [isLoading, setIsLoading] = useState(false);
   const [totalCount, setTotalCount] = useState(0);
   const [isCreating, setIsCreating] = useState(false);
+  const [isUpdating, setIsUpdating] = useState(false);
   const [selectedTestimonial, setSelectedTestimonial] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [editingTestimonialId, setEditingTestimonialId] = useState(null);
   
   const [formData, setFormData] = useState({
     client_name: '',
@@ -99,6 +104,8 @@ export default function HalogigTestimonials() {
   };
 
   const handleOpenModal = () => {
+    setIsEditMode(false);
+    setEditingTestimonialId(null);
     setFormData({
       client_name: '',
       client_designation: '',
@@ -108,8 +115,22 @@ export default function HalogigTestimonials() {
     onOpen();
   };
 
+  const handleEditClick = (testimonial) => {
+    setIsEditMode(true);
+    setEditingTestimonialId(testimonial.id);
+    setFormData({
+      client_name: testimonial.client_name || '',
+      client_designation: testimonial.client_designation || '',
+      client_company_name: testimonial.client_company_name || '',
+      testimonial_comment: testimonial.testimonial_comment || '',
+    });
+    onOpen();
+  };
+
   const handleCloseModal = () => {
     onClose();
+    setIsEditMode(false);
+    setEditingTestimonialId(null);
     setFormData({
       client_name: '',
       client_designation: '',
@@ -133,16 +154,31 @@ export default function HalogigTestimonials() {
       return;
     }
 
-    setIsCreating(true);
-    try {
-      await dispatch(createTestimonial(formData));
-      handleCloseModal();
-      fetchTestimonials();
-      showSuccess('Testimonial created successfully');
-    } catch (error) {
-      showError('Failed to create testimonial');
-    } finally {
-      setIsCreating(false);
+    if (isEditMode) {
+      setIsUpdating(true);
+      try {
+        await dispatch(updateTestimonial({
+          testimonialId: editingTestimonialId,
+          formData,
+        }));
+        handleCloseModal();
+        fetchTestimonials();
+      } catch (error) {
+        // Error is already handled in the Redux slice
+      } finally {
+        setIsUpdating(false);
+      }
+    } else {
+      setIsCreating(true);
+      try {
+        await dispatch(createTestimonial(formData));
+        handleCloseModal();
+        fetchTestimonials();
+      } catch (error) {
+        // Error is already handled in the Redux slice
+      } finally {
+        setIsCreating(false);
+      }
     }
   };
 
@@ -326,16 +362,28 @@ export default function HalogigTestimonials() {
                             </Text>
                           </Td>
                           <Td borderColor={borderColor} textAlign="center">
-                            <Tooltip label="Delete Testimonial">
-                              <IconButton
-                                aria-label="Delete testimonial"
-                                icon={<MdDelete />}
-                                size="sm"
-                                variant="ghost"
-                                colorScheme="red"
-                                onClick={() => handleDeleteClick(testimonial)}
-                              />
-                            </Tooltip>
+                            <HStack spacing="8px" justify="center">
+                              <Tooltip label="Edit Testimonial">
+                                <IconButton
+                                  aria-label="Edit testimonial"
+                                  icon={<MdEdit />}
+                                  size="sm"
+                                  variant="ghost"
+                                  colorScheme="blue"
+                                  onClick={() => handleEditClick(testimonial)}
+                                />
+                              </Tooltip>
+                              <Tooltip label="Delete Testimonial">
+                                <IconButton
+                                  aria-label="Delete testimonial"
+                                  icon={<MdDelete />}
+                                  size="sm"
+                                  variant="ghost"
+                                  colorScheme="red"
+                                  onClick={() => handleDeleteClick(testimonial)}
+                                />
+                              </Tooltip>
+                            </HStack>
                           </Td>
                         </Tr>
                       ))
@@ -397,11 +445,11 @@ export default function HalogigTestimonials() {
         </Box>
       </Card>
 
-      {/* Create Testimonial Modal */}
+      {/* Create/Edit Testimonial Modal */}
       <Modal isOpen={isOpen} onClose={handleCloseModal} size="xl" isCentered>
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader>Create Testimonial</ModalHeader>
+          <ModalHeader>{isEditMode ? 'Update Testimonial' : 'Create Testimonial'}</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
             <VStack spacing="16px" align="stretch">
@@ -454,10 +502,10 @@ export default function HalogigTestimonials() {
             <Button
               colorScheme="brand"
               onClick={handleCreateTestimonial}
-              isLoading={isCreating}
-              loadingText="Creating..."
+              isLoading={isCreating || isUpdating}
+              loadingText={isEditMode ? "Updating..." : "Creating..."}
             >
-              Create
+              {isEditMode ? 'Update' : 'Create'}
             </Button>
           </ModalFooter>
         </ModalContent>

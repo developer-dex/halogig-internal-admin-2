@@ -91,5 +91,6 @@ export const apiEndPoints = {
   // Testimonial endpoints
   CREATE_TESTIMONIAL: "admin/testimonial",
   GET_ALL_TESTIMONIALS: "admin/testimonials",
+  UPDATE_TESTIMONIAL: "admin/testimonial",
   DELETE_TESTIMONIAL: "admin/testimonial",
 };

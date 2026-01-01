@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { apiEndPoints } from "../../config/path";
 import { showError, showSuccess } from "../../helpers/messageHelper";
-import { getApi, postApi, deleteApi } from "../../services/api";
+import { getApi, postApi, putApi, deleteApi } from "../../services/api";
 
 const initialState = {
   isLoading: false,
@@ -40,6 +40,21 @@ export const getAllTestimonials = createAsyncThunk(
       return payload;
     } catch (e) {
       showError(e.response?.data?.message || "Failed to fetch testimonials");
+      throw e;
+    }
+  }
+);
+
+// Update testimonial
+export const updateTestimonial = createAsyncThunk(
+  "/updateTestimonial",
+  async ({ testimonialId, formData }) => {
+    try {
+      const payload = await putApi(`${apiEndPoints.UPDATE_TESTIMONIAL}/${testimonialId}/update`, formData);
+      showSuccess(payload.data.message || "Testimonial updated successfully");
+      return payload;
+    } catch (e) {
+      showError(e.response?.data?.message || "Failed to update testimonial");
       throw e;
     }
   }
@@ -100,6 +115,22 @@ export const testimonialSlice = createSlice({
       })
       .addCase(getAllTestimonials.rejected, (state) => {
         state.isLoading = false;
+        state.isError = true;
+      })
+
+      // Update Testimonial
+      .addCase(updateTestimonial.pending, (state) => {
+        state.createLoading = true;
+        state.createError = null;
+      })
+      .addCase(updateTestimonial.fulfilled, (state, { payload }) => {
+        state.createLoading = false;
+        state.isSuccess = true;
+        state.responseCode = payload?.status;
+      })
+      .addCase(updateTestimonial.rejected, (state, { error }) => {
+        state.createLoading = false;
+        state.createError = error.message;
         state.isError = true;
       })
 
