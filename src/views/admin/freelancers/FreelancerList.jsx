@@ -113,7 +113,7 @@ function FreelancerList() {
   // Chakra color mode values (match ClientList look)
   const textColor = useColorModeValue('rgb(32, 33, 36)', 'white');
   const borderColor = useColorModeValue('gray.200', 'whiteAlpha.100');
-  const bgColor = useColorModeValue('#F4F7FE', 'black');
+  const bgColor = useColorModeValue('#FFFFFF', 'black');
   const hoverBg = useColorModeValue('gray.50', 'whiteAlpha.50');
 
   const getStatusColorScheme = (status) => {
@@ -195,7 +195,7 @@ function FreelancerList() {
                         </Td>
                       </Tr>
                     ) : (
-                      rows.map((fr) => {
+                      rows.map((fr, index) => {
                         // Format sub categories
                         const subCategories = Array.isArray(fr.sub_category_names) && fr.sub_category_names.length > 0
                           ? fr.sub_category_names.join(', ')
@@ -223,9 +223,11 @@ function FreelancerList() {
                         }
 
                         const statusColors = getStatusColorScheme(fr.status);
+                        // Apply background color to odd rows (1st, 3rd, 5th, etc.)
+                        const isOddRow = index % 2 === 0;
 
                         return (
-                          <Tr key={fr.id} _hover={{ bg: hoverBg }} transition="all 0.2s">
+                          <Tr key={fr.id} bg={isOddRow ? '#F4F7FE' : 'transparent'} _hover={{ bg: hoverBg }} transition="all 0.2s">
                             <Td borderColor={borderColor}>
                               <Text color={textColor} fontSize="sm" fontWeight="normal">{fr.first_name || '--'}</Text>
                             </Td>

@@ -42,7 +42,7 @@ export default function FreelancerTickets() {
   // Chakra color mode values
   const textColor = useColorModeValue('rgb(32, 33, 36)', 'white');
   const borderColor = useColorModeValue('gray.200', 'whiteAlpha.100');
-  const bgColor = useColorModeValue('#F4F7FE', 'black');
+  const bgColor = useColorModeValue('#FFFFFF', 'black');
   const hoverBg = useColorModeValue('gray.50', 'whiteAlpha.50');
 
   const fetchDisputes = async () => {
@@ -213,10 +213,13 @@ export default function FreelancerTickets() {
                         </Td>
                       </Tr>
                     ) : (
-                      disputes.map((dispute) => {
+                      disputes.map((dispute, index) => {
                         const statusColors = getStatusColorScheme(dispute.status);
+                        // Apply background color to odd rows (1st, 3rd, 5th, etc.)
+                        const isOddRow = index % 2 === 0;
                         return (
                           <Tr
+                            bg={isOddRow ? '#F8FAFD' : 'transparent'}
                             key={dispute.dispute_uuid}
                             _hover={{ bg: hoverBg }}
                             transition="all 0.2s"

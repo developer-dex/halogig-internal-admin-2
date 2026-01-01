@@ -33,7 +33,7 @@ export default function Payments() {
 
   const textColor = useColorModeValue('rgb(32, 33, 36)', 'white');
   const borderColor = useColorModeValue('gray.200', 'whiteAlpha.100');
-  const bgColor = useColorModeValue('#F4F7FE', 'black');
+  const bgColor = useColorModeValue('#FFFFFF', 'black');
   const hoverBg = useColorModeValue('gray.50', 'whiteAlpha.50');
 
   useEffect(() => {
@@ -132,7 +132,9 @@ export default function Payments() {
                         </Td>
                       </Tr>
                     ) : (
-                      rows.map((bid) => {
+                      rows.map((bid, index) => {
+                        // Apply background color to odd rows (1st, 3rd, 5th, etc.)
+                        const isOddRow = index % 2 === 0;
                         const statusText = getStatusText(bid);
                         const statusColors = getStatusColors(statusText);
                         const freelancerName = `${bid?.freelancer?.first_name || ''} ${bid?.freelancer?.last_name || ''}`.trim() || '--';
@@ -154,7 +156,7 @@ export default function Payments() {
                         const paymentId = bid?.first_milestone_transaction?.payment_id || '--';
                         
                         return (
-                          <Tr key={bid.id || bid._id} _hover={{ bg: hoverBg }} transition="all 0.2s">
+                          <Tr key={bid.id || bid._id} bg={isOddRow ? '#F4F7FE' : 'transparent'} _hover={{ bg: hoverBg }} transition="all 0.2s">
                             <Td borderColor={borderColor}>
                               <Text color={textColor} fontSize="sm" fontWeight="normal">
                                 #{bid.id || bid._id || '--'}

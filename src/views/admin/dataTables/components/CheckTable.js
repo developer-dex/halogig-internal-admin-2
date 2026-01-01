@@ -188,9 +188,11 @@ export default function CheckTable(props) {
             {table
               .getRowModel()
               .rows.slice(0, 11)
-              .map((row) => {
+              .map((row, index) => {
+                // Apply background color to odd rows (1st, 3rd, 5th, etc.)
+                const isOddRow = index % 2 === 0;
                 return (
-                  <Tr key={row.id}>
+                  <Tr key={row.id} bg={isOddRow ? '#F4F7FE' : 'transparent'}>
                     {row.getVisibleCells().map((cell) => {
                       return (
                         <Td

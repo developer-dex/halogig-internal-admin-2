@@ -96,9 +96,9 @@ export default function Blog() {
     (state) => state.blog
   );
 
-  const textColor = useColorModeValue('rgb(32, 33, 36)', 'white');
+  const textColor = useColorModeValue('rgb(32, 33, 36)', 'white');  
   const borderColor = useColorModeValue('gray.200', 'whiteAlpha.100');
-  const bgColor = useColorModeValue('#F4F7FE', 'black');
+  const bgColor = useColorModeValue('#FFFFFF', 'black');
   const hoverBg = useColorModeValue('gray.50', 'whiteAlpha.50');
   const cardBg = useColorModeValue('white', 'navy.800');
   const contentBgColor = useColorModeValue('gray.50', 'gray.700');
@@ -897,8 +897,11 @@ export default function Blog() {
                     </Tr>
                   </Thead>
                   <Tbody>
-                    {blogList.map((row) => (
-                      <Tr key={row.id} _hover={{ bg: hoverBg }} transition="all 0.2s">
+                    {blogList.map((row, index) => {
+                      // Apply background color to odd rows (1st, 3rd, 5th, etc.)
+                      const isOddRow = index % 2 === 0;
+                      return (
+                        <Tr key={row.id} bg={isOddRow ? '#F4F7FE' : 'transparent'} _hover={{ bg: hoverBg }} transition="all 0.2s">
                         <Td borderColor={borderColor}>
                           <Text color={textColor} fontSize="sm" fontWeight="normal">
                             {row.id}
@@ -958,7 +961,8 @@ export default function Blog() {
                           </HStack>
                         </Td>
                       </Tr>
-                    ))}
+                    );
+                  })}
                   </Tbody>
                 </Table>
               </Box>

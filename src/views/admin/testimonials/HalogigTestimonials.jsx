@@ -74,7 +74,7 @@ export default function HalogigTestimonials() {
   // Chakra color mode values
   const textColor = useColorModeValue('rgb(32, 33, 36)', 'white');
   const borderColor = useColorModeValue('gray.200', 'whiteAlpha.100');
-  const bgColor = useColorModeValue('#F4F7FE', 'black');
+  const bgColor = useColorModeValue('#FFFFFF', 'black');
   const hoverBg = useColorModeValue('gray.50', 'whiteAlpha.50');
 
   const fetchTestimonials = async () => {
@@ -325,9 +325,13 @@ export default function HalogigTestimonials() {
                         </Td>
                       </Tr>
                     ) : (
-                      testimonials.map((testimonial) => (
+                      testimonials.map((testimonial, index) => {
+                        // Apply background color to odd rows (1st, 3rd, 5th, etc.)
+                        const isOddRow = index % 2 === 0;
+                        return (
                         <Tr
                           key={testimonial.id}
+                          bg={isOddRow ? '#F8FAFD' : 'transparent'}
                           _hover={{ bg: hoverBg }}
                           transition="all 0.2s"
                         >
@@ -386,7 +390,8 @@ export default function HalogigTestimonials() {
                             </HStack>
                           </Td>
                         </Tr>
-                      ))
+                      );
+                    })
                     )}
                   </Tbody>
                 </Table>

@@ -30,7 +30,7 @@ export default function FreelancerPayments() {
 
   const textColor = useColorModeValue('rgb(32, 33, 36)', 'white');
   const borderColor = useColorModeValue('gray.200', 'whiteAlpha.100');
-  const bgColor = useColorModeValue('#F4F7FE', 'black');
+  const bgColor = useColorModeValue('#FFFFFF', 'black');
   const hoverBg = useColorModeValue('gray.50', 'whiteAlpha.50');
 
   useEffect(() => {
@@ -119,11 +119,13 @@ export default function FreelancerPayments() {
                         </Td>
                       </Tr>
                     ) : (
-                      rows.map((payment) => {
+                      rows.map((payment, index) => {
+                        // Apply background color to odd rows (1st, 3rd, 5th, etc.)
+                        const isOddRow = index % 2 === 0;
                         const statusColors = getStatusColors(payment.status);
                         
                         return (
-                          <Tr key={payment.id} _hover={{ bg: hoverBg }} transition="all 0.2s">
+                          <Tr key={payment.id} bg={isOddRow ? '#F4F7FE' : 'transparent'} _hover={{ bg: hoverBg }} transition="all 0.2s">
                             <Td borderColor={borderColor}>
                               <Text color={textColor} fontSize="sm" fontWeight="normal">
                                 {payment.project_name}

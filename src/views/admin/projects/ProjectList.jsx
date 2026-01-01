@@ -96,7 +96,7 @@ export default function ProjectList() {
 
   const textColor = useColorModeValue('rgb(32, 33, 36)', 'white');
   const borderColor = useColorModeValue('gray.200', 'whiteAlpha.100');
-  const bgColor = useColorModeValue('#F4F7FE', 'black');
+  const bgColor = useColorModeValue('#FFFFFF', 'black');
   const hoverBg = useColorModeValue('gray.50', 'whiteAlpha.50');
   const modalBg = useColorModeValue('white', 'navy.800');
   const inputBg = useColorModeValue('white', 'navy.700');
@@ -586,12 +586,15 @@ export default function ProjectList() {
                         </Td>
                       </Tr>
                     ) : (
-                      projects.map((project) => {
+                      projects.map((project, index) => {
                         const statusText = getProjectStatusText(project);
                         const statusColors = getStatusColorScheme(statusText);
+                        // Apply background color to odd rows (1st, 3rd, 5th, etc.)
+                        const isOddRow = index % 2 === 0;
                         return (
                           <Tr
                             key={project.id}
+                            bg={isOddRow ? '#F4F7FE' : 'transparent'}
                             _hover={{ bg: hoverBg }}
                             transition="all 0.2s"
                           >

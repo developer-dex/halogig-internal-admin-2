@@ -56,7 +56,7 @@ export default function ClientList() {
   // Chakra color mode values
   const textColor = useColorModeValue('rgb(32, 33, 36)', 'white');
   const borderColor = useColorModeValue('gray.200', 'whiteAlpha.100');
-  const bgColor = useColorModeValue('#F4F7FE', 'black');
+  const bgColor = useColorModeValue('#FFFFFF', 'black');
   const hoverBg = useColorModeValue('gray.50', 'whiteAlpha.50');
 
   const fetchClients = async () => {
@@ -282,11 +282,14 @@ export default function ClientList() {
                         </Td>
                       </Tr>
                     ) : (
-                      clients.map((client) => {
+                      clients.map((client, index) => {
                         const statusColors = getStatusColorScheme(client.status);
+                        // Apply background color to odd rows (1st, 3rd, 5th, etc.)
+                        const isOddRow = index % 2 === 0;
                         return (
                           <Tr
                             key={client.id}
+                            bg={isOddRow ? '#F4F7FE' : 'transparent'}
                             _hover={{ bg: hoverBg }}
                             transition="all 0.2s"
                           >

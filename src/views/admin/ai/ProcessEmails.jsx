@@ -50,7 +50,7 @@ const ProcessEmails = () => {
 
   const textColor = useColorModeValue("rgb(32, 33, 36)", "white");
   const borderColor = useColorModeValue("gray.200", "whiteAlpha.100");
-  const bgColor = useColorModeValue("#F4F7FE", "black");
+  const bgColor = useColorModeValue("#FFFFFF", "black");
   const hoverBg = useColorModeValue("gray.50", "whiteAlpha.50");
 
   const fetchData = async () => {
@@ -346,8 +346,11 @@ const ProcessEmails = () => {
                     </Td>
                   </Tr>
                 ) : (
-                  rows.map((item) => (
-                    <Tr key={item.id} _hover={{ bg: hoverBg }} transition="all 0.2s">
+                  rows.map((item, index) => {
+                    // Apply background color to odd rows (1st, 3rd, 5th, etc.)
+                    const isOddRow = index % 2 === 0;
+                    return (
+                    <Tr key={item.id} bg={isOddRow ? '#F8FAFD' : 'transparent'} _hover={{ bg: hoverBg }} transition="all 0.2s">
                       <Td borderColor={borderColor}>
                         <Text color={textColor} fontSize="sm" fontWeight="normal">{item.email || "—"}</Text>
                       </Td>
@@ -418,7 +421,8 @@ const ProcessEmails = () => {
                         </Text>
                       </Td>
                     </Tr>
-                  ))
+                    );
+                  })
                 )}
               </Tbody>
             </Table>

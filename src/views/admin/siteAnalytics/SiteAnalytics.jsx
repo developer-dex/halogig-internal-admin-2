@@ -56,7 +56,7 @@ export default function SiteAnalytics() {
 
   const textColor = useColorModeValue('rgb(32, 33, 36)', 'white');
   const borderColor = useColorModeValue('gray.200', 'whiteAlpha.100');
-  const bgColor = useColorModeValue('#F4F7FE', 'black');
+  const bgColor = useColorModeValue('#FFFFFF', 'black');
   const hoverBg = useColorModeValue('gray.50', 'whiteAlpha.50');
   const cardBg = useColorModeValue('white', 'navy.800');
 
@@ -283,8 +283,11 @@ export default function SiteAnalytics() {
                     </Tr>
                   </Thead>
                   <Tbody>
-                    {pageAnalytics.map((item) => (
-                      <Tr key={item.id || item._id} _hover={{ bg: hoverBg }} transition="all 0.2s">
+                    {pageAnalytics.map((item, index) => {
+                      // Apply background color to odd rows (1st, 3rd, 5th, etc.)
+                      const isOddRow = index % 2 === 0;
+                      return (
+                      <Tr key={item.id || item._id} bg={isOddRow ? '#F4F7FE' : 'transparent'}   _hover={{ bg: hoverBg }} transition="all 0.2s">
                         {/* Date - extracted from In time */}
                         <Td borderColor={borderColor} minW="120px">
                           <Text color={textColor} fontSize="sm" whiteSpace="nowrap">
@@ -417,7 +420,8 @@ export default function SiteAnalytics() {
                           </Text>
                         </Td>
                       </Tr>
-                    ))}
+                    );
+                  })}
                   </Tbody>
                 </Table>
               </Box>
