@@ -107,7 +107,7 @@ function VerifyOtp() {
     <Flex
       minH='100vh'
       w='100%'
-      bg='#F2F6FC'
+      bg='#F0F4F9'
       alignItems='center'
       justifyContent='center'
       px={{ base: '25px', md: '0px' }}
@@ -119,7 +119,8 @@ function VerifyOtp() {
         style={{ 
           boxShadow: '0 12px 40px rgba(0, 0, 0, 0.12)',
           padding: '20px',
-          borderRadius: '15px'
+          borderRadius: '15px',
+          backgroundColor: '#FFFFFF'
         }}>
         <Box textAlign='center' mb='36px'>
           <Image 
