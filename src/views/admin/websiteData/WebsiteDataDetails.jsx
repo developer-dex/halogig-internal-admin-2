@@ -30,6 +30,10 @@ import {
   AlertTitle,
   AlertDescription,
   Stack,
+  Checkbox,
+  CheckboxGroup,
+  RadioGroup,
+  Radio,
 } from '@chakra-ui/react';
 import {
   MdArrowBack,
@@ -38,10 +42,13 @@ import {
   MdAdd,
   MdRemove,
   MdSync,
+  MdDragIndicator,
 } from 'react-icons/md';
 import {
   getWebsiteDataById,
   updateWebsiteData,
+  getWebsiteDataSlugs,
+  updateWebsiteDataOrder,
 } from '../../../features/admin/websiteDataSlice';
 import { showError, showSuccess } from '../../../helpers/messageHelper';
 import { patchApi } from '../../../services/api';
@@ -84,10 +91,45 @@ export default function WebsiteDataDetails() {
   const [syncValue, setSyncValue] = useState('');
   const [isSyncing, setIsSyncing] = useState(false);
 
+  // Sections order state
+  const [sectionsOrder, setSectionsOrder] = useState([]);
+  const [originalSectionsOrder, setOriginalSectionsOrder] = useState([]);
+  const [isEditingSectionsOrder, setIsEditingSectionsOrder] = useState(false);
+  const [isSavingSectionsOrder, setIsSavingSectionsOrder] = useState(false);
+  const [draggedIndex, setDraggedIndex] = useState(null);
+  const [dragOverIndex, setDragOverIndex] = useState(null);
+
+  // Sections order save modal state
+  const sectionsOrderSaveModal = useDisclosure();
+  const [applyType, setApplyType] = useState('single'); // 'all', 'single', 'selected'
+  const [websiteDataSlugs, setWebsiteDataSlugs] = useState([]);
+  const [selectedSlugIds, setSelectedSlugIds] = useState([]);
+  const [isLoadingSlugs, setIsLoadingSlugs] = useState(false);
+
   const textColor = useColorModeValue('secondaryGray.900', 'white');
   const borderColor = useColorModeValue('gray.200', 'whiteAlpha.100');
   const cardBg = useColorModeValue('white', 'navy.800');
   const groupBg = useColorModeValue('gray.50', 'whiteAlpha.50');
+
+  // Helper function to convert order object to array
+  const convertOrderToArray = (orderObj) => {
+    if (!orderObj || typeof orderObj !== 'object') {
+      return [];
+    }
+    // Convert object to array of {key, value} pairs and sort by value
+    return Object.entries(orderObj)
+      .map(([key, value]) => ({ key, value }))
+      .sort((a, b) => a.value - b.value);
+  };
+
+  // Helper function to convert array back to order object
+  const convertArrayToOrder = (orderArray) => {
+    const orderObj = {};
+    orderArray.forEach((item, index) => {
+      orderObj[item.key] = index + 1;
+    });
+    return orderObj;
+  };
 
   // Fetch website data by ID
   const fetchWebsiteData = async () => {
@@ -131,6 +173,13 @@ export default function WebsiteDataDetails() {
           metaTitle: data.meta_title || '',
           metaDescription: data.meta_description || '',
         });
+
+        // Initialize sections order
+        if (data.order) {
+          const orderArray = convertOrderToArray(data.order);
+          setSectionsOrder(orderArray);
+          setOriginalSectionsOrder(orderArray);
+        }
       }
     } catch (error) {
       console.error('Error fetching website data:', error);
@@ -486,6 +535,162 @@ export default function WebsiteDataDetails() {
     }
   };
 
+  // Handle sections order drag and drop
+  const handleDragStart = (index) => {
+    setDraggedIndex(index);
+  };
+
+  const handleDragOver = (e, index) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (draggedIndex !== null && draggedIndex !== index) {
+      setDragOverIndex(index);
+    }
+  };
+
+  const handleDragLeave = () => {
+    setDragOverIndex(null);
+  };
+
+  const handleDrop = (e, dropIndex) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (draggedIndex === null || draggedIndex === dropIndex) {
+      setDraggedIndex(null);
+      setDragOverIndex(null);
+      return;
+    }
+
+    const newOrder = [...sectionsOrder];
+    const draggedItem = newOrder[draggedIndex];
+    newOrder.splice(draggedIndex, 1);
+    newOrder.splice(dropIndex, 0, draggedItem);
+
+    // Update order values
+    const updatedOrder = newOrder.map((item, index) => ({
+      ...item,
+      value: index + 1,
+    }));
+
+    setSectionsOrder(updatedOrder);
+    setDraggedIndex(null);
+    setDragOverIndex(null);
+  };
+
+  const handleDragEnd = () => {
+    setDraggedIndex(null);
+    setDragOverIndex(null);
+  };
+
+  // Handle sections order edit
+  const handleSectionsOrderEdit = () => {
+    setIsEditingSectionsOrder(true);
+  };
+
+  // Handle sections order cancel
+  const handleSectionsOrderCancel = () => {
+    setSectionsOrder([...originalSectionsOrder]);
+    setIsEditingSectionsOrder(false);
+  };
+
+  // Handle sections order save - open modal
+  const handleSectionsOrderSave = () => {
+    sectionsOrderSaveModal.onOpen();
+    // Reset state
+    setApplyType('single');
+    setSelectedSlugIds([]);
+  };
+
+  // Fetch website data slugs
+  const fetchWebsiteDataSlugs = async () => {
+    try {
+      setIsLoadingSlugs(true);
+      const response = await dispatch(getWebsiteDataSlugs());
+      if (response.payload?.data?.success) {
+        setWebsiteDataSlugs(response.payload.data.data || []);
+      }
+    } catch (error) {
+      console.error('Error fetching website data slugs:', error);
+    } finally {
+      setIsLoadingSlugs(false);
+    }
+  };
+
+  // Handle apply type change
+  const handleApplyTypeChange = (type) => {
+    setApplyType(type);
+    if (type !== 'selected') {
+      setSelectedSlugIds([]);
+    } else {
+      // Fetch slugs when selected is chosen
+      if (websiteDataSlugs.length === 0) {
+        fetchWebsiteDataSlugs();
+      }
+    }
+  };
+
+  // Handle slug selection change
+  const handleSlugSelectionChange = (selectedIds) => {
+    setSelectedSlugIds(selectedIds);
+  };
+
+  // Handle confirm save sections order
+  const handleConfirmSaveSectionsOrder = async () => {
+    try {
+      setIsSavingSectionsOrder(true);
+      sectionsOrderSaveModal.onClose();
+
+      const orderObj = convertArrayToOrder(sectionsOrder);
+      const currentId = parseInt(id);
+      
+      let payload = {
+        section: orderObj,
+        type: applyType,
+      };
+
+      if (applyType === 'single') {
+        // For single, pass the id
+        payload.id = currentId;
+        payload.otherPages = null;
+      } else if (applyType === 'selected') {
+        // For selected, append current id to otherPages array (if not already included)
+        const selectedIds = selectedSlugIds.map(slugId => parseInt(slugId));
+        if (!selectedIds.includes(currentId)) {
+          selectedIds.push(currentId);
+        }
+        payload.otherPages = selectedIds;
+      } else {
+        // For all, otherPages is null
+        payload.otherPages = null;
+      }
+
+      await dispatch(updateWebsiteDataOrder(payload));
+
+      setOriginalSectionsOrder([...sectionsOrder]);
+      setIsEditingSectionsOrder(false);
+      fetchWebsiteData();
+    } catch (error) {
+      console.error('Update sections order error:', error);
+    } finally {
+      setIsSavingSectionsOrder(false);
+    }
+  };
+
+  // Get section display name
+  const getSectionDisplayName = (key) => {
+    const names = {
+      halogig_review: 'Halogig Review',
+      services: 'Services',
+      industries: 'Industries',
+      use_cases: 'Use Cases',
+      freelancers: 'Freelancers',
+      punch_lines: 'Punch Lines',
+      interlinking: 'Interlinking',
+    };
+    return names[key] || key;
+  };
+
   if (isLoading && !originalData) {
     return (
       <Box>
@@ -556,6 +761,116 @@ export default function WebsiteDataDetails() {
               )}
             </HStack>
           </Flex>
+        </Box>
+      </Card>
+
+      {/* Sections Order Card */}
+      <Card mb="20px" bg={cardBg}>
+        <Box p="24px">
+          <Flex justify="space-between" align="center" mb={4}>
+            <Text color={textColor} fontSize="2xl" fontWeight="700">
+              Sections Order
+            </Text>
+            {!isEditingSectionsOrder ? (
+              <Button
+                leftIcon={<MdEdit />}
+                colorScheme="brand"
+                onClick={handleSectionsOrderEdit}
+              >
+                Edit
+              </Button>
+            ) : (
+              <HStack spacing={2}>
+                <Button variant="outline" onClick={handleSectionsOrderCancel} isDisabled={isSavingSectionsOrder}>
+                  Cancel
+                </Button>
+                <Button
+                  leftIcon={<MdSave />}
+                  colorScheme="brand"
+                  onClick={handleSectionsOrderSave}
+                  isLoading={isSavingSectionsOrder}
+                  loadingText="Saving..."
+                >
+                  Save Changes
+                </Button>
+              </HStack>
+            )}
+          </Flex>
+
+          <VStack align="stretch" spacing={2}>
+            {sectionsOrder.length === 0 ? (
+              <Text color="gray.500" textAlign="center" py={4}>
+                No sections order data available
+              </Text>
+            ) : (
+              sectionsOrder.map((section, index) => (
+                <Box
+                  key={section.key}
+                  draggable={isEditingSectionsOrder}
+                  onDragStart={() => handleDragStart(index)}
+                  onDragOver={(e) => handleDragOver(e, index)}
+                  onDragLeave={handleDragLeave}
+                  onDrop={(e) => handleDrop(e, index)}
+                  onDragEnd={handleDragEnd}
+                  p={4}
+                  border="2px solid"
+                  borderColor={
+                    dragOverIndex === index && draggedIndex !== index
+                      ? 'brand.500'
+                      : draggedIndex === index
+                      ? 'gray.300'
+                      : borderColor
+                  }
+                  borderRadius="md"
+                  bg={
+                    dragOverIndex === index && draggedIndex !== index
+                      ? 'brand.50'
+                      : draggedIndex === index
+                      ? groupBg
+                      : cardBg
+                  }
+                  cursor={isEditingSectionsOrder ? 'move' : 'default'}
+                  opacity={draggedIndex === index ? 0.5 : 1}
+                  transition="all 0.2s"
+                  transform={
+                    dragOverIndex === index && draggedIndex !== index
+                      ? 'translateY(-4px)'
+                      : isEditingSectionsOrder && draggedIndex !== index
+                      ? 'translateY(0)'
+                      : 'translateY(0)'
+                  }
+                  boxShadow={
+                    dragOverIndex === index && draggedIndex !== index
+                      ? 'lg'
+                      : isEditingSectionsOrder && draggedIndex !== index
+                      ? 'sm'
+                      : 'none'
+                  }
+                  _hover={
+                    isEditingSectionsOrder && draggedIndex !== index
+                      ? { bg: groupBg, transform: 'translateY(-2px)', boxShadow: 'md' }
+                      : {}
+                  }
+                >
+                  <Flex align="center" justify="space-between">
+                    <HStack spacing={3}>
+                      {isEditingSectionsOrder && (
+                        <Box color="gray.400" cursor="grab" _active={{ cursor: 'grabbing' }}>
+                          <MdDragIndicator size={24} />
+                        </Box>
+                      )}
+                      <Text fontSize="lg" fontWeight="600" color={textColor}>
+                        {getSectionDisplayName(section.key)}
+                      </Text>
+                    </HStack>
+                    <Text fontSize="md" fontWeight="500" color="gray.500">
+                      Order: {section.value}
+                    </Text>
+                  </Flex>
+                </Box>
+              ))
+            )}
+          </VStack>
         </Box>
       </Card>
 
@@ -1163,6 +1478,104 @@ export default function WebsiteDataDetails() {
               loadingText="Syncing..."
             >
               Sync All Records
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+
+      {/* Sections Order Save Modal */}
+      <Modal isOpen={sectionsOrderSaveModal.isOpen} onClose={sectionsOrderSaveModal.onClose} isCentered size="xl">
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Apply Sections Order Changes</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <Text fontSize="md" mb={4} fontWeight="500">
+              Do you want to apply this changes in:
+            </Text>
+
+            <RadioGroup value={applyType} onChange={handleApplyTypeChange} mb={4}>
+              <VStack align="stretch" spacing={3}>
+                <Radio value="all" colorScheme="brand">
+                  Apply to all
+                </Radio>
+                <Radio value="single" colorScheme="brand">
+                  Single
+                </Radio>
+                <Radio value="selected" colorScheme="brand">
+                  Selected
+                </Radio>
+              </VStack>
+            </RadioGroup>
+
+            {applyType === 'selected' && (
+              <Box mt={4}>
+                <FormControl>
+                  <FormLabel fontSize="sm" fontWeight="600" mb={2}>
+                    Select Data
+                  </FormLabel>
+                  {isLoadingSlugs ? (
+                    <Flex justify="center" py={4}>
+                      <Spinner size="md" color="brand.500" />
+                    </Flex>
+                  ) : (
+                    <Box
+                      maxH="300px"
+                      overflowY="auto"
+                      border="1px solid"
+                      borderColor={borderColor}
+                      borderRadius="md"
+                      p={3}
+                    >
+                      <CheckboxGroup
+                        value={selectedSlugIds}
+                        onChange={handleSlugSelectionChange}
+                        colorScheme="brand"
+                      >
+                        <VStack align="stretch" spacing={2}>
+                          {websiteDataSlugs.length === 0 ? (
+                            <Text color="gray.500" textAlign="center" py={2}>
+                              No data available
+                            </Text>
+                          ) : (
+                            websiteDataSlugs.map((slug) => (
+                              <Checkbox key={slug.id} value={String(slug.id)}>
+                                <Text fontSize="sm" color={textColor}>
+                                  {slug.full_slug}
+                                </Text>
+                              </Checkbox>
+                            ))
+                          )}
+                        </VStack>
+                      </CheckboxGroup>
+                    </Box>
+                  )}
+                </FormControl>
+              </Box>
+            )}
+
+            <Alert status="info" mt={4}>
+              <AlertIcon />
+              <AlertDescription fontSize="sm">
+                {applyType === 'all' && 'This will apply the sections order to all website data records.'}
+                {applyType === 'single' && `This will apply the sections order to the current record (ID: ${id}).`}
+                {applyType === 'selected' &&
+                  `This will apply the sections order to ${selectedSlugIds.length} selected record(s).`}
+              </AlertDescription>
+            </Alert>
+          </ModalBody>
+          <ModalFooter>
+            <Button variant="ghost" mr={3} onClick={sectionsOrderSaveModal.onClose} isDisabled={isSavingSectionsOrder}>
+              Cancel
+            </Button>
+            <Button
+              colorScheme="brand"
+              onClick={handleConfirmSaveSectionsOrder}
+              isLoading={isSavingSectionsOrder}
+              loadingText="Saving..."
+              isDisabled={applyType === 'selected' && selectedSlugIds.length === 0}
+            >
+              Yes, Apply Changes
             </Button>
           </ModalFooter>
         </ModalContent>

@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { apiEndPoints } from "../../config/path";
 import { showError, showSuccess } from "../../helpers/messageHelper";
-import { getApi, postApi, deleteApi, putApi } from "../../services/api";
+import { getApi, postApi, deleteApi, putApi, patchApi } from "../../services/api";
 
 const initialState = {
     isLoading: false,
@@ -153,6 +153,35 @@ export const downloadWebsiteDataExcel = createAsyncThunk(
             return { blob };
         } catch (e) {
             showError(e.message || "Failed to download Excel file");
+            throw e;
+        }
+    }
+);
+
+// Get website data slugs
+export const getWebsiteDataSlugs = createAsyncThunk(
+    "/getWebsiteDataSlugs",
+    async () => {
+        try {
+            const payload = await getApi(apiEndPoints.GET_WEBSITE_DATA_SLUGS);
+            return payload;
+        } catch (e) {
+            showError(e.response?.data?.message || "Failed to fetch website data slugs");
+            throw e;
+        }
+    }
+);
+
+// Update website data order
+export const updateWebsiteDataOrder = createAsyncThunk(
+    "/updateWebsiteDataOrder",
+    async (data) => {
+        try {
+            const payload = await patchApi(apiEndPoints.UPDATE_WEBSITE_DATA_ORDER, data);
+            showSuccess("Sections order updated successfully");
+            return payload;
+        } catch (e) {
+            showError(e.response?.data?.message || "Failed to update sections order");
             throw e;
         }
     }

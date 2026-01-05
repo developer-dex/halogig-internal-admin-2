@@ -76,6 +76,8 @@ export const apiEndPoints = {
   GET_BATCH_NAME: "admin/batch-name",
   GET_HTML_TEMPLATE: "admin/html-template",
   GET_WEBSITE_DATA_SLUG: "admin/website-data-slug",
+  GET_WEBSITE_DATA_SLUGS: "admin/website-data-slugs",
+  UPDATE_WEBSITE_DATA_ORDER: "admin/website-data/update-order",
   CAMPAIGN_SEND: "campaign/send",
   GET_EMAIL_CAMPAIGNS: "admin/email-campaigns",
   
