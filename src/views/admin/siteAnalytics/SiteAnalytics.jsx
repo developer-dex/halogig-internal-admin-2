@@ -137,8 +137,9 @@ export default function SiteAnalytics() {
             : '--',
           'IP Address': item.ip_address || '--',
           Location: item.location || '--',
-          'Page Visit': item.url || '--',
           'User Type': item.user_type || 'guest',
+          'Today Visit Count': item.today_visit_count ?? '--',
+          'Total Visit Till Date': item.total_visit_till_date ?? '--',
           'In Time': item.start_time
             ? moment(item.start_time).format('h:mm:ss A')
             : '--',
@@ -153,6 +154,7 @@ export default function SiteAnalytics() {
           'Telecom Provider': item.telecom_provider || '--',
           Browser: item.browser || '--',
           Source: 'web',
+          'Page Visit': item.url || '--',
           Role: item.role || '--',
           Industry: item.industry_name || '--',
         }));
@@ -268,8 +270,9 @@ export default function SiteAnalytics() {
                       <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" bg={bgColor}>Date</Th>
                       <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" bg={bgColor}>IP Address</Th>
                       <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" minW="120px" bg={bgColor}>Location</Th>
-                      <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" minW="400px" bg={bgColor}>Page Visit</Th>
                       <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" bg={bgColor}>User Type</Th>
+                      <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" bg={bgColor}>Today Visit Count</Th>
+                      <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" bg={bgColor}>Total Visit Till Date</Th>
                       <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" bg={bgColor}>In Time</Th>
                       <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" bg={bgColor}>Out Time</Th>
                       <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" bg={bgColor}>Time Spent</Th>
@@ -278,6 +281,7 @@ export default function SiteAnalytics() {
                       <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" bg={bgColor}>Telecom Provider</Th>
                       <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" bg={bgColor}>Browser</Th>
                       <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" bg={bgColor}>Source</Th>
+                      <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" minW="400px" bg={bgColor}>Page Visit</Th>
                       <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" bg={bgColor}>Role</Th>
                       <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" bg={bgColor}>Industry</Th>
                     </Tr>
@@ -332,25 +336,22 @@ export default function SiteAnalytics() {
                             {item.location || '--'}
                           </Text>
                         </Td>
-                        {/* Page Visit */}
-                        <Td borderColor={borderColor} maxW="450px">
-                          <Tooltip label={item.url || ''} placement="top">
-                            <Text
-                              color={textColor}
-                              fontSize="sm"
-                              whiteSpace="normal"
-                              wordBreak="break-word"
-                              noOfLines={3}
-                              cursor="pointer"
-                            >
-                              {item.url || '--'}
-                            </Text>
-                          </Tooltip>
-                        </Td>
                         {/* User Type - Static "guest" */}
                         <Td borderColor={borderColor}>
                           <Text color={textColor} fontSize="sm">
                             {item.user_type || 'guest'}
+                          </Text>
+                        </Td>
+                        {/* Today Visit Count */}
+                        <Td borderColor={borderColor}>
+                          <Text color={textColor} fontSize="sm">
+                            {item.today_visit_count ?? '--'}
+                          </Text>
+                        </Td>
+                        {/* Total Visit Till Date */}
+                        <Td borderColor={borderColor}>
+                          <Text color={textColor} fontSize="sm">
+                            {item.total_visit_till_date ?? '--'}
                           </Text>
                         </Td>
                         {/* In Time - Only time, not date */}
@@ -406,6 +407,21 @@ export default function SiteAnalytics() {
                           <Text color={textColor} fontSize="sm">
                             web
                           </Text>
+                        </Td>
+                        {/* Page Visit */}
+                        <Td borderColor={borderColor} maxW="450px">
+                          <Tooltip label={item.url || ''} placement="top">
+                            <Text
+                              color={textColor}
+                              fontSize="sm"
+                              whiteSpace="normal"
+                              wordBreak="break-word"
+                              noOfLines={3}
+                              cursor="pointer"
+                            >
+                              {item.url || '--'}
+                            </Text>
+                          </Tooltip>
                         </Td>
                         {/* Role */}
                         <Td borderColor={borderColor}>
