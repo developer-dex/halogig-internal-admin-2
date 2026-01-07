@@ -36,6 +36,7 @@ import {
   AlertDescription,
   VStack,
   SimpleGrid,
+  Select,
 } from '@chakra-ui/react';
 import {
   MdCloudUpload,
@@ -104,7 +105,7 @@ export default function WebsiteData() {
     metaDescription: '',
   });
 
-  const pageLimit = 10;
+  const [pageLimit, setPageLimit] = useState(50);
 
   const { isLoading, uploadLoading, uploadResponse, uploadError, responseData } = useSelector(
     (state) => state.websiteData
@@ -568,7 +569,7 @@ export default function WebsiteData() {
         <Box p="8px" ps="12px" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}> 
           <Flex justify="space-between" align="center" mb="8px" flexWrap="wrap" gap={2}>
             <Box>
-              <Text color={textColor} fontSize="xl" fontWeight="700" mb="2px">
+              <Text color={textColor} fontSize="l" fontWeight="700" mb="2px">
                 Website Data Management
               </Text>
               {/* <Text color="black" fontSize="s">
@@ -723,7 +724,7 @@ export default function WebsiteData() {
           ) : (
             <>
               <Box
-                maxH={{ base: 'calc(100vh - 200px)', md: 'calc(100vh - 210px)', xl: 'calc(100vh - 210px)' }}
+                h={{ base: 'calc(100vh - 200px)', md: 'calc(100vh - 210px)', xl: 'calc(100vh - 210px)' }}
                 overflowY="auto"
                 overflowX="auto"
                 border="1px solid"
@@ -733,11 +734,11 @@ export default function WebsiteData() {
                 <Table variant="simple" color="gray.500" minW="800px">
                   <Thead position="sticky" top="0" zIndex="1" bg={bgColor}>
                     <Tr>
-                      <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" bg={bgColor}>ID</Th>
-                      <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" bg={bgColor}>Category</Th>
-                      <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" bg={bgColor}>Service</Th>
-                      <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" bg={bgColor}>Slug URL</Th>
-                      <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" textAlign="center" bg={bgColor}>Operations</Th>
+                      <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="capitalize" bg={bgColor}>ID</Th>
+                      <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="capitalize" bg={bgColor}>Category</Th>
+                      <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="capitalize" bg={bgColor}>Service</Th>
+                      <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="capitalize" bg={bgColor}>Slug URL</Th>
+                      <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="capitalize" textAlign="center" bg={bgColor}>Operations</Th>
                     </Tr>
                   </Thead>
                   <Tbody>
@@ -746,24 +747,24 @@ export default function WebsiteData() {
                       const isOddRow = index % 2 === 0;
                       return (
                         <Tr key={row.id} bg={isOddRow ? '#F4F7FE' : 'transparent'} _hover={{ bg: hoverBg }} transition="all 0.2s">
-                        <Td borderColor={borderColor}>
+                        <Td borderColor={borderColor} pt="8px" pb="8px">
                           <Text color={textColor} fontSize="sm" fontWeight="normal">
                             {row.id}
                           </Text>
                         </Td>
-                        <Td borderColor={borderColor}>
+                        <Td borderColor={borderColor} pt="8px" pb="8px">
                           {row.category_name && (
                             <Badge px="12px" py="4px" borderRadius="full" color={textColor}  fontWeight="normal" borderColor="rgb(32, 33, 36)">
                               {row.category_name}
                             </Badge>
                           )}
                         </Td>
-                        <Td borderColor={borderColor}>
+                        <Td borderColor={borderColor} pt="8px" pb="8px">
                           <Text color={textColor} fontSize="sm" fontWeight="normal">
                             {row.service_name || '-'}
                           </Text>
                         </Td>
-                        <Td borderColor={borderColor}>
+                        <Td borderColor={borderColor} pt="8px" pb="8px">
                           <Text
                             color={textColor}
                             fontSize="sm"
@@ -777,7 +778,7 @@ export default function WebsiteData() {
                             {row.slug_link || '-'}
                           </Text>
                         </Td>
-                        <Td borderColor={borderColor} textAlign="center">
+                        <Td borderColor={borderColor} textAlign="center" pt="8px" pb="8px">
                           <HStack spacing={1} justify="center">
                             <Tooltip label="Edit">
                               <IconButton
@@ -822,10 +823,31 @@ export default function WebsiteData() {
               </Box>
 
               {/* Pagination */}
-              <Flex justify="space-between" align="center" mt="6px" pt="6px" borderTop="1px solid" borderColor={borderColor}>
-                <Text color={textColor} fontSize="sm">
-                  Page {currentPage} of {totalPages} ({totalCount} total)
-                </Text>
+              <Flex justify="space-between" align="center" mt="6px" pt="6px" borderTop="1px solid" borderColor={borderColor} flexWrap="wrap" gap="8px">
+                <HStack spacing="12px">
+                  <Text color={textColor} fontSize="sm">
+                    Page {currentPage} of {totalPages} ({totalCount} total)
+                  </Text>
+                  <HStack spacing="8px">
+                    <Text color="black" fontSize="sm" whiteSpace="nowrap">Per page:</Text>
+                    <Select
+                      size="sm"
+                      w="80px"
+                      value={pageLimit}
+                      onChange={(e) => {
+                        setPageLimit(Number(e.target.value));
+                        setCurrentPage(1);
+                      }}
+                      borderColor={borderColor}
+                      _hover={{ borderColor: 'brand.500' }}
+                    >
+                      <option value={50}>50</option>
+                      <option value={100}>100</option>
+                      <option value={200}>200</option>
+                      <option value={300}>300</option>
+                    </Select>
+                  </HStack>
+                </HStack>
                 <HStack spacing="8px">
                   <IconButton
                     aria-label="Previous page"

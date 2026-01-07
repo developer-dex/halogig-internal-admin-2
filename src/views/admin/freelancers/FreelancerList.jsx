@@ -26,6 +26,7 @@ import {
   Tooltip,
   HStack,
   Card,
+  Select,
 } from '@chakra-ui/react';
 import { MdVisibility, MdChevronLeft, MdChevronRight } from 'react-icons/md';
 import { useDispatch, useSelector } from 'react-redux';
@@ -143,7 +144,7 @@ function FreelancerList() {
     <Box>
       <Card bg={bgColor}>
         <Box p="12px">
-          <Text color={textColor} fontSize="2xl" fontWeight="700" mb="10px">
+          <Text color={textColor} fontSize="l" fontWeight="700" mb="10px">
             Freelancers
           </Text>
 
@@ -154,7 +155,7 @@ function FreelancerList() {
           ) : (
             <>
               <Box
-                maxH={{ base: 'calc(100vh - 200px)', md: 'calc(100vh - 130px)', xl: 'calc(100vh - 130px)' }}
+                h={{ base: 'calc(100vh - 160px)', md: 'calc(100vh - 130px)', xl: 'calc(100vh - 130px)' }}
                 overflowY="auto"
                 overflowX="auto"
                 border="1px solid"
@@ -164,25 +165,25 @@ function FreelancerList() {
                 <Table variant="simple" color="gray.500" minW="1000px">
                   <Thead position="sticky" top="0" zIndex="1" bg={bgColor}>
                     <Tr>
-                      <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" bg={bgColor}>
+                      <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="capitalize" bg={bgColor}>
                         First Name
                       </Th>
-                      <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" bg={bgColor}>
+                      <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="capitalize" bg={bgColor}>
                         Last Name
                       </Th>
-                      <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" bg={bgColor}>
+                      <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="capitalize" bg={bgColor}>
                         Sub Categories
                       </Th>
-                      <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" bg={bgColor}>
+                      <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="capitalize" bg={bgColor}>
                         Location
                       </Th>
-                      <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" bg={bgColor}>
+                      <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="capitalize" bg={bgColor}>
                         Last Login
                       </Th>
-                      <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" textAlign="center" bg={bgColor}>
+                      <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="capitalize" textAlign="center" bg={bgColor}>
                         Status
                       </Th>
-                      <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" textAlign="center" bg={bgColor}>
+                      <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="capitalize" textAlign="center" bg={bgColor}>
                         View
                       </Th>
                     </Tr>
@@ -228,22 +229,22 @@ function FreelancerList() {
 
                         return (
                           <Tr key={fr.id} bg={isOddRow ? '#F4F7FE' : 'transparent'} _hover={{ bg: hoverBg }} transition="all 0.2s">
-                            <Td borderColor={borderColor}>
+                            <Td borderColor={borderColor} pt="8px" pb="8px">
                               <Text color={textColor} fontSize="sm" fontWeight="normal">{fr.first_name || '--'}</Text>
                             </Td>
-                            <Td borderColor={borderColor}>
+                            <Td borderColor={borderColor} pt="8px" pb="8px">
                               <Text color={textColor} fontSize="sm" fontWeight="normal">{fr.last_name || '--'}</Text>
                             </Td>
-                            <Td borderColor={borderColor}>
+                            <Td borderColor={borderColor} pt="8px" pb="8px">
                               <Text color={textColor} fontSize="sm" fontWeight="normal">{subCategories}</Text>
                             </Td>
-                            <Td borderColor={borderColor}>
+                            <Td borderColor={borderColor} pt="8px" pb="8px">
                               <Text color={textColor} fontSize="sm" fontWeight="normal">{location}</Text>
                             </Td>
-                            <Td borderColor={borderColor}>
+                            <Td borderColor={borderColor} pt="8px" pb="8px">
                               <Text color={textColor} fontSize="sm" fontWeight="normal">{lastLogin}</Text>
                             </Td>
-                            <Td borderColor={borderColor} textAlign="center">
+                            <Td borderColor={borderColor} textAlign="center" pt="8px" pb="8px">
                               <Button
                                 size="sm"
                                 bg={statusColors.bg}
@@ -260,7 +261,7 @@ function FreelancerList() {
                                 {fr.status || 'Pending'}
                               </Button>
                             </Td>
-                            <Td borderColor={borderColor} textAlign="center">
+                            <Td borderColor={borderColor} textAlign="center" pt="8px" pb="8px">
                               <Tooltip label="View Freelancer Details">
                                 <IconButton
                                   aria-label="View freelancer"
@@ -281,10 +282,31 @@ function FreelancerList() {
               </Box>
 
               {/* Pagination */}
-              <Flex justify="space-between" align="center"  pt="8px">
-                <Text color="black" fontSize="sm">
-                  Showing <Text as="span" fontWeight="700" color="brand.500">{rows.length}</Text> of {totalCount}
-                </Text>
+              <Flex justify="space-between" align="center" pt="8px" flexWrap="wrap" gap="8px">
+                <HStack spacing="12px">
+                  <Text color="black" fontSize="sm">
+                    Showing <Text as="span" fontWeight="700" color="brand.500">{rows.length}</Text> of {totalCount}
+                  </Text>
+                  <HStack spacing="8px">
+                    <Text color="black" fontSize="sm" whiteSpace="nowrap">Per page:</Text>
+                    <Select
+                      size="sm"
+                      w="80px"
+                      value={pageLimit}
+                      onChange={(e) => {
+                        setPageLimit(Number(e.target.value));
+                        setPage(1);
+                      }}
+                      borderColor={borderColor}
+                      _hover={{ borderColor: 'brand.500' }}
+                    >
+                      <option value={50}>50</option>
+                      <option value={100}>100</option>
+                      <option value={200}>200</option>
+                      <option value={300}>300</option>
+                    </Select>
+                  </HStack>
+                </HStack>
 
                 <HStack spacing="8px">
                   <IconButton aria-label="Previous page" icon={<MdChevronLeft />} size="sm" onClick={() => setPage((p)=> Math.max(1, p-1))} isDisabled={page === 1} variant="outline" />

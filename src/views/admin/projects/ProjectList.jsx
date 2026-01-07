@@ -62,7 +62,7 @@ export default function ProjectList() {
   const statusModal = useDisclosure();
   const editModal = useDisclosure();
   const statusOptions = ['Pending', 'Approved', 'Rejected'];
-  const pageLimit = 50;
+  const [pageLimit, setPageLimit] = useState(50);
 
   // Get dropdown data from Redux store
   const dropdownData = useSelector((state) => state.dropdownDataReducer);
@@ -468,7 +468,7 @@ export default function ProjectList() {
         <Box p="12px">
           <Text
             color={textColor}
-            fontSize="2xl"
+            fontSize="l"
             fontWeight="700"
             mb="8px"
           >
@@ -482,7 +482,7 @@ export default function ProjectList() {
           ) : (
             <>
               <Box
-                maxH={{ base: 'calc(100vh - 200px)', md: 'calc(100vh - 130px)', xl: 'calc(100vh - 130px)' }}
+                h={{ base: 'calc(100vh - 160px)', md: 'calc(100vh - 130px)', xl: 'calc(100vh - 130px)' }}
                 overflowY="auto"
                 overflowX="auto"
                 border="1px solid"
@@ -497,84 +497,84 @@ export default function ProjectList() {
                         color="black"
                         fontSize="xs"
                         fontWeight="700"
-                        textTransform="uppercase"
+                        textTransform="capitalize"
                         bg={bgColor}
                       >
-                        PROJECT TITLE
+                        Project Title
                       </Th>
                       <Th
                         borderColor={borderColor}
                         color="black"
                         fontSize="xs"
                         fontWeight="700"
-                        textTransform="uppercase"
+                        textTransform="capitalize"
                         bg={bgColor}
                       >
-                        FIRST NAME
+                        First Name
                       </Th>
                       <Th
                         borderColor={borderColor}
                         color="black"
                         fontSize="xs"
                         fontWeight="700"
-                        textTransform="uppercase"
+                        textTransform="capitalize"
                         bg={bgColor}
                       >
-                        LAST NAME
+                        Last Name
                       </Th>
                       <Th
                         borderColor={borderColor}
                         color="black"
                         fontSize="xs"
                         fontWeight="700"
-                        textTransform="uppercase"
+                        textTransform="capitalize"
                         bg={bgColor}
                       >
-                        EMAIL
+                        Email
                       </Th>
                       <Th
                         borderColor={borderColor}
                         color="black"
                         fontSize="xs"
                         fontWeight="700"
-                        textTransform="uppercase"
+                        textTransform="capitalize"
                         textAlign="center"
                         bg={bgColor}
                       >
-                        PRICING MODEL
+                        Pricing Model
                       </Th>
                       <Th
                         borderColor={borderColor}
                         color="black"
                         fontSize="xs"
                         fontWeight="700"
-                        textTransform="uppercase"
+                        textTransform="capitalize"
                         textAlign="center"
                         bg={bgColor}
                       >
-                        STATUS
+                        Status
                       </Th>
                       <Th
                         borderColor={borderColor}
                         color="black"
                         fontSize="xs"
                         fontWeight="700"
-                        textTransform="uppercase"
+                        textTransform="capitalize"
                         textAlign="center"
                         bg={bgColor}
                       >
-                        ACTION
+                        Action
                       </Th>
                       <Th
                         borderColor={borderColor}
                         color="black"
                         fontSize="xs"
                         fontWeight="700"
-                        textTransform="uppercase"
+                        textTransform="capitalize"
                         textAlign="center"
                         bg={bgColor}
                       >
-                        COPY LINK
+                        Copy Link
                       </Th>
                     </Tr>
                   </Thead>
@@ -598,32 +598,32 @@ export default function ProjectList() {
                             _hover={{ bg: hoverBg }}
                             transition="all 0.2s"
                           >
-                            <Td borderColor={borderColor}>
+                            <Td borderColor={borderColor} pt="8px" pb="8px">
                               <Text color={textColor} fontSize="sm" fontWeight="normal">
                                 {project.project_title || '--'} 
                               </Text>
                             </Td>
-                            <Td borderColor={borderColor}>
+                            <Td borderColor={borderColor} pt="8px" pb="8px">
                               <Text color={textColor} fontSize="sm" fontWeight="normal">
                                 {project.User?.first_name || '--'}
                               </Text>
                             </Td>
-                            <Td borderColor={borderColor}>
+                            <Td borderColor={borderColor} pt="8px" pb="8px">
                               <Text color={textColor} fontSize="sm" fontWeight="normal">
                                 {project.User?.last_name || '--'}
                               </Text>
                             </Td>
-                            <Td borderColor={borderColor}>
+                            <Td borderColor={borderColor} pt="8px" pb="8px">
                               <Text color={textColor} fontSize="sm" fontWeight="normal">
                                 {project.User?.email || '--'}
                               </Text>
                             </Td>
-                            <Td borderColor={borderColor} textAlign="center">
+                            <Td borderColor={borderColor} textAlign="center" pt="8px" pb="8px">
                               <Text color={textColor} fontSize="sm">
                                 {getPricingModelName(project.model_engagement ?? project.pricing_model)}
                               </Text>
                             </Td>
-                            <Td borderColor={borderColor} textAlign="center">
+                            <Td borderColor={borderColor} textAlign="center" pt="8px" pb="8px">
                               <Button
                                 size="sm"
                                 bg={statusColors.bg}
@@ -643,7 +643,7 @@ export default function ProjectList() {
                                 {statusText}
                               </Button>
                             </Td>
-                            <Td borderColor={borderColor} textAlign="center">
+                            <Td borderColor={borderColor} textAlign="center" pt="8px" pb="8px">
                               <Tooltip label="Edit Project">
                                 <IconButton
                                   aria-label="Edit project"
@@ -655,7 +655,7 @@ export default function ProjectList() {
                                 />
                               </Tooltip>
                             </Td>
-                            <Td borderColor={borderColor} textAlign="center">
+                            <Td borderColor={borderColor} textAlign="center" pt="8px" pb="8px">
                               {project.created_by_admin && project.client_project_link ? (
                                 <Tooltip label="Copy project link">
                                   <Button
@@ -687,12 +687,35 @@ export default function ProjectList() {
                 pt="8px"
                 borderTop="1px solid"
                 borderColor={borderColor}
+                flexWrap="wrap"
+                gap="8px"
               >
-                <Text color="black" fontSize="sm">
-                  Showing <Text as="span" fontWeight="700" color="brand.500">
-                    {projects.length}
-                  </Text> of {totalCount}
-                </Text>
+                <HStack spacing="12px">
+                  <Text color="black" fontSize="sm">
+                    Showing <Text as="span" fontWeight="700" color="brand.500">
+                      {projects.length}
+                    </Text> of {totalCount}
+                  </Text>
+                  <HStack spacing="8px">
+                    <Text color="black" fontSize="sm" whiteSpace="nowrap">Per page:</Text>
+                    <Select
+                      size="sm"
+                      w="80px"
+                      value={pageLimit}
+                      onChange={(e) => {
+                        setPageLimit(Number(e.target.value));
+                        setCurrentPage(1);
+                      }}
+                      borderColor={borderColor}
+                      _hover={{ borderColor: 'brand.500' }}
+                    >
+                      <option value={50}>50</option>
+                      <option value={100}>100</option>
+                      <option value={200}>200</option>
+                      <option value={300}>300</option>
+                    </Select>
+                  </HStack>
+                </HStack>
                 
                 <HStack spacing="8px">
                   <IconButton

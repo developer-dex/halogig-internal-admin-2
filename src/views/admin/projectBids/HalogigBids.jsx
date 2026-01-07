@@ -19,6 +19,7 @@ import {
   Tooltip,
   Badge,
   Avatar,
+  Select,
 } from '@chakra-ui/react';
 import { MdChevronLeft, MdChevronRight, MdVisibility } from 'react-icons/md';
 import { getAllProjectBids } from '../../../features/admin/projectBidsSlice';
@@ -28,7 +29,7 @@ export default function HalogigBids() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState(1);
-  const pageLimit = 50;
+  const [pageLimit, setPageLimit] = useState(50);
 
   const { isLoading, bids, totalCount } = useSelector((s) => s.projectBidsReducer || {});
 
@@ -39,7 +40,7 @@ export default function HalogigBids() {
 
   useEffect(() => {
     dispatch(getAllProjectBids({ page: currentPage, pageLimit, byAdmin: true }));
-  }, [dispatch, currentPage]);
+  }, [dispatch, currentPage, pageLimit]);
 
   const rows = useMemo(() => Array.isArray(bids) ? bids : [], [bids]);
   const totalPages = Math.ceil((totalCount || 0) / pageLimit) || 1;
@@ -90,7 +91,7 @@ export default function HalogigBids() {
     <Box>
       <Card bg={bgColor}>
         <Box p="12px">
-          <Text color={textColor} fontSize="2xl" fontWeight="700" mb="8px">
+          <Text color={textColor} fontSize="l" fontWeight="700" mb="8px">
             Halogig Bids
           </Text>
 
@@ -101,7 +102,7 @@ export default function HalogigBids() {
           ) : (
             <>
               <Box
-                maxH={{ base: 'calc(100vh - 200px)', md: 'calc(100vh - 130px)', xl: 'calc(100vh - 130px)' }}
+                h={{ base: 'calc(100vh - 160px)', md: 'calc(100vh - 130px)', xl: 'calc(100vh - 130px)' }}
                 overflowY="auto"
                 overflowX="auto"
                 border="1px solid"
@@ -111,13 +112,13 @@ export default function HalogigBids() {
                 <Table variant="simple" color="gray.500" minW="1000px">
                   <Thead position="sticky" top="0" zIndex="1" bg={bgColor}>
                     <Tr>
-                      <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" bg={bgColor}>BID ID</Th>
-                      <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" bg={bgColor}>PROJECT</Th>
-                      <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" bg={bgColor}>FREELANCER</Th>
-                      <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" textAlign="center" bg={bgColor}>BID AMOUNT</Th>
-                      <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" textAlign="center" bg={bgColor}>SUBMITTED</Th>
-                      <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" textAlign="center" bg={bgColor}>STATUS</Th>
-                      <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" textAlign="center" bg={bgColor}>VIEW</Th>
+                      <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="capitalize" bg={bgColor}>Bid ID</Th>
+                      <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="capitalize" bg={bgColor}>Project</Th>
+                      <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="capitalize" bg={bgColor}>Freelancer</Th>
+                      <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="capitalize" textAlign="center" bg={bgColor}>Bid Amount</Th>
+                      <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="capitalize" textAlign="center" bg={bgColor}>Submitted</Th>
+                      <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="capitalize" textAlign="center" bg={bgColor}>Status</Th>
+                      <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="capitalize" textAlign="center" bg={bgColor}>View</Th>
                     </Tr>
                   </Thead>
                   <Tbody>
@@ -138,12 +139,12 @@ export default function HalogigBids() {
                         
                         return (
                           <Tr key={bid.id || bid._id} bg={isOddRow ? '#F4F7FE' : 'transparent'} _hover={{ bg: hoverBg }} transition="all 0.2s">
-                            <Td borderColor={borderColor}>
+                            <Td borderColor={borderColor} pt="8px" pb="8px">
                               <Text color={textColor} fontSize="sm" fontWeight="normal">
                                 #{bid.id || bid._id || '--'}
                               </Text>
                             </Td>
-                            <Td borderColor={borderColor}>
+                            <Td borderColor={borderColor} pt="8px" pb="8px">
                               <Text color={textColor} fontSize="sm" fontWeight="normal">
                                 {bid?.ClientProject?.project_title || bid?.Project?.project_title || bid?.project_title || '--'}
                               </Text>
@@ -151,7 +152,7 @@ export default function HalogigBids() {
                                 {bid?.ClientProject?.Category?.name || bid?.Project?.Category?.name || bid?.category_name || '--'}
                               </Text>
                             </Td>
-                            <Td borderColor={borderColor}>
+                            <Td borderColor={borderColor} pt="8px" pb="8px">
                               <Flex align="center" gap={3}>
                                 <Box>
                                   <Text color={textColor} fontSize="sm" fontWeight="normal">
@@ -163,17 +164,17 @@ export default function HalogigBids() {
                                 </Box>
                               </Flex>
                             </Td>
-                            <Td borderColor={borderColor} textAlign="center">
+                            <Td borderColor={borderColor} textAlign="center" pt="8px" pb="8px">
                               <Text color={textColor} fontSize="sm" fontWeight="normal">
                                 {formatCurrency(bid?.bid_amount)}
                               </Text>
                             </Td>
-                            <Td borderColor={borderColor} textAlign="center">
+                            <Td borderColor={borderColor} textAlign="center" pt="8px" pb="8px">
                               <Text color={textColor} fontSize="sm" fontWeight="normal">
                                 {formatDate(bid?.created_at || bid?.createdAt)}
                               </Text>
                             </Td>
-                            <Td borderColor={borderColor} textAlign="center">
+                            <Td borderColor={borderColor} textAlign="center" pt="8px" pb="8px">
                               <Button
                                 size="sm"
                                 bg={statusColors.bg}
@@ -189,7 +190,7 @@ export default function HalogigBids() {
                                 {statusText}
                               </Button>
                             </Td>
-                            <Td borderColor={borderColor} textAlign="center">
+                            <Td borderColor={borderColor} textAlign="center" pt="8px" pb="8px">
                               <Tooltip label="View Bid Details">
                                 <Button
                                   size="sm"
@@ -215,10 +216,31 @@ export default function HalogigBids() {
                 </Table>
               </Box>
 
-              <Flex justify="space-between" align="center" pt="8px" borderTop="1px solid" borderColor={borderColor}>
-                <Text color="black" fontSize="sm">
-                  Showing <Text as="span" fontWeight="700" color="brand.500">{rows.length}</Text> of {totalCount}
-                </Text>
+              <Flex justify="space-between" align="center" pt="8px" borderTop="1px solid" borderColor={borderColor} flexWrap="wrap" gap="8px">
+                <HStack spacing="12px">
+                  <Text color="black" fontSize="sm">
+                    Showing <Text as="span" fontWeight="700" color="brand.500">{rows.length}</Text> of {totalCount}
+                  </Text>
+                  <HStack spacing="8px">
+                    <Text color="black" fontSize="sm" whiteSpace="nowrap">Per page:</Text>
+                    <Select
+                      size="sm"
+                      w="80px"
+                      value={pageLimit}
+                      onChange={(e) => {
+                        setPageLimit(Number(e.target.value));
+                        setCurrentPage(1);
+                      }}
+                      borderColor={borderColor}
+                      _hover={{ borderColor: 'brand.500' }}
+                    >
+                      <option value={50}>50</option>
+                      <option value={100}>100</option>
+                      <option value={200}>200</option>
+                      <option value={300}>300</option>
+                    </Select>
+                  </HStack>
+                </HStack>
                 <HStack spacing="8px">
                   <IconButton aria-label="Previous page" icon={<MdChevronLeft />} size="sm" onClick={() => setCurrentPage((p)=> Math.max(1, p-1))} isDisabled={currentPage === 1} variant="outline" />
                   {Array.from({ length: totalPages }, (_, i) => i + 1).slice(0, 10).map((p) => (

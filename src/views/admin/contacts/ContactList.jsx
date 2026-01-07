@@ -100,7 +100,7 @@ export default function ContactList() {
     notes: '',
   });
 
-  const pageLimit = 10;
+  const [pageLimit, setPageLimit] = useState(50);
 
   const isIndividual = useMemo(() => {
     const selected = enrollAsData.find((o) => String(o.id) === String(createFormData.designation));
@@ -174,7 +174,7 @@ export default function ContactList() {
 
   useEffect(() => {
     fetchContacts();
-  }, [currentPage]);
+  }, [currentPage, pageLimit]);
 
   // Initialize country list options for Create modal
   useEffect(() => {
@@ -457,7 +457,7 @@ export default function ContactList() {
     <Box>
       <Card bg={bgColor} mb={{ base: '0px', '2xl': '20px' }}>
         <Flex align="center" justify="space-between" mb="20px" p="12px">
-          <Text color={textColor} fontSize="2xl" fontWeight="700">
+          <Text color={textColor} fontSize="xl" fontWeight="700">
             Contact List
           </Text>
           <Button
@@ -477,7 +477,7 @@ export default function ContactList() {
         ) : (
           <>
             <Box
-                maxH={{ base: 'calc(100vh - 200px)', md: 'calc(100vh - 130px)', xl: 'calc(100vh - 130px)' }}
+                h={{ base: 'calc(100vh - 200px)', md: 'calc(100vh - 180px)', xl: 'calc(100vh - 180px)' }}
                 overflowY="auto"
               overflowX="auto"
               border="1px solid"
@@ -489,15 +489,15 @@ export default function ContactList() {
               <Table variant="simple" color="gray.500" minW="1000px">
                 <Thead position="sticky" top="0" zIndex="1" bg={bgColor}>
                   <Tr>
-                    <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" bg={bgColor}>First Name</Th>
-                    <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" bg={bgColor}>Last Name</Th>
-                    <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" bg={bgColor}>Email</Th>
-                    <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" bg={bgColor}>Phone Number</Th>
-                    <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" bg={bgColor}>Company Name</Th>
-                    <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" bg={bgColor}>Requirements</Th>
-                    <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" bg={bgColor}>Notes</Th>
-                    <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" textAlign="center" bg={bgColor}>Action</Th>
-                    <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" textAlign="center" bg={bgColor}>Delete</Th>
+                    <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="capitalize" bg={bgColor}>First Name</Th>
+                    <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="capitalize" bg={bgColor}>Last Name</Th>
+                    <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="capitalize" bg={bgColor}>Email</Th>
+                    <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="capitalize" bg={bgColor}>Phone Number</Th>
+                    <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="capitalize" bg={bgColor}>Company Name</Th>
+                    <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="capitalize" bg={bgColor}>Requirements</Th>
+                    <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="capitalize" bg={bgColor}>Notes</Th>
+                    <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="capitalize" textAlign="center" bg={bgColor}>Action</Th>
+                    <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="capitalize" textAlign="center" bg={bgColor}>Delete</Th>
                   </Tr>
                 </Thead>
                 <Tbody>
@@ -513,32 +513,32 @@ export default function ContactList() {
                       const isOddRow = index % 2 === 0;
                       return (
                       <Tr key={contact.id || contact._id} bg={isOddRow ? '#F4F7FE' : 'transparent'} _hover={{ bg: hoverBg }} transition="all 0.2s">
-                        <Td borderColor={borderColor}>
+                        <Td borderColor={borderColor} pt="8px" pb="8px">
                           <Text color={textColor} fontSize="sm" fontWeight="normal">
                             {contact.first_name || '--'}
                           </Text>
                         </Td>
-                        <Td borderColor={borderColor}>
+                        <Td borderColor={borderColor} pt="8px" pb="8px">
                           <Text color={textColor} fontSize="sm" fontWeight="normal">
                             {contact.last_name || '--'}
                           </Text>
                         </Td>
-                        <Td borderColor={borderColor}>
+                        <Td borderColor={borderColor} pt="8px" pb="8px">
                           <Text color={textColor} fontSize="sm" fontWeight="normal">
                             {contact.email || '--'}
                           </Text>
                         </Td>
-                        <Td borderColor={borderColor}>
+                        <Td borderColor={borderColor} pt="8px" pb="8px">
                           <Text color={textColor} fontSize="sm" fontWeight="normal">
                             {contact.mobile || '--'}
                           </Text>
                         </Td>
-                        <Td borderColor={borderColor}>
+                        <Td borderColor={borderColor} pt="8px" pb="8px">
                           <Text color={textColor} fontSize="sm" fontWeight="normal">
                             {contact.company_name || '--'}
                           </Text>
                         </Td>
-                        <Td borderColor={borderColor}>
+                        <Td borderColor={borderColor} pt="8px" pb="8px">
                           {contact.requirements ? (
                             <Flex align="center" gap={2} maxW="200px">
                               <Text
@@ -567,7 +567,7 @@ export default function ContactList() {
                             <Text color={textColor} fontSize="sm" fontWeight="normal">--</Text>
                           )}
                         </Td>
-                        <Td borderColor={borderColor}>
+                        <Td borderColor={borderColor} pt="8px" pb="8px">
                           {contact.notes ? (
                             <Flex align="center" gap={2} maxW="200px">
                               <Text
@@ -596,7 +596,7 @@ export default function ContactList() {
                             <Text color={textColor} fontSize="sm" fontWeight="normal">--</Text>
                           )}
                         </Td>
-                        <Td borderColor={borderColor} textAlign="center">
+                        <Td borderColor={borderColor} textAlign="center" pt="8px" pb="8px">
                           {contact.is_client_added === true ? (
                             <Badge  style={{color: 'rgb(32, 33, 36)', borderColor: 'rgb(32, 33, 36)'}} px="12px" py="4px" borderRadius="full">
                               Added
@@ -613,7 +613,7 @@ export default function ContactList() {
                             </Button>
                           )}
                         </Td>
-                        <Td borderColor={borderColor} textAlign="center">
+                        <Td borderColor={borderColor} textAlign="center" pt="8px" pb="8px">
                           <IconButton
                             aria-label="Delete contact"
                             icon={<MdDelete />}
@@ -631,10 +631,31 @@ export default function ContactList() {
               </Table>
             </Box>
 
-            <Flex justify="space-between" align="center"  pt="8px" borderTop="1px solid" borderColor={borderColor} px="12px" pb="12px">
+            <Flex justify="space-between" align="center" pt="8px" borderTop="1px solid" borderColor={borderColor} px="12px" pb="12px" flexWrap="wrap" gap="8px">
+              <HStack spacing="12px">
                 <Text color={textColor} fontSize="sm">
-                Showing <Text as="span" fontWeight="700" color="brand.500">{contacts.length}</Text> of {totalCount}
-              </Text>
+                  Showing <Text as="span" fontWeight="700" color="brand.500">{contacts.length}</Text> of {totalCount}
+                </Text>
+                <HStack spacing="8px">
+                  <Text color="black" fontSize="sm" whiteSpace="nowrap">Per page:</Text>
+                  <Select
+                    size="sm"
+                    w="80px"
+                    value={pageLimit}
+                    onChange={(e) => {
+                      setPageLimit(Number(e.target.value));
+                      setCurrentPage(1);
+                    }}
+                    borderColor={borderColor}
+                    _hover={{ borderColor: 'brand.500' }}
+                  >
+                    <option value={50}>50</option>
+                    <option value={100}>100</option>
+                    <option value={200}>200</option>
+                    <option value={300}>300</option>
+                  </Select>
+                </HStack>
+              </HStack>
               <HStack spacing="8px">
                 <IconButton
                   aria-label="Previous page"

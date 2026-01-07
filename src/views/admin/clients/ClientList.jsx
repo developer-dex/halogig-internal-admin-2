@@ -27,6 +27,7 @@ import {
   Tooltip,
   Flex,
   Card,
+  Select,
 } from '@chakra-ui/react';
 import { 
   MdVisibility, 
@@ -51,7 +52,7 @@ export default function ClientList() {
   const [selectedStatus, setSelectedStatus] = useState('');
   
   const statusOptions = ['Pending', 'Approved', 'Rejected', 'Under Review', 'Suspended'];
-  const pageLimit = 50;
+  const [pageLimit, setPageLimit] = useState(50);
 
   // Chakra color mode values
   const textColor = useColorModeValue('rgb(32, 33, 36)', 'white');
@@ -79,7 +80,7 @@ export default function ClientList() {
 
   useEffect(() => {
     fetchClients();
-  }, [currentPage]);
+  }, [currentPage, pageLimit]);
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
@@ -174,7 +175,7 @@ export default function ClientList() {
         <Box p="12px">
           <Text
             color={textColor}
-            fontSize="2xl"
+            fontSize="l"
             fontWeight="700"
             mb="8px"
           >
@@ -188,7 +189,7 @@ export default function ClientList() {
           ) : (
             <>
               <Box
-                maxH={{ base: 'calc(100vh - 200px)', md: 'calc(100vh - 130px)', xl: 'calc(100vh - 130px)' }}
+                h={{ base: 'calc(100vh - 160px)', md: 'calc(100vh - 130px)', xl: 'calc(100vh - 130px)' }}
                 overflowY="auto"
                 overflowX="auto"
                 border="1px solid"
@@ -203,74 +204,74 @@ export default function ClientList() {
                         color="black"
                         fontSize="xs"
                         fontWeight="700"
-                        textTransform="uppercase"
+                        textTransform="capitalize"
                         bg={bgColor}
                       >
-                        FIRST NAME
+                        First Name
                       </Th>
                       <Th
                         borderColor={borderColor}
                         color="black"
                         fontSize="xs"
                         fontWeight="700"
-                        textTransform="uppercase"
+                        textTransform="capitalize"
                         bg={bgColor}
                       >
-                        LAST NAME
+                        Last Name
                       </Th>
                       <Th
                         borderColor={borderColor}
                         color="black"
                         fontSize="xs"
                         fontWeight="700"
-                        textTransform="uppercase"
+                        textTransform="capitalize"
                         bg={bgColor}
                       >
-                        EMAIL
+                        Email
                       </Th>
                       <Th
                         borderColor={borderColor}
                         color="black"
                         fontSize="xs"
                         fontWeight="700"
-                        textTransform="uppercase"
+                        textTransform="capitalize"
                         textAlign="center"
                         bg={bgColor}
                       >
-                        ACTION
+                        Action
                       </Th>
                       <Th
                         borderColor={borderColor}
                         color="black"
                         fontSize="xs"
                         fontWeight="700"
-                        textTransform="uppercase"
+                        textTransform="capitalize"
                         textAlign="center"
                         bg={bgColor}
                       >
-                        POST PROJECT
+                        Post Project
                       </Th>
                       <Th
                         borderColor={borderColor}
                           color="black"
                         fontSize="xs"
                         fontWeight="700"
-                        textTransform="uppercase"
+                        textTransform="capitalize"
                         textAlign="center"
                         bg={bgColor}
                       >
-                        SET-UP LINK
+                        Set-Up Link
                       </Th>
                       <Th
                         borderColor={borderColor}
                           color="black"
                         fontSize="xs"
                         fontWeight="700"
-                        textTransform="uppercase"
+                        textTransform="capitalize"
                         textAlign="center"
                         bg={bgColor}
                       >
-                        VIEW
+                        View
                       </Th>
                     </Tr>
                   </Thead>
@@ -293,22 +294,22 @@ export default function ClientList() {
                             _hover={{ bg: hoverBg }}
                             transition="all 0.2s"
                           >
-                            <Td borderColor={borderColor}>
+                            <Td borderColor={borderColor} pt="8px" pb="8px">
                               <Text color={textColor} fontSize="sm" fontWeight="normal">
                                 {client.first_name || '--'}
                               </Text>
                             </Td>
-                            <Td borderColor={borderColor}>
+                            <Td borderColor={borderColor} pt="8px" pb="8px">
                               <Text color={textColor} fontSize="sm" fontWeight="normal">
                                 {client.last_name || '--'}
                               </Text>
                             </Td>
-                            <Td borderColor={borderColor}>
+                            <Td borderColor={borderColor} pt="8px" pb="8px">
                               <Text color={textColor} fontSize="sm" fontWeight="normal">
                                 {client.email || '--'}
                               </Text>
                             </Td>
-                            <Td borderColor={borderColor} textAlign="center">
+                            <Td borderColor={borderColor} textAlign="center" pt="8px" pb="8px">
                               <Button
                                 size="sm"
                                 bg={statusColors.bg}
@@ -328,7 +329,7 @@ export default function ClientList() {
                                 {client.status || 'Pending'}
                               </Button>
                             </Td>
-                            <Td borderColor={borderColor} textAlign="center">
+                            <Td borderColor={borderColor} textAlign="center" pt="8px" pb="8px">
                               {client.created_by_admin && (
                                 <Button
                                   size="sm"
@@ -342,7 +343,7 @@ export default function ClientList() {
                                 </Button>
                               )}
                             </Td>
-                            <Td borderColor={borderColor} textAlign="center">
+                            <Td borderColor={borderColor} textAlign="center" pt="8px" pb="8px">
                               {client.created_by_admin && client.share_link ? (
                                 <HStack spacing="8px" justify="center">
                                   <Tooltip label={client.share_link}>
@@ -370,7 +371,7 @@ export default function ClientList() {
                                 <Text color="black">--</Text>
                               )}
                             </Td>
-                            <Td borderColor={borderColor} textAlign="center">
+                            <Td borderColor={borderColor} textAlign="center" pt="8px" pb="8px">
                               <Tooltip label="View Client Details">
                                 <IconButton
                                   aria-label="View client"
@@ -394,16 +395,38 @@ export default function ClientList() {
               <Flex
                 justify="space-between"
                 align="center"
-                // mt="8px"
                 pt="8px"
                 borderTop="1px solid"
                 borderColor={borderColor}
+                flexWrap="wrap"
+                gap="8px"
               >
-                <Text color="black" fontSize="sm">
-                  Showing <Text as="span" fontWeight="700" color="brand.500">
-                    {clients.length}
-                  </Text> of {totalCount}
-                </Text>
+                <HStack spacing="12px">
+                  <Text color="black" fontSize="sm">
+                    Showing <Text as="span" fontWeight="700" color="brand.500">
+                      {clients.length}
+                    </Text> of {totalCount}
+                  </Text>
+                  <HStack spacing="8px">
+                    <Text color="black" fontSize="sm" whiteSpace="nowrap">Per page:</Text>
+                    <Select
+                      size="sm"
+                      w="80px"
+                      value={pageLimit}
+                      onChange={(e) => {
+                        setPageLimit(Number(e.target.value));
+                        setCurrentPage(1);
+                      }}
+                      borderColor={borderColor}
+                      _hover={{ borderColor: 'brand.500' }}
+                    >
+                      <option value={50}>50</option>
+                      <option value={100}>100</option>
+                      <option value={200}>200</option>
+                      <option value={300}>300</option>
+                    </Select>
+                  </HStack>
+                </HStack>
                 
                 <HStack spacing="8px">
                   <IconButton

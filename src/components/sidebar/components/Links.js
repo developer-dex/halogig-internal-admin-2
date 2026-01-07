@@ -102,19 +102,19 @@ export function SidebarLinks(props) {
               onClick={() => toggleCategory(route.category)}
             >
               <HStack spacing="8px">
-                {categoryIcon && (
+                {/* {categoryIcon && (
                   <Box
                     color={categoryActive ? activeIcon : textColor}
                     // me="2px"
                   >
                     {categoryIcon}
                   </Box>
-                )}
+                )} */}
                 <Text
-                  fontSize="13px"
-                  color={categoryActive ? activeColor : categoryColor}
+                  fontSize="14px"
+                  color={categoryActive ? categoryColor : categoryColor}
                   fontWeight={categoryActive ? "600" : "500"}
-                  // textTransform="uppercase"
+                  // textTransform="capitalize"
                   letterSpacing="0.5px"
                 >
                   {route.category}
@@ -156,10 +156,10 @@ export function SidebarLinks(props) {
                                     ? activeColor
                                     : textColor
                                 }
-                                fontSize="14px"
+                                fontSize="13px"
                                 fontWeight={
                                   isItemActive
-                                    ? "bold"
+                                    ? "semibold"
                                     : "normal"
                                 }>
                                 {item.name}

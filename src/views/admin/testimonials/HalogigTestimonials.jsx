@@ -30,6 +30,7 @@ import {
   Textarea,
   VStack,
   Tooltip,
+  Select,
 } from '@chakra-ui/react';
 import {
   MdAdd,
@@ -69,7 +70,7 @@ export default function HalogigTestimonials() {
     testimonial_comment: '',
   });
 
-  const pageLimit = 50;
+  const [pageLimit, setPageLimit] = useState(50);
 
   // Chakra color mode values
   const textColor = useColorModeValue('rgb(32, 33, 36)', 'white');
@@ -97,7 +98,7 @@ export default function HalogigTestimonials() {
 
   useEffect(() => {
     fetchTestimonials();
-  }, [currentPage]);
+  }, [currentPage, pageLimit]);
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
@@ -222,7 +223,7 @@ export default function HalogigTestimonials() {
           <Flex justify="space-between" align="center" mb="8px">
             <Text
               color={textColor}
-              fontSize="2xl"
+              fontSize="l"
               fontWeight="700"
             >
               Halogig Testimonials
@@ -243,7 +244,7 @@ export default function HalogigTestimonials() {
           ) : (
             <>
               <Box
-                maxH={{ base: 'calc(100vh - 200px)', md: 'calc(100vh - 130px)', xl: 'calc(100vh - 130px)' }}
+                h={{ base: 'calc(100vh - 170px)', md: 'calc(100vh - 140px)', xl: 'calc(100vh - 140px)' }}
                 overflowY="auto"
                 overflowX="auto"
                 border="1px solid"
@@ -258,62 +259,62 @@ export default function HalogigTestimonials() {
                         color="black"
                         fontSize="xs"
                         fontWeight="700"
-                        textTransform="uppercase"
+                        textTransform="capitalize"
                         bg={bgColor}
                       >
-                        CLIENT NAME
+                        Client Name
                       </Th>
                       <Th
                         borderColor={borderColor}
                         color="black"
                         fontSize="xs"
                         fontWeight="700"
-                        textTransform="uppercase"
+                        textTransform="capitalize"
                         bg={bgColor}
                       >
-                        DESIGNATION
+                        Designation
                       </Th>
                       <Th
                         borderColor={borderColor}
                         color="black"
                         fontSize="xs"
                         fontWeight="700"
-                        textTransform="uppercase"
+                        textTransform="capitalize"
                         bg={bgColor}
                       >
-                        COMPANY NAME
+                        Company Name
                       </Th>
                       <Th
                         borderColor={borderColor}
                         color="black"
                         fontSize="xs"
                         fontWeight="700"
-                        textTransform="uppercase"
+                        textTransform="capitalize"
                         bg={bgColor}
                       >
-                        TESTIMONIAL COMMENT
+                        Testimonial Comment
                       </Th>
                       <Th
                         borderColor={borderColor}
                         color="black"
                         fontSize="xs"
                         fontWeight="700"
-                        textTransform="uppercase"
+                        textTransform="capitalize"
                         textAlign="center"
                         bg={bgColor}
                       >
-                        CREATED ON
+                        Created On
                       </Th>
                       <Th
                         borderColor={borderColor}
                         color="black"
                         fontSize="xs"
                         fontWeight="700"
-                        textTransform="uppercase"
+                        textTransform="capitalize"
                         textAlign="center"
                         bg={bgColor}
                       >
-                        ACTION
+                          Action
                       </Th>
                     </Tr>
                   </Thead>
@@ -335,22 +336,22 @@ export default function HalogigTestimonials() {
                           _hover={{ bg: hoverBg }}
                           transition="all 0.2s"
                         >
-                          <Td borderColor={borderColor}>
+                          <Td borderColor={borderColor} pt="8px" pb="8px">
                             <Text color={textColor} fontSize="sm" fontWeight="normal">
                               {testimonial.client_name || '--'}
                             </Text>
                           </Td>
-                          <Td borderColor={borderColor}>
+                          <Td borderColor={borderColor} pt="8px" pb="8px">
                             <Text color={textColor} fontSize="sm" fontWeight="normal">
                               {testimonial.client_designation || '--'}
                             </Text>
                           </Td>
-                          <Td borderColor={borderColor}>
+                          <Td borderColor={borderColor} pt="8px" pb="8px">
                             <Text color={textColor} fontSize="sm" fontWeight="normal">
                               {testimonial.client_company_name || '--'}
                             </Text>
                           </Td>
-                          <Td borderColor={borderColor}>
+                          <Td borderColor={borderColor} pt="8px" pb="8px">
                             <Text 
                               color={textColor} 
                               fontSize="sm" 
@@ -360,12 +361,12 @@ export default function HalogigTestimonials() {
                               {testimonial.testimonial_comment || '--'}
                             </Text>
                           </Td>
-                          <Td borderColor={borderColor} textAlign="center">
+                          <Td borderColor={borderColor} textAlign="center" pt="8px" pb="8px">
                             <Text color={textColor} fontSize="sm" fontWeight="normal">
                               {formatDate(testimonial.created_at)}
                             </Text>
                           </Td>
-                          <Td borderColor={borderColor} textAlign="center">
+                          <Td borderColor={borderColor} textAlign="center" pt="8px" pb="8px"  >
                             <HStack spacing="8px" justify="center">
                               <Tooltip label="Edit Testimonial">
                                 <IconButton
@@ -404,12 +405,35 @@ export default function HalogigTestimonials() {
                 pt="8px"
                 borderTop="1px solid"
                 borderColor={borderColor}
+                flexWrap="wrap"
+                gap="8px"
               >
-                <Text color="black" fontSize="sm">
-                  Showing <Text as="span" fontWeight="700" color="brand.500">
-                    {testimonials.length}
-                  </Text> of {totalCount}
-                </Text>
+                <HStack spacing="12px">
+                  <Text color="black" fontSize="sm">
+                    Showing <Text as="span" fontWeight="700" color="brand.500">
+                      {testimonials.length}
+                    </Text> of {totalCount}
+                  </Text>
+                  <HStack spacing="8px">
+                    <Text color="black" fontSize="sm" whiteSpace="nowrap">Per page:</Text>
+                    <Select
+                      size="sm"
+                      w="80px"
+                      value={pageLimit}
+                      onChange={(e) => {
+                        setPageLimit(Number(e.target.value));
+                        setCurrentPage(1);
+                      }}
+                      borderColor={borderColor}
+                      _hover={{ borderColor: 'brand.500' }}
+                    >
+                      <option value={50}>50</option>
+                      <option value={100}>100</option>
+                      <option value={200}>200</option>
+                      <option value={300}>300</option>
+                    </Select>
+                  </HStack>
+                </HStack>
                 
                 <HStack spacing="8px">
                   <IconButton

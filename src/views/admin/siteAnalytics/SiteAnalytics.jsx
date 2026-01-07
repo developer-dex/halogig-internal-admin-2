@@ -26,6 +26,7 @@ import {
   Flex,
   HStack,
   Tooltip,
+  Select,
 } from '@chakra-ui/react';
 import {
   MdArrowBack,
@@ -52,7 +53,7 @@ export default function SiteAnalytics() {
   const [toDate, setToDate] = useState('');
 
   const exportModal = useDisclosure();
-  const pageLimit = 50;
+  const [pageLimit, setPageLimit] = useState(50);
 
   const textColor = useColorModeValue('rgb(32, 33, 36)', 'white');
   const borderColor = useColorModeValue('gray.200', 'whiteAlpha.100');
@@ -96,7 +97,7 @@ export default function SiteAnalytics() {
 
   useEffect(() => {
     fetchData();
-  }, [currentPage, selectedIpAddress]);
+  }, [currentPage, selectedIpAddress, pageLimit]);
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
@@ -213,7 +214,7 @@ export default function SiteAnalytics() {
                   Back to List
                 </Button>
               )}
-              <Text color={textColor} fontSize="xl" fontWeight="700">
+              <Text color={textColor} fontSize="l" fontWeight="700">
                 {selectedIpAddress ? `Analytics for IP: ${selectedIpAddress}` : 'Visitor Analytics'}
               </Text>
             </HStack>
@@ -257,7 +258,7 @@ export default function SiteAnalytics() {
           ) : (
             <>
               <Box
-                maxH={{ base: 'calc(100vh - 200px)', md: 'calc(100vh - 130px)', xl: 'calc(100vh - 130px)' }}
+                h={{ base: 'calc(100vh - 160px)', md: 'calc(100vh - 130px)', xl: 'calc(100vh - 130px)' }}
                 overflowY="auto"
                 overflowX="auto"
                 border="1px solid"
@@ -267,23 +268,23 @@ export default function SiteAnalytics() {
                 <Table variant="simple" color="gray.500" minW="1400px">
                   <Thead position="sticky" top="0" zIndex="1" bg={bgColor}>
                     <Tr>
-                      <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" bg={bgColor}>Date</Th>
-                      <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" bg={bgColor}>IP Address</Th>
-                      <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" minW="120px" bg={bgColor}>Location</Th>
-                      <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" bg={bgColor}>User Type</Th>
-                      <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" bg={bgColor}>Today Visit Count</Th>
-                      <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" bg={bgColor}>Total Visit Till Date</Th>
-                      <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" bg={bgColor}>In Time</Th>
-                      <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" bg={bgColor}>Out Time</Th>
-                      <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" bg={bgColor}>Time Spent</Th>
-                      <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" bg={bgColor}>Page Load Time</Th>
-                      <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" bg={bgColor}>Device Type</Th>
-                      <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" bg={bgColor}>Telecom Provider</Th>
-                      <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" bg={bgColor}>Browser</Th>
-                      <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" bg={bgColor}>Source</Th>
-                      <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" minW="400px" bg={bgColor}>Page Visit</Th>
-                      <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" bg={bgColor}>Role</Th>
-                      <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" bg={bgColor}>Industry</Th>
+                      <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="capitalize" bg={bgColor}>Date</Th>
+                      <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="capitalize" bg={bgColor}>IP Address</Th>
+                      <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="capitalize" minW="120px" bg={bgColor}>Location</Th>
+                      <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="capitalize" bg={bgColor}>User Type</Th>
+                      <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="capitalize" bg={bgColor}>Today Visit Count</Th>
+                      <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="capitalize" bg={bgColor}>Total Visit Till Date</Th>
+                      <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="capitalize" bg={bgColor}>In Time</Th>
+                      <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="capitalize" bg={bgColor}>Out Time</Th>
+                      <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="capitalize" bg={bgColor}>Time Spent</Th>
+                      <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="capitalize" bg={bgColor}>Page Load Time</Th>
+                      <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="capitalize" bg={bgColor}>Device Type</Th>
+                      <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="capitalize" bg={bgColor}>Telecom Provider</Th>
+                      <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="capitalize" bg={bgColor}>Browser</Th>
+                      <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="capitalize" bg={bgColor}>Source</Th>
+                      <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="capitalize" minW="400px" bg={bgColor}>Page Visit</Th>
+                      <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="capitalize" bg={bgColor}>Role</Th>
+                      <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="capitalize" bg={bgColor}>Industry</Th>
                     </Tr>
                   </Thead>
                   <Tbody>
@@ -293,7 +294,7 @@ export default function SiteAnalytics() {
                       return (
                       <Tr key={item.id || item._id} bg={isOddRow ? '#F4F7FE' : 'transparent'}   _hover={{ bg: hoverBg }} transition="all 0.2s">
                         {/* Date - extracted from In time */}
-                        <Td borderColor={borderColor} minW="120px">
+                        <Td borderColor={borderColor} minW="120px" pt="8px" pb="8px">
                           <Text color={textColor} fontSize="sm" whiteSpace="nowrap">
                             {item.start_time
                               ? moment(item.start_time).format('DD-MM-YYYY')
@@ -301,7 +302,7 @@ export default function SiteAnalytics() {
                           </Text>
                         </Td>
                         {/* IP Address */}
-                        <Td borderColor={borderColor}>
+                        <Td borderColor={borderColor} pt="8px" pb="8px">
                           {item.ip_address ? (
                             <Tooltip label="View IP Analytics" hasArrow>
                               <Text
@@ -331,31 +332,31 @@ export default function SiteAnalytics() {
                           )}
                         </Td>
                         {/* Location */}
-                        <Td borderColor={borderColor} maxW="150px">
+                        <Td borderColor={borderColor} maxW="150px" pt="8px" pb="8px">
                           <Text color={textColor} fontSize="sm" whiteSpace="normal" wordBreak="break-word" noOfLines={2}>
                             {item.location || '--'}
                           </Text>
                         </Td>
                         {/* User Type - Static "guest" */}
-                        <Td borderColor={borderColor}>
+                        <Td borderColor={borderColor} pt="8px" pb="8px">
                           <Text color={textColor} fontSize="sm">
                             {item.user_type || 'guest'}
                           </Text>
                         </Td>
                         {/* Today Visit Count */}
-                        <Td borderColor={borderColor}>
+                        <Td borderColor={borderColor} pt="8px" pb="8px">
                           <Text color={textColor} fontSize="sm">
                             {item.today_visit_count ?? '--'}
                           </Text>
                         </Td>
                         {/* Total Visit Till Date */}
-                        <Td borderColor={borderColor}>
+                        <Td borderColor={borderColor} pt="8px" pb="8px">
                           <Text color={textColor} fontSize="sm">
                             {item.total_visit_till_date ?? '--'}
                           </Text>
                         </Td>
                         {/* In Time - Only time, not date */}
-                        <Td borderColor={borderColor}>
+                        <Td borderColor={borderColor} pt="8px" pb="8px">
                           <Text color={textColor} fontSize="sm" whiteSpace="normal">
                             {item.start_time
                               ? moment(item.start_time).format('h:mm:ss A')
@@ -363,7 +364,7 @@ export default function SiteAnalytics() {
                           </Text>
                         </Td>
                         {/* Out Time - Only time, not date */}
-                        <Td borderColor={borderColor}>
+                        <Td borderColor={borderColor} pt="8px" pb="8px">
                           <Text color={textColor} fontSize="sm" whiteSpace="normal">
                             {item.end_time
                               ? moment(item.end_time).format('h:mm:ss A')
@@ -371,7 +372,7 @@ export default function SiteAnalytics() {
                           </Text>
                         </Td>
                         {/* Time Spent */}
-                        <Td borderColor={borderColor}>
+                        <Td borderColor={borderColor} pt="8px" pb="8px">
                           <Text color={textColor} fontSize="sm">
                             {item.time_spent
                               ? moment.duration(item.time_spent, 'seconds').format('m [min] s [sec]')
@@ -379,37 +380,37 @@ export default function SiteAnalytics() {
                           </Text>
                         </Td>
                         {/* Page Load Time */}
-                        <Td borderColor={borderColor}>
+                        <Td borderColor={borderColor} pt="8px" pb="8px">
                           <Text color={textColor} fontSize="sm">
                             {item.page_load_time ? `${Math.abs(item.page_load_time)} sec` : '--'}
                           </Text>
                         </Td>
                         {/* Device Type */}
-                        <Td borderColor={borderColor}>
+                        <Td borderColor={borderColor} pt="8px" pb="8px">
                           <Text color={textColor} fontSize="sm">
                             {item.device_type || '--'}
                           </Text>
                         </Td>
                         {/* Telecom Provider */}
-                        <Td borderColor={borderColor}>
+                        <Td borderColor={borderColor} pt="8px" pb="8px" >
                           <Text color={textColor} fontSize="sm">
                             {item.telecom_provider || '--'}
                           </Text>
                         </Td>
                         {/* Browser */}
-                        <Td borderColor={borderColor}>
+                        <Td borderColor={borderColor} pt="8px" pb="8px" >
                           <Text color={textColor} fontSize="sm">
                             {item.browser || '--'}
                           </Text>
                         </Td>
                         {/* Source - Static "web" */}
-                        <Td borderColor={borderColor}>
+                        <Td borderColor={borderColor} pt="8px" pb="8px" >
                           <Text color={textColor} fontSize="sm">
                             web
                           </Text>
                         </Td>
                         {/* Page Visit */}
-                        <Td borderColor={borderColor} maxW="450px">
+                        <Td borderColor={borderColor} maxW="450px" pt="8px" pb="8px" >
                           <Tooltip label={item.url || ''} placement="top">
                             <Text
                               color={textColor}
@@ -424,13 +425,13 @@ export default function SiteAnalytics() {
                           </Tooltip>
                         </Td>
                         {/* Role */}
-                        <Td borderColor={borderColor}>
+                        <Td borderColor={borderColor} pt="8px" pb="8px" >
                           <Text color={textColor} fontSize="sm">
                             {item.role || '--'}
                           </Text>
                         </Td>
                         {/* Industry */}
-                        <Td borderColor={borderColor}>
+                        <Td borderColor={borderColor} pt="8px" pb="8px" >
                           <Text color={textColor} fontSize="sm">
                             {item.industry_name || '--'}
                           </Text>
@@ -443,10 +444,31 @@ export default function SiteAnalytics() {
               </Box>
 
               {/* Pagination */}
-              <Flex justify="space-between" align="center" pt="8px" borderTop="1px solid" borderColor={borderColor}>
-                <Text color="black" fontSize="sm">
-                  Showing <Text as="span" fontWeight="700" color="brand.500">{pageAnalytics.length}</Text> of {totalCount}
-                </Text>
+              <Flex justify="space-between" align="center" pt="8px" borderTop="1px solid" borderColor={borderColor} flexWrap="wrap" gap="8px">
+                <HStack spacing="12px">
+                  <Text color="black" fontSize="sm">
+                    Showing <Text as="span" fontWeight="700" color="brand.500">{pageAnalytics.length}</Text> of {totalCount}
+                  </Text>
+                  <HStack spacing="8px">
+                    <Text color="black" fontSize="sm" whiteSpace="nowrap">Per page:</Text>
+                    <Select
+                      size="sm"
+                      w="80px"
+                      value={pageLimit}
+                      onChange={(e) => {
+                        setPageLimit(Number(e.target.value));
+                        setCurrentPage(1);
+                      }}
+                      borderColor={borderColor}
+                      _hover={{ borderColor: 'brand.500' }}
+                    >
+                      <option value={50}>50</option>
+                      <option value={100}>100</option>
+                      <option value={200}>200</option>
+                      <option value={300}>300</option>
+                    </Select>
+                  </HStack>
+                </HStack>
                 <HStack spacing="8px">
                   <IconButton
                     aria-label="Previous page"

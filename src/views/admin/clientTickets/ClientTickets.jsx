@@ -19,6 +19,7 @@ import {
   Badge,
   Button,
   Tooltip,
+  Select,
 } from '@chakra-ui/react';
 import { 
   MdChevronLeft,
@@ -37,7 +38,7 @@ export default function ClientTickets() {
   const [isLoading, setIsLoading] = useState(false);
   const [totalCount, setTotalCount] = useState(0);
   
-  const pageLimit = 50;
+  const [pageLimit, setPageLimit] = useState(50);
 
   // Chakra color mode values
   const textColor = useColorModeValue('rgb(32, 33, 36)', 'white');
@@ -66,7 +67,7 @@ export default function ClientTickets() {
 
   useEffect(() => {
     fetchDisputes();
-  }, [currentPage]);
+  }, [currentPage, pageLimit]);
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
@@ -115,7 +116,7 @@ export default function ClientTickets() {
         <Box p="12px">
           <Text
             color={textColor}
-            fontSize="2xl"
+            fontSize="l"
             fontWeight="700"
             mb="8px"
           >
@@ -129,7 +130,7 @@ export default function ClientTickets() {
           ) : (
             <>
               <Box
-                maxH={{ base: 'calc(100vh - 200px)', md: 'calc(100vh - 130px)', xl: 'calc(100vh - 130px)' }}
+                h={{ base: 'calc(100vh - 160px)', md: 'calc(100vh - 130px)', xl: 'calc(100vh - 130px)' }}
                 overflowY="auto"
                 overflowX="auto"
                 border="1px solid"
@@ -144,64 +145,64 @@ export default function ClientTickets() {
                         color="black"
                         fontSize="xs"
                         fontWeight="700"
-                        textTransform="uppercase"
+                        textTransform="capitalize"
                         bg={bgColor}
                       >
-                        DISPUTE UUID
+                        Dispute ID
                       </Th>
                       <Th
                         borderColor={borderColor}
                         color="black"
                         fontSize="xs"
                         fontWeight="700"
-                        textTransform="uppercase"
+                        textTransform="capitalize"
                         bg={bgColor}
                       >
-                        PROJECT TITLE
+                        Project Title
                       </Th>
                       <Th
                         borderColor={borderColor}
                         color="black"
                         fontSize="xs"
                         fontWeight="700"
-                        textTransform="uppercase"
+                        textTransform="capitalize"
                         textAlign="center"
                         bg={bgColor}
                       >
-                        AMOUNT
+                        Amount
                       </Th>
                       <Th
                         borderColor={borderColor}
                         color="black"
                         fontSize="xs"
                         fontWeight="700"
-                        textTransform="uppercase"
+                        textTransform="capitalize"
                         textAlign="center"
                         bg={bgColor}
                       >
-                        STATUS
+                        Status
                       </Th>
                       <Th
                         borderColor={borderColor}
                         color="black"
                         fontSize="xs"
                         fontWeight="700"
-                        textTransform="uppercase"
+                        textTransform="capitalize"
                         textAlign="center"
                         bg={bgColor}
                       >
-                        RAISED ON
+                        Raised On
                       </Th>
                       <Th
                         borderColor={borderColor}
                         color="black"
                         fontSize="xs"
                         fontWeight="700"
-                        textTransform="uppercase"
+                        textTransform="capitalize"
                         textAlign="center"
                         bg={bgColor}
                       >
-                        VIEW
+                        View
                       </Th>
                     </Tr>
                   </Thead>
@@ -224,22 +225,22 @@ export default function ClientTickets() {
                             _hover={{ bg: hoverBg }}
                             transition="all 0.2s"
                           >
-                            <Td borderColor={borderColor}>
+                            <Td borderColor={borderColor} pt="8px" pb="8px">
                               <Text color={textColor} fontSize="sm" fontWeight="normal">
                                 {dispute.dispute_uuid || '--'}
                               </Text>
                             </Td>
-                            <Td borderColor={borderColor}>
+                            <Td borderColor={borderColor} pt="8px" pb="8px">
                               <Text color={textColor} fontSize="sm" fontWeight="normal">
                                 {dispute.project_title || '--'}
                               </Text>
                             </Td>
-                            <Td borderColor={borderColor} textAlign="center">
+                            <Td borderColor={borderColor} textAlign="center" pt="8px" pb="8px">
                               <Text color={textColor} fontSize="sm" fontWeight="normal">
                                 {formatAmount(dispute.amount)}
                               </Text>
                             </Td>
-                            <Td borderColor={borderColor} textAlign="center">
+                            <Td borderColor={borderColor} textAlign="center" pt="8px" pb="8px">
                               <Badge
                                 bg={statusColors.bg}
                                 color={statusColors.color}
@@ -252,12 +253,12 @@ export default function ClientTickets() {
                                 {dispute.status || 'Pending'}
                               </Badge>
                             </Td>
-                            <Td borderColor={borderColor} textAlign="center">
+                            <Td borderColor={borderColor} textAlign="center" pt="8px" pb="8px">
                               <Text color={textColor} fontSize="sm" fontWeight="normal">
                                 {formatDate(dispute.raised_on)}
                               </Text>
                             </Td>
-                            <Td borderColor={borderColor} textAlign="center">
+                            <Td borderColor={borderColor} textAlign="center" pt="8px" pb="8px">
                               <Tooltip label="View Project Finance Details">
                                 <IconButton
                                   aria-label="View details"
@@ -285,12 +286,35 @@ export default function ClientTickets() {
                 pt="8px"
                 borderTop="1px solid"
                 borderColor={borderColor}
+                flexWrap="wrap"
+                gap="8px"
               >
-                <Text color="black" fontSize="sm">
-                  Showing <Text as="span" fontWeight="700" color="brand.500">
-                    {disputes.length}
-                  </Text> of {totalCount}
-                </Text>
+                <HStack spacing="12px">
+                  <Text color="black" fontSize="sm">
+                    Showing <Text as="span" fontWeight="700" color="brand.500">
+                      {disputes.length}
+                    </Text> of {totalCount}
+                  </Text>
+                  <HStack spacing="8px">
+                    <Text color="black" fontSize="sm" whiteSpace="nowrap">Per page:</Text>
+                    <Select
+                      size="sm"
+                      w="80px"
+                      value={pageLimit}
+                      onChange={(e) => {
+                        setPageLimit(Number(e.target.value));
+                        setCurrentPage(1);
+                      }}
+                      borderColor={borderColor}
+                      _hover={{ borderColor: 'brand.500' }}
+                    >
+                      <option value={50}>50</option>
+                      <option value={100}>100</option>
+                      <option value={200}>200</option>
+                      <option value={300}>300</option>
+                    </Select>
+                  </HStack>
+                </HStack>
                 
                 <HStack spacing="8px">
                   <IconButton

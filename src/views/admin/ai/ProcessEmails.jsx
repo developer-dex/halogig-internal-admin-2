@@ -28,12 +28,11 @@ import {
   FormControl,
   FormLabel,
   Input,
+  Select,
 } from "@chakra-ui/react";
 import { MdChevronLeft, MdChevronRight, MdCloudUpload, MdRefresh } from "react-icons/md";
 import { fetchEmailDomainAnalysis } from "../../../features/admin/emailDomainAnalysisSlice";
 import { showError, showSuccess } from "../../../helpers/messageHelper";
-
-const pageSize = 30;
 
 const ProcessEmails = () => {
   const dispatch = useDispatch();
@@ -41,6 +40,7 @@ const ProcessEmails = () => {
   const uploadModal = useDisclosure();
   
   const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(50);
   const [isLoading, setIsLoading] = useState(false);
   const [rows, setRows] = useState([]);
   const [totalCount, setTotalCount] = useState(0);
@@ -75,7 +75,7 @@ const ProcessEmails = () => {
 
   useEffect(() => {
     fetchData();
-  }, [dispatch, page]);
+  }, [dispatch, page, pageSize]);
 
   const totalPages = useMemo(() => {
     return Math.max(1, Math.ceil(totalCount / pageSize));
@@ -281,7 +281,7 @@ const ProcessEmails = () => {
         <>
           <Box
             flex="1"
-            maxH={{ base: 'calc(100vh - 200px)', md: 'calc(100vh - 130px)', xl: 'calc(100vh - 130px)' }}
+            h={{ base: 'calc(100vh - 290px)', md: 'calc(100vh - 250px)', xl: 'calc(100vh - 250px)' }}
             overflowY="auto"
             overflowX="auto"
             border="1px solid"
@@ -291,50 +291,50 @@ const ProcessEmails = () => {
             <Table variant="simple" color="gray.500" minW="2000px">
               <Thead position="sticky" top="0" zIndex="1" bg={bgColor}>
                 <Tr>
-                  <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" bg={bgColor}>
-                    EMAIL
+                  <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="capitalize" bg={bgColor}>
+                    Email
                   </Th>
-                  <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" bg={bgColor}>
-                    DOMAIN
+                  <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="capitalize" bg={bgColor}>
+                    Domain
                   </Th>
-                  <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" bg={bgColor}>
-                    WEBSITE
+                  <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="capitalize" bg={bgColor}>
+                    Website
                   </Th>
-                  <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" bg={bgColor}>
-                    BUSINESS NATURE
+                  <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="capitalize" bg={bgColor}>
+                    Business Nature
                   </Th>
-                  <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" bg={bgColor}>
-                    BUSINESS DESCRIPTION
+                  <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="capitalize" bg={bgColor}>
+                    Business Description
                   </Th>
-                  <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" bg={bgColor}>
-                    BUSINESS MODEL
+                  <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="capitalize" bg={bgColor}>
+                    Business Model
                   </Th>
-                  <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" bg={bgColor}>
-                    KEY PRODUCTS
+                  <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="capitalize" bg={bgColor}>
+                    Key Products
                   </Th>
-                  <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" bg={bgColor}>
-                    SPECIAL CATEGORY 1
+                  <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="capitalize" bg={bgColor}>
+                    Special Category 1
                   </Th>
-                  <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" bg={bgColor}>
-                    SPECIAL CATEGORY 2
+                  <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="capitalize" bg={bgColor}>
+                    Special Category 2
                   </Th>
-                  <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" bg={bgColor}>
-                    SPECIAL CATEGORY 3
+                  <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="capitalize" bg={bgColor}>
+                    Special Category 3
                   </Th>
-                  <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" bg={bgColor}>
-                    BATCH ID
+                  <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="capitalize" bg={bgColor}>
+                    Batch Name
                   </Th>
-                  <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" textAlign="center" bg={bgColor}>
-                    STATUS
+                  <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="capitalize" textAlign="center" bg={bgColor}>
+                    Status
                   </Th>
-                  <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" bg={bgColor}>
-                    ERROR MESSAGE
+                  <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="capitalize" bg={bgColor}>
+                    Error Message
                   </Th>
-                  <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" bg={bgColor}>
-                    CREATED AT
+                  <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="capitalize" bg={bgColor}>
+                    Created At
                   </Th>
-                  <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="uppercase" bg={bgColor}>
-                    UPDATED AT
+                  <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="capitalize" bg={bgColor}>
+                    Updated At
                   </Th>
                 </Tr>
               </Thead>
@@ -351,71 +351,71 @@ const ProcessEmails = () => {
                     const isOddRow = index % 2 === 0;
                     return (
                     <Tr key={item.id} bg={isOddRow ? '#F8FAFD' : 'transparent'} _hover={{ bg: hoverBg }} transition="all 0.2s">
-                      <Td borderColor={borderColor}>
+                      <Td borderColor={borderColor} pt="8px" pb="8px">
                         <Text color={textColor} fontSize="sm" fontWeight="normal">{item.email || "—"}</Text>
                       </Td>
-                      <Td borderColor={borderColor}>
+                      <Td borderColor={borderColor} pt="8px" pb="8px">
                         <Text color={textColor} fontSize="sm" fontWeight="normal">{item.domain || "—"}</Text>
                       </Td>
-                      <Td borderColor={borderColor} maxW="240px">
+                      <Td borderColor={borderColor} maxW="240px" pt="8px" pb="8px">
                         <Text color={textColor} fontSize="sm" fontWeight="normal" whiteSpace="nowrap" overflow="hidden" textOverflow="ellipsis">
                           {item.website || "—"}
                         </Text>
                       </Td>
-                      <Td borderColor={borderColor} maxW="240px">
+                      <Td borderColor={borderColor} maxW="240px" pt="8px" pb="8px">
                         <Text color={textColor} fontSize="sm" fontWeight="normal" whiteSpace="nowrap" overflow="hidden" textOverflow="ellipsis">
                           {item.business_nature || "—"}
                         </Text>
                       </Td>
-                      <Td borderColor={borderColor} maxW="300px">
+                      <Td borderColor={borderColor} maxW="300px" pt="8px" pb="8px">
                         <Text color={textColor} fontSize="sm" fontWeight="normal" whiteSpace="nowrap" overflow="hidden" textOverflow="ellipsis">
                           {item.business_description || "—"}
                         </Text>
                       </Td>
-                      <Td borderColor={borderColor} maxW="300px">
+                      <Td borderColor={borderColor} maxW="300px" pt="8px" pb="8px">
                         <Text color={textColor} fontSize="sm" fontWeight="normal" whiteSpace="nowrap" overflow="hidden" textOverflow="ellipsis">
                           {item.business_model || "—"}
                         </Text>
                       </Td>
-                      <Td borderColor={borderColor} maxW="240px">
+                      <Td borderColor={borderColor} maxW="240px" pt="8px" pb="8px">
                         <Text color={textColor} fontSize="sm" fontWeight="normal" whiteSpace="nowrap" overflow="hidden" textOverflow="ellipsis">
                           {item.key_products || "—"}
                         </Text>
                       </Td>
-                      <Td borderColor={borderColor}>
+                      <Td borderColor={borderColor} pt="8px" pb="8px">
                         <Text color={textColor} fontSize="sm" fontWeight="normal">
                           {item.special_category_1 || "—"}
                         </Text>
                       </Td>
-                      <Td borderColor={borderColor}>
+                      <Td borderColor={borderColor} pt="8px" pb="8px">
                         <Text color={textColor} fontSize="sm" fontWeight="normal">
                           {item.special_category_2 || "—"}
                         </Text>
                       </Td>
-                      <Td borderColor={borderColor}>
+                      <Td borderColor={borderColor} pt="8px" pb="8px">
                         <Text color={textColor} fontSize="sm" fontWeight="normal">
                           {item.special_category_3 || "—"}
                         </Text>
                       </Td>
-                      <Td borderColor={borderColor}>
+                      <Td borderColor={borderColor} pt="8px" pb="8px">
                         <Text color={textColor} fontSize="sm" fontWeight="normal">
                           {item.batch_id || "—"}
                         </Text>
                       </Td>
-                      <Td borderColor={borderColor} textAlign="center">
+                      <Td borderColor={borderColor} textAlign="center" pt="8px" pb="8px"  >
                         {renderStatusTag(item.status)}
                       </Td>
-                      <Td borderColor={borderColor} maxW="240px">
+                      <Td borderColor={borderColor} maxW="240px" pt="8px" pb="8px">
                         <Text color={textColor} fontSize="sm" fontWeight="normal" whiteSpace="nowrap" overflow="hidden" textOverflow="ellipsis">
                           {item.error_message || "—"}
                         </Text>
                       </Td>
-                      <Td borderColor={borderColor}>
+                      <Td borderColor={borderColor} pt="8px" pb="8px">
                         <Text color={textColor} fontSize="sm" fontWeight="normal">
                           {formatDate(item.created_at || item.createdAt)}
                         </Text>
                       </Td>
-                      <Td borderColor={borderColor}>
+                      <Td borderColor={borderColor} pt="8px" pb="8px">
                         <Text color={textColor} fontSize="sm" fontWeight="normal">
                           {formatDate(item.updated_at || item.updatedAt)}
                         </Text>
@@ -429,10 +429,31 @@ const ProcessEmails = () => {
           </Box>
 
           {/* Pagination */}
-          <Flex justify="space-between" align="center" pt="8px">
-            <Text color="black" fontSize="sm">
-              Showing <Text as="span" fontWeight="700" color="brand.500">{rows.length}</Text> of {totalCount}
-            </Text>
+          <Flex justify="space-between" align="center" pt="8px" flexWrap="wrap" gap="8px">
+            <HStack spacing="12px">
+              <Text color="black" fontSize="sm">
+                Showing <Text as="span" fontWeight="700" color="brand.500">{rows.length}</Text> of {totalCount}
+              </Text>
+              <HStack spacing="8px">
+                <Text color="black" fontSize="sm" whiteSpace="nowrap">Per page:</Text>
+                <Select
+                  size="sm"
+                  w="80px"
+                  value={pageSize}
+                  onChange={(e) => {
+                    setPageSize(Number(e.target.value));
+                    setPage(1);
+                  }}
+                  borderColor={borderColor}
+                  _hover={{ borderColor: 'brand.500' }}
+                >
+                  <option value={50}>50</option>
+                  <option value={100}>100</option>
+                  <option value={200}>200</option>
+                  <option value={300}>300</option>
+                </Select>
+              </HStack>
+            </HStack>
 
             <HStack spacing="8px">
               <IconButton 
