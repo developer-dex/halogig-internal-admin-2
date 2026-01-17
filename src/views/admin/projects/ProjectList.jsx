@@ -40,12 +40,12 @@ import {
 } from '@chakra-ui/react';
 import { MdChevronLeft, MdChevronRight, MdEdit, MdVisibility, MdContentCopy } from 'react-icons/md';
 import { projectData, updateProjectStatus, updateProject } from '../../../features/admin/projectManagementSlice';
-import { 
-  fetchCategories, 
-  fetchSubcategories, 
-  fetchTechnologies, 
+import {
+  fetchCategories,
+  fetchSubcategories,
+  fetchTechnologies,
   fetchIndustries,
-  clearSubcategories 
+  clearSubcategories
 } from '../../../features/admin/dropdownDataSlice';
 import { showError, showSuccess } from '../../../helpers/messageHelper';
 import { copyToClipboard } from '../../../utils/utils';
@@ -85,7 +85,7 @@ export default function ProjectList() {
     notice_period_min: '',
     notice_period_max: '',
     project_summary: '',
-    type_of_project: 'maintainance',
+    type_of_project: 'maintenance',
     customer_industry: '',
     currency_type: 'USD',
     currency_symbol: '$',
@@ -108,7 +108,7 @@ export default function ProjectList() {
         page: currentPage,
         limit: pageLimit
       }));
-      
+
       if (response.payload?.data?.data?.projects) {
         setProjects(response.payload.data.data.projects);
         setTotalCount(response.payload.data.data.total_count || 0);
@@ -150,10 +150,10 @@ export default function ProjectList() {
     if (editModal.isOpen && selectedProject && categories.length > 0 && technologies.length > 0 && industries.length > 0) {
       // Map model_engagement string values
       let pricingModel = selectedProject.model_engagement || 'hourly';
-      
+
       // Map type_of_project string values
-      let projectType = selectedProject.type_of_project || 'maintainance';
-      
+      let projectType = selectedProject.type_of_project || 'maintenance';
+
       const updatedFormData = {
         project_category: selectedProject.project_category || '',
         project_sub_category: selectedProject.project_sub_category || '',
@@ -173,7 +173,7 @@ export default function ProjectList() {
         currency_symbol: selectedProject.currency_symbol || '$',
         location_preferancer: selectedProject.location_preferancer || ''
       };
-      
+
       setFormData(updatedFormData);
     }
   }, [editModal.isOpen, selectedProject, categories, technologies, industries]);
@@ -209,17 +209,17 @@ export default function ProjectList() {
 
   const handleStatusChange = async () => {
     if (!selectedProject) return;
-    
+
     try {
       // Map status text to status number
       const statusMap = { 'Pending': 1, 'Approved': 2, 'Rejected': 3 };
       const newStatus = statusMap[selectedStatus] || 1;
-      
+
       await dispatch(updateProjectStatus({
         projectId: selectedProject.id,
         status: newStatus
       }));
-      
+
       // Update local state
       setProjects((prevProjects) =>
         prevProjects.map((project) =>
@@ -228,7 +228,7 @@ export default function ProjectList() {
             : project
         )
       );
-      
+
       showSuccess('Project status updated successfully');
       handleCloseStatusModal();
       fetchProjects(); // Refresh the list
@@ -240,13 +240,13 @@ export default function ProjectList() {
   // Edit Modal handlers
   const handleEditClick = (project) => {
     setSelectedProject(project);
-    
+
     // Map model_engagement string values
     let pricingModel = project.model_engagement || 'hourly';
-    
+
     // Map type_of_project string values
-    let projectType = project.type_of_project || 'maintainance';
-    
+    let projectType = project.type_of_project || 'maintenance';
+
     setFormData({
       project_category: project.project_category || '',
       project_sub_category: project.project_sub_category || '',
@@ -266,9 +266,9 @@ export default function ProjectList() {
       currency_symbol: project.currency_symbol || '$',
       location_preferancer: project.location_preferancer || ''
     });
-    
+
     editModal.onOpen();
-    
+
     // Fetch subcategories if category is selected
     if (project.project_category) {
       dispatch(fetchSubcategories(project.project_category));
@@ -291,7 +291,7 @@ export default function ProjectList() {
       notice_period_min: '',
       notice_period_max: '',
       project_summary: '',
-      type_of_project: 'maintainance',
+      type_of_project: 'maintenance',
       customer_industry: '',
       currency_type: 'USD',
       currency_symbol: '$',
@@ -371,7 +371,7 @@ export default function ProjectList() {
       showSuccess('Project updated successfully');
       handleCloseEditModal();
       fetchProjects();
-      
+
     } catch (error) {
       console.error('Error updating project:', error);
       showError('Failed to update project');
@@ -600,7 +600,7 @@ export default function ProjectList() {
                           >
                             <Td borderColor={borderColor} pt="8px" pb="8px">
                               <Text color={textColor} fontSize="sm" fontWeight="normal">
-                                {project.project_title || '--'} 
+                                {project.project_title || '--'}
                               </Text>
                             </Td>
                             <Td borderColor={borderColor} pt="8px" pb="8px">
@@ -650,7 +650,7 @@ export default function ProjectList() {
                                   icon={<MdEdit />}
                                   size="sm"
                                   variant="ghost"
-                                  style={{color: 'rgb(32, 33, 36)'}}
+                                  style={{ color: 'rgb(32, 33, 36)' }}
                                   onClick={() => handleEditClick(project)}
                                 />
                               </Tooltip>
@@ -690,6 +690,7 @@ export default function ProjectList() {
                 flexWrap="wrap"
                 gap="8px"
               >
+<<<<<<< HEAD
                 <HStack spacing="12px">
                   <Text color="black" fontSize="sm">
                     Showing <Text as="span" fontWeight="700" color="brand.500">
@@ -717,6 +718,14 @@ export default function ProjectList() {
                   </HStack>
                 </HStack>
                 
+=======
+                <Text color="black" fontSize="sm">
+                  Showing <Text as="span" fontWeight="700" color="brand.500">
+                    {projects.length}
+                  </Text> of {totalCount}
+                </Text>
+
+>>>>>>> 2829983 (chore: just add the ai create project')
                 <HStack spacing="8px">
                   <IconButton
                     aria-label="Previous page"
@@ -726,7 +735,7 @@ export default function ProjectList() {
                     isDisabled={currentPage === 1}
                     variant="outline"
                   />
-                  
+
                   {Array.from({ length: totalPages }, (_, i) => i + 1)
                     .slice(0, 10)
                     .map((page) => (
@@ -740,7 +749,7 @@ export default function ProjectList() {
                         {page}
                       </Button>
                     ))}
-                  
+
                   <IconButton
                     aria-label="Next page"
                     icon={<MdChevronRight />}
@@ -789,9 +798,9 @@ export default function ProjectList() {
       </Modal>
 
       {/* Edit Project Modal */}
-      <Modal 
-        isOpen={editModal.isOpen} 
-        onClose={handleCloseEditModal} 
+      <Modal
+        isOpen={editModal.isOpen}
+        onClose={handleCloseEditModal}
         size="xl"
         scrollBehavior="inside"
       >
@@ -932,12 +941,12 @@ export default function ProjectList() {
                     <option value="EUR">EUR - €</option>
                   </Select>
                 </SimpleGrid>
-                {parseFloat(formData.project_amount_min) > parseFloat(formData.project_amount_max) && 
-                 formData.project_amount_min && formData.project_amount_max && (
-                  <FormHelperText color="red.500" fontSize="xs">
-                    Max amount must be greater than {formData.project_amount_min}
-                  </FormHelperText>
-                )}
+                {parseFloat(formData.project_amount_min) > parseFloat(formData.project_amount_max) &&
+                  formData.project_amount_min && formData.project_amount_max && (
+                    <FormHelperText color="red.500" fontSize="xs">
+                      Max amount must be greater than {formData.project_amount_min}
+                    </FormHelperText>
+                  )}
               </FormControl>
 
               {/* Contract Duration - Show for Hourly and Fixed Price */}
@@ -960,12 +969,12 @@ export default function ProjectList() {
                       bg={inputBg}
                     />
                   </SimpleGrid>
-                  {parseFloat(formData.project_duration_min) > parseFloat(formData.project_duration_max) && 
-                   formData.project_duration_min && formData.project_duration_max && (
-                    <FormHelperText color="red.500" fontSize="xs">
-                      Max duration must be greater than {formData.project_duration_min}
-                    </FormHelperText>
-                  )}
+                  {parseFloat(formData.project_duration_min) > parseFloat(formData.project_duration_max) &&
+                    formData.project_duration_min && formData.project_duration_max && (
+                      <FormHelperText color="red.500" fontSize="xs">
+                        Max duration must be greater than {formData.project_duration_min}
+                      </FormHelperText>
+                    )}
                 </FormControl>
               )}
 
@@ -989,19 +998,19 @@ export default function ProjectList() {
                       bg={inputBg}
                     />
                   </SimpleGrid>
-                  {parseFloat(formData.notice_period_min) > parseFloat(formData.notice_period_max) && 
-                   formData.notice_period_min && formData.notice_period_max && (
-                    <FormHelperText color="red.500" fontSize="xs">
-                      Max notice period must be greater than {formData.notice_period_min}
-                    </FormHelperText>
-                  )}
+                  {parseFloat(formData.notice_period_min) > parseFloat(formData.notice_period_max) &&
+                    formData.notice_period_min && formData.notice_period_max && (
+                      <FormHelperText color="red.500" fontSize="xs">
+                        Max notice period must be greater than {formData.notice_period_min}
+                      </FormHelperText>
+                    )}
                 </FormControl>
               )}
 
               {/* Project Summary */}
               <FormControl>
                 <FormLabel fontWeight="600" fontSize="sm">
-                  Project Summary 
+                  Project Summary
                   {formData.model_engagement === 'retainer' && (
                     <Text as="span" color="gray.500" fontWeight="normal" fontSize="xs" ml={2}>
                       (Optional for Retainership)
@@ -1018,13 +1027,13 @@ export default function ProjectList() {
                 />
                 <Flex justify="space-between" mt={1}>
                   <Box>
-                    {formData.model_engagement !== 'retainer' && 
-                     formData.project_summary && 
-                     formData.project_summary.length < 100 && (
-                      <FormHelperText color="red.500" fontSize="xs" mt={0}>
-                        Minimum 100 characters required
-                      </FormHelperText>
-                    )}
+                    {formData.model_engagement !== 'retainer' &&
+                      formData.project_summary &&
+                      formData.project_summary.length < 100 && (
+                        <FormHelperText color="red.500" fontSize="xs" mt={0}>
+                          Minimum 100 characters required
+                        </FormHelperText>
+                      )}
                   </Box>
                   <Text fontSize="xs" color="gray.500">
                     {formData.project_summary?.length || 0}/300 characters
@@ -1040,9 +1049,9 @@ export default function ProjectList() {
                   onChange={(value) => handleInputChange('type_of_project', value)}
                 >
                   <Stack direction={{ base: 'column', md: 'row' }} spacing={4}>
-                    <Radio value="maintainance" colorScheme="brand">Maintenance</Radio>
+                    <Radio value="maintenance" colorScheme="brand">Maintenance</Radio>
                     <Radio value="new-development" colorScheme="brand">New Development</Radio>
-                    <Radio value="maintainance-cum-new-development" colorScheme="brand">Maintenance Cum New Development</Radio>
+                    <Radio value="maintenance-cum-new-development" colorScheme="brand">Maintenance Cum New Development</Radio>
                   </Stack>
                 </RadioGroup>
               </FormControl>
@@ -1059,7 +1068,7 @@ export default function ProjectList() {
                   {Array.isArray(industries) && industries.length > 0 ? (
                     industries.map((industry) => (
                       <option key={industry.id} value={industry.id}>
-                        {industry.industry}
+                        {industry.industry || industry.name || industry.title}
                       </option>
                     ))
                   ) : (
@@ -1086,16 +1095,16 @@ export default function ProjectList() {
           </ModalBody>
 
           <ModalFooter borderTopWidth="1px">
-            <Button 
-              variant="ghost" 
-              mr={3} 
+            <Button
+              variant="ghost"
+              mr={3}
               onClick={handleCloseEditModal}
               isDisabled={isSaving}
             >
               Cancel
             </Button>
-            <Button 
-              colorScheme="brand" 
+            <Button
+              colorScheme="brand"
               onClick={handleSaveChanges}
               isLoading={isSaving}
               loadingText="Updating..."

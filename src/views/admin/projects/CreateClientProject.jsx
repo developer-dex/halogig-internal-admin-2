@@ -33,7 +33,7 @@ import { showError, showSuccess } from '../../../helpers/messageHelper';
 export default function CreateClientProject() {
   const navigate = useNavigate();
   const location = useLocation();
-  
+
   // Get client data from navigation state
   const clientInfo = location.state || {};
 
@@ -54,7 +54,7 @@ export default function CreateClientProject() {
     durationMin: '',
     durationMax: '',
     projectSummary: '',
-    typeOfProject: 'maintainance',
+    typeOfProject: 'maintenance',
     currency: 'INR-₹',
     locationPreferancer: ''
   });
@@ -71,7 +71,7 @@ export default function CreateClientProject() {
   const [subCategories, setSubCategories] = useState([]);
   const [technologies, setTechnologies] = useState([]);
   const [industries, setIndustries] = useState([]);
-  
+
   // Location state
   const [userCity, setUserCity] = useState('');
   const [userCountry, setUserCountry] = useState('');
@@ -87,7 +87,7 @@ export default function CreateClientProject() {
     try {
       setIsLoading(true);
       const response = await getApi(apiEndPoints.GET_CATEGORIES);
-      
+
       // Match the structure used in dropdownDataSlice
       if (Array.isArray(response?.data?.data)) {
         setCategories(response.data.data);
@@ -114,7 +114,7 @@ export default function CreateClientProject() {
     }
     try {
       const response = await getApi(`${apiEndPoints.GET_SUBCATEGORIES}/${categoryId}`);
-      
+
       // Match the structure used in dropdownDataSlice
       if (Array.isArray(response?.data?.data)) {
         setSubCategories(response.data.data);
@@ -135,7 +135,7 @@ export default function CreateClientProject() {
   const fetchTechnologies = async () => {
     try {
       const response = await getApi(apiEndPoints.GET_TECHNOLOGIES);
-      
+
       // Match the structure used in dropdownDataSlice
       if (Array.isArray(response?.data?.data)) {
         setTechnologies(response.data.data);
@@ -156,7 +156,7 @@ export default function CreateClientProject() {
   const fetchIndustries = async () => {
     try {
       const response = await getApi(apiEndPoints.GET_INDUSTRIES);
-      
+
       // Match the structure used in dropdownDataSlice
       if (Array.isArray(response?.data?.data)) {
         setIndustries(response.data.data);
@@ -181,16 +181,16 @@ export default function CreateClientProject() {
       setUserCountry('Country');
       return;
     }
-    
+
     try {
       const response = await getApi(`${apiEndPoints.GET_CLIENT_DETAILS}/${clientInfo.clientId}/details`);
       const clientData = response?.data?.data || response?.data || response;
-      
+
       if (clientData) {
         // Handle city
         const city = clientData.city || '';
         setUserCity(city);
-        
+
         // Handle country - could be string or object with name property
         let country = '';
         if (typeof clientData.country === 'string') {
@@ -230,7 +230,7 @@ export default function CreateClientProject() {
   // Handle pricing model change
   const handlePricingModelChange = (value) => {
     setFormData(prev => ({ ...prev, pricingModel: value }));
-    
+
     // Update visibility
     setHourlyVisible(value === 'hourly');
     setRetainershipVisible(value === 'retainer');
@@ -647,9 +647,9 @@ export default function CreateClientProject() {
                   onChange={(value) => setFormData(prev => ({ ...prev, typeOfProject: value }))}
                 >
                   <Stack direction="row" spacing={4}>
-                    <Radio value="maintainance">Maintenance</Radio>
+                    <Radio value="maintenance">Maintenance</Radio>
                     <Radio value="new-development">New Development</Radio>
-                    <Radio value="maintainance-cum-new-development">Maintenance Cum New Development</Radio>
+                    <Radio value="maintenance-cum-new-development">Maintenance Cum New Development</Radio>
                   </Stack>
                 </RadioGroup>
               </FormControl>

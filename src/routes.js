@@ -57,6 +57,7 @@ import EmailDomainAnalysis from 'views/admin/ai';
 import FreelancerTickets from 'views/admin/freelancerTickets';
 import ClientTickets from 'views/admin/clientTickets';
 import HalogigTestimonials from 'views/admin/testimonials';
+import AdminProjects from 'views/admin/adminProjects';
 const ProjectBidsPage = () => <ProjectBids />;
 const HalogigBidsPage = () => <HalogigBids />;
 const NewOrderPage = () => <NewOrder />;
@@ -269,6 +270,13 @@ const routes = [
         icon: <Icon as={MdScience} width="20px" height="20px" color="inherit" />,
         component: <EmailDomainAnalysis />,
       },
+       {
+        name: 'Projects',
+        layout: '/admin',
+        path: '/ai/admin-projects',
+        icon: <Icon as={MdFolder} width="20px" height="20px" color="inherit" />,
+        component: <AdminProjects />,
+      }
     ],
   },
   {
@@ -330,7 +338,7 @@ const routes = [
         component: <HalogigTestimonials />,
       },
     ],
-  },
+  }
 
 ];
 

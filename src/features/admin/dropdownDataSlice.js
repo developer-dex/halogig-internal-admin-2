@@ -104,10 +104,9 @@ export const dropdownDataSlice = createSlice({
         .addCase(fetchCategories.fulfilled, (state, { payload }) => {
             state.isLoading = false;
             state.isSuccess = true;
-            console.log('Categories API Response:', payload);
-            console.log('Categories Data:', payload?.data?.data);
-            state.categories = Array.isArray(payload?.data?.data) ? payload.data.data : [];
-            console.log('Final Categories State:', state.categories);
+            state.categories = Array.isArray(payload?.data?.data) 
+                ? payload.data.data 
+                : (Array.isArray(payload?.data) ? payload.data : []);
         })
         .addCase(fetchCategories.rejected, (state) => {
             state.isLoading = false;
@@ -120,9 +119,9 @@ export const dropdownDataSlice = createSlice({
         .addCase(fetchSubcategories.fulfilled, (state, { payload }) => {
             state.isLoading = false;
             state.isSuccess = true;
-            console.log('Subcategories API Response:', payload);
-            console.log('Subcategories Data:', payload?.data?.data);
-            state.subcategories = Array.isArray(payload?.data?.data) ? payload.data.data : [];
+            state.subcategories = Array.isArray(payload?.data?.data) 
+                ? payload.data.data 
+                : (Array.isArray(payload?.data) ? payload.data : []);
         })
         .addCase(fetchSubcategories.rejected, (state) => {
             state.isLoading = false;
@@ -135,9 +134,9 @@ export const dropdownDataSlice = createSlice({
         .addCase(fetchTechnologies.fulfilled, (state, { payload }) => {
             state.isLoading = false;
             state.isSuccess = true;
-            console.log('Technologies API Response:', payload);
-            console.log('Technologies Data:', payload?.data?.data);
-            state.technologies = Array.isArray(payload?.data?.data) ? payload.data.data : [];
+            state.technologies = Array.isArray(payload?.data?.data) 
+                ? payload.data.data 
+                : (Array.isArray(payload?.data) ? payload.data : []);
         })
         .addCase(fetchTechnologies.rejected, (state) => {
             state.isLoading = false;
@@ -150,9 +149,9 @@ export const dropdownDataSlice = createSlice({
         .addCase(fetchIndustries.fulfilled, (state, { payload }) => {
             state.isLoading = false;
             state.isSuccess = true;
-            console.log('Industries API Response:', payload);
-            console.log('Industries Data:', payload?.data?.data);
-            state.industries = Array.isArray(payload?.data?.data) ? payload.data.data : [];
+            state.industries = Array.isArray(payload?.data?.data) 
+                ? payload.data.data 
+                : (Array.isArray(payload?.data) ? payload.data : []);
         })
         .addCase(fetchIndustries.rejected, (state) => {
             state.isLoading = false;
