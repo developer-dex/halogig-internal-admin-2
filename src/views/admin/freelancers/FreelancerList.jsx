@@ -51,6 +51,7 @@ function FreelancerList() {
   const statusModal = useDisclosure();
   const [selectedStatus, setSelectedStatus] = useState('');
   const statusOptions = ['Pending', 'Approved', 'Rejected', 'Under Review', 'Suspended'];
+<<<<<<< Updated upstream
 
   // Determine if this is the Management -> Freelancers page (approved only)
   // Registration -> Freelancers is at /freelancers, Management -> Freelancers is at /freelancers-management
@@ -59,6 +60,8 @@ function FreelancerList() {
   // Set filters: Management page shows only approved, Registration shows all others (exclude approved)
   const statusFilter = isManagementPage ? 'approved' : null;
   const excludeStatusFilter = !isManagementPage ? 'approved' : null;
+=======
+>>>>>>> Stashed changes
 
   const {
     isLoading,

@@ -52,12 +52,15 @@ import WebsiteDataDetails from 'views/admin/websiteData/WebsiteDataDetails';
 import SiteAnalytics from 'views/admin/siteAnalytics';
 import ChatRoom from 'views/admin/chatRoom';
 import UserChatRoom from 'views/admin/userChatRoom';
+<<<<<<< Updated upstream
 import Blog from 'views/admin/blog';
 import EmailDomainAnalysis from 'views/admin/ai';
 import FreelancerTickets from 'views/admin/freelancerTickets';
 import ClientTickets from 'views/admin/clientTickets';
 import HalogigTestimonials from 'views/admin/testimonials';
 import AdminProjects from 'views/admin/adminProjects';
+=======
+>>>>>>> Stashed changes
 const ProjectBidsPage = () => <ProjectBids />;
 const HalogigBidsPage = () => <HalogigBids />;
 const NewOrderPage = () => <NewOrder />;
@@ -244,6 +247,7 @@ const routes = [
         component: <WebsiteDataPage />,
       },
       {
+<<<<<<< Updated upstream
         name: 'Blog',
         layout: '/admin',
         path: '/blog',
@@ -251,6 +255,8 @@ const routes = [
         component: <BlogPage />,
       },
       {
+=======
+>>>>>>> Stashed changes
         name: 'Visitor Analytics',
         layout: '/admin',
         path: '/site-analytics',
@@ -304,6 +310,7 @@ const routes = [
       //   icon: <Icon as={MdChat} width="20px" height="20px" color="inherit" />,
       //   component: <UserChatRoomsPage />,
       // },
+<<<<<<< Updated upstream
     ],
   },
   {
@@ -324,6 +331,8 @@ const routes = [
         icon: <Icon as={MdSupport} width="20px" height="20px" color="inherit" />,
         component: <ClientTickets />,
       },
+=======
+>>>>>>> Stashed changes
     ],
   },
   {

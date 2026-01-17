@@ -690,42 +690,12 @@ export default function ProjectList() {
                 flexWrap="wrap"
                 gap="8px"
               >
-<<<<<<< HEAD
-                <HStack spacing="12px">
-                  <Text color="black" fontSize="sm">
-                    Showing <Text as="span" fontWeight="700" color="brand.500">
-                      {projects.length}
-                    </Text> of {totalCount}
-                  </Text>
-                  <HStack spacing="8px">
-                    <Text color="black" fontSize="sm" whiteSpace="nowrap">Per page:</Text>
-                    <Select
-                      size="sm"
-                      w="80px"
-                      value={pageLimit}
-                      onChange={(e) => {
-                        setPageLimit(Number(e.target.value));
-                        setCurrentPage(1);
-                      }}
-                      borderColor={borderColor}
-                      _hover={{ borderColor: 'brand.500' }}
-                    >
-                      <option value={50}>50</option>
-                      <option value={100}>100</option>
-                      <option value={200}>200</option>
-                      <option value={300}>300</option>
-                    </Select>
-                  </HStack>
-                </HStack>
-                
-=======
                 <Text color="black" fontSize="sm">
                   Showing <Text as="span" fontWeight="700" color="brand.500">
                     {projects.length}
                   </Text> of {totalCount}
                 </Text>
 
->>>>>>> 2829983 (chore: just add the ai create project')
                 <HStack spacing="8px">
                   <IconButton
                     aria-label="Previous page"

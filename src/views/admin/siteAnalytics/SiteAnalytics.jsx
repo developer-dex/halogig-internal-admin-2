@@ -57,7 +57,11 @@ export default function SiteAnalytics() {
 
   const textColor = useColorModeValue('rgb(32, 33, 36)', 'white');
   const borderColor = useColorModeValue('gray.200', 'whiteAlpha.100');
+<<<<<<< Updated upstream
   const bgColor = useColorModeValue('#FFFFFF', 'black');
+=======
+  const bgColor = useColorModeValue('#F4F7FE', 'black');
+>>>>>>> Stashed changes
   const hoverBg = useColorModeValue('gray.50', 'whiteAlpha.50');
   const cardBg = useColorModeValue('white', 'navy.800');
 
