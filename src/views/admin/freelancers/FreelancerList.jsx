@@ -51,17 +51,14 @@ function FreelancerList() {
   const statusModal = useDisclosure();
   const [selectedStatus, setSelectedStatus] = useState('');
   const statusOptions = ['Pending', 'Approved', 'Rejected', 'Under Review', 'Suspended'];
-<<<<<<< Updated upstream
 
   // Determine if this is the Management -> Freelancers page (approved only)
   // Registration -> Freelancers is at /freelancers, Management -> Freelancers is at /freelancers-management
   const isManagementPage = location.pathname === '/admin/freelancers-management';
-  
+
   // Set filters: Management page shows only approved, Registration shows all others (exclude approved)
   const statusFilter = isManagementPage ? 'approved' : null;
   const excludeStatusFilter = !isManagementPage ? 'approved' : null;
-=======
->>>>>>> Stashed changes
 
   const {
     isLoading,
@@ -271,7 +268,7 @@ function FreelancerList() {
                                   icon={<MdVisibility />}
                                   size="sm"
                                   variant="ghost"
-                                  style={{color: 'rgb(32, 33, 36)'}}
+                                  style={{ color: 'rgb(32, 33, 36)' }}
                                   onClick={() => openDetails(fr.id)}
                                 />
                               </Tooltip>
@@ -312,7 +309,7 @@ function FreelancerList() {
                 </HStack>
 
                 <HStack spacing="8px">
-                  <IconButton aria-label="Previous page" icon={<MdChevronLeft />} size="sm" onClick={() => setPage((p)=> Math.max(1, p-1))} isDisabled={page === 1} variant="outline" />
+                  <IconButton aria-label="Previous page" icon={<MdChevronLeft />} size="sm" onClick={() => setPage((p) => Math.max(1, p - 1))} isDisabled={page === 1} variant="outline" />
                   {Array.from({ length: totalPages }, (_, i) => i + 1)
                     .slice(0, 10)
                     .map((p) => (
@@ -320,7 +317,7 @@ function FreelancerList() {
                         {p}
                       </Button>
                     ))}
-                  <IconButton aria-label="Next page" icon={<MdChevronRight />} size="sm" onClick={() => setPage((p)=> p+1)} isDisabled={page === totalPages} variant="outline" />
+                  <IconButton aria-label="Next page" icon={<MdChevronRight />} size="sm" onClick={() => setPage((p) => p + 1)} isDisabled={page === totalPages} variant="outline" />
                 </HStack>
               </Flex>
             </>

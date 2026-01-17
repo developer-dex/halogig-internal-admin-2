@@ -57,11 +57,7 @@ export default function SiteAnalytics() {
 
   const textColor = useColorModeValue('rgb(32, 33, 36)', 'white');
   const borderColor = useColorModeValue('gray.200', 'whiteAlpha.100');
-<<<<<<< Updated upstream
   const bgColor = useColorModeValue('#FFFFFF', 'black');
-=======
-  const bgColor = useColorModeValue('#F4F7FE', 'black');
->>>>>>> Stashed changes
   const hoverBg = useColorModeValue('gray.50', 'whiteAlpha.50');
   const cardBg = useColorModeValue('white', 'navy.800');
 
@@ -296,153 +292,153 @@ export default function SiteAnalytics() {
                       // Apply background color to odd rows (1st, 3rd, 5th, etc.)
                       const isOddRow = index % 2 === 0;
                       return (
-                      <Tr key={item.id || item._id} bg={isOddRow ? '#F4F7FE' : 'transparent'}   _hover={{ bg: hoverBg }} transition="all 0.2s">
-                        {/* Date - extracted from In time */}
-                        <Td borderColor={borderColor} minW="120px" pt="8px" pb="8px">
-                          <Text color={textColor} fontSize="sm" whiteSpace="nowrap">
-                            {item.start_time
-                              ? moment(item.start_time).format('DD-MM-YYYY')
-                              : '--'}
-                          </Text>
-                        </Td>
-                        {/* IP Address */}
-                        <Td borderColor={borderColor} pt="8px" pb="8px">
-                          {item.ip_address ? (
-                            <Tooltip label="View IP Analytics" hasArrow>
+                        <Tr key={item.id || item._id} bg={isOddRow ? '#F4F7FE' : 'transparent'} _hover={{ bg: hoverBg }} transition="all 0.2s">
+                          {/* Date - extracted from In time */}
+                          <Td borderColor={borderColor} minW="120px" pt="8px" pb="8px">
+                            <Text color={textColor} fontSize="sm" whiteSpace="nowrap">
+                              {item.start_time
+                                ? moment(item.start_time).format('DD-MM-YYYY')
+                                : '--'}
+                            </Text>
+                          </Td>
+                          {/* IP Address */}
+                          <Td borderColor={borderColor} pt="8px" pb="8px">
+                            {item.ip_address ? (
+                              <Tooltip label="View IP Analytics" hasArrow>
+                                <Text
+                                  color={selectedIpAddress ? textColor : 'brand.500'}
+                                  fontSize="sm"
+                                  fontWeight="normal"
+                                  fontFamily="monospace"
+                                  cursor={selectedIpAddress ? 'default' : 'pointer'}
+                                  _hover={
+                                    selectedIpAddress
+                                      ? {}
+                                      : { textDecoration: 'underline' }
+                                  }
+                                  onClick={
+                                    selectedIpAddress
+                                      ? undefined
+                                      : () => handleViewIpAnalytics(item.ip_address)
+                                  }
+                                >
+                                  {item.ip_address}
+                                </Text>
+                              </Tooltip>
+                            ) : (
+                              <Text color={textColor} fontSize="sm" fontWeight="normal" fontFamily="monospace">
+                                --
+                              </Text>
+                            )}
+                          </Td>
+                          {/* Location */}
+                          <Td borderColor={borderColor} maxW="150px" pt="8px" pb="8px">
+                            <Text color={textColor} fontSize="sm" whiteSpace="normal" wordBreak="break-word" noOfLines={2}>
+                              {item.location || '--'}
+                            </Text>
+                          </Td>
+                          {/* User Type - Static "guest" */}
+                          <Td borderColor={borderColor} pt="8px" pb="8px">
+                            <Text color={textColor} fontSize="sm">
+                              {item.user_type || 'guest'}
+                            </Text>
+                          </Td>
+                          {/* Today Visit Count */}
+                          <Td borderColor={borderColor} pt="8px" pb="8px">
+                            <Text color={textColor} fontSize="sm">
+                              {item.today_visit_count ?? '--'}
+                            </Text>
+                          </Td>
+                          {/* Total Visit Till Date */}
+                          <Td borderColor={borderColor} pt="8px" pb="8px">
+                            <Text color={textColor} fontSize="sm">
+                              {item.total_visit_till_date ?? '--'}
+                            </Text>
+                          </Td>
+                          {/* In Time - Only time, not date */}
+                          <Td borderColor={borderColor} pt="8px" pb="8px">
+                            <Text color={textColor} fontSize="sm" whiteSpace="normal">
+                              {item.start_time
+                                ? moment(item.start_time).format('h:mm:ss A')
+                                : '--'}
+                            </Text>
+                          </Td>
+                          {/* Out Time - Only time, not date */}
+                          <Td borderColor={borderColor} pt="8px" pb="8px">
+                            <Text color={textColor} fontSize="sm" whiteSpace="normal">
+                              {item.end_time
+                                ? moment(item.end_time).format('h:mm:ss A')
+                                : '--'}
+                            </Text>
+                          </Td>
+                          {/* Time Spent */}
+                          <Td borderColor={borderColor} pt="8px" pb="8px">
+                            <Text color={textColor} fontSize="sm">
+                              {item.time_spent
+                                ? moment.duration(item.time_spent, 'seconds').format('m [min] s [sec]')
+                                : '--'}
+                            </Text>
+                          </Td>
+                          {/* Page Load Time */}
+                          <Td borderColor={borderColor} pt="8px" pb="8px">
+                            <Text color={textColor} fontSize="sm">
+                              {item.page_load_time ? `${Math.abs(item.page_load_time)} sec` : '--'}
+                            </Text>
+                          </Td>
+                          {/* Device Type */}
+                          <Td borderColor={borderColor} pt="8px" pb="8px">
+                            <Text color={textColor} fontSize="sm">
+                              {item.device_type || '--'}
+                            </Text>
+                          </Td>
+                          {/* Telecom Provider */}
+                          <Td borderColor={borderColor} pt="8px" pb="8px" >
+                            <Text color={textColor} fontSize="sm">
+                              {item.telecom_provider || '--'}
+                            </Text>
+                          </Td>
+                          {/* Browser */}
+                          <Td borderColor={borderColor} pt="8px" pb="8px" >
+                            <Text color={textColor} fontSize="sm">
+                              {item.browser || '--'}
+                            </Text>
+                          </Td>
+                          {/* Source - Static "web" */}
+                          <Td borderColor={borderColor} pt="8px" pb="8px" >
+                            <Text color={textColor} fontSize="sm">
+                              web
+                            </Text>
+                          </Td>
+                          {/* Page Visit */}
+                          <Td borderColor={borderColor} maxW="450px" pt="8px" pb="8px" >
+                            <Tooltip label={item.url || ''} placement="top">
                               <Text
-                                color={selectedIpAddress ? textColor : 'brand.500'}
+                                color={textColor}
                                 fontSize="sm"
-                                fontWeight="normal"
-                                fontFamily="monospace"
-                                cursor={selectedIpAddress ? 'default' : 'pointer'}
-                                _hover={
-                                  selectedIpAddress
-                                    ? {}
-                                    : { textDecoration: 'underline' }
-                                }
-                                onClick={
-                                  selectedIpAddress
-                                    ? undefined
-                                    : () => handleViewIpAnalytics(item.ip_address)
-                                }
+                                whiteSpace="normal"
+                                wordBreak="break-word"
+                                noOfLines={3}
+                                cursor="pointer"
                               >
-                                {item.ip_address}
+                                {item.url || '--'}
                               </Text>
                             </Tooltip>
-                          ) : (
-                            <Text color={textColor} fontSize="sm" fontWeight="normal" fontFamily="monospace">
-                              --
+                          </Td>
+                          {/* Role */}
+                          <Td borderColor={borderColor} pt="8px" pb="8px" >
+                            <Text color={textColor} fontSize="sm">
+                              {item.role || '--'}
                             </Text>
-                          )}
-                        </Td>
-                        {/* Location */}
-                        <Td borderColor={borderColor} maxW="150px" pt="8px" pb="8px">
-                          <Text color={textColor} fontSize="sm" whiteSpace="normal" wordBreak="break-word" noOfLines={2}>
-                            {item.location || '--'}
-                          </Text>
-                        </Td>
-                        {/* User Type - Static "guest" */}
-                        <Td borderColor={borderColor} pt="8px" pb="8px">
-                          <Text color={textColor} fontSize="sm">
-                            {item.user_type || 'guest'}
-                          </Text>
-                        </Td>
-                        {/* Today Visit Count */}
-                        <Td borderColor={borderColor} pt="8px" pb="8px">
-                          <Text color={textColor} fontSize="sm">
-                            {item.today_visit_count ?? '--'}
-                          </Text>
-                        </Td>
-                        {/* Total Visit Till Date */}
-                        <Td borderColor={borderColor} pt="8px" pb="8px">
-                          <Text color={textColor} fontSize="sm">
-                            {item.total_visit_till_date ?? '--'}
-                          </Text>
-                        </Td>
-                        {/* In Time - Only time, not date */}
-                        <Td borderColor={borderColor} pt="8px" pb="8px">
-                          <Text color={textColor} fontSize="sm" whiteSpace="normal">
-                            {item.start_time
-                              ? moment(item.start_time).format('h:mm:ss A')
-                              : '--'}
-                          </Text>
-                        </Td>
-                        {/* Out Time - Only time, not date */}
-                        <Td borderColor={borderColor} pt="8px" pb="8px">
-                          <Text color={textColor} fontSize="sm" whiteSpace="normal">
-                            {item.end_time
-                              ? moment(item.end_time).format('h:mm:ss A')
-                              : '--'}
-                          </Text>
-                        </Td>
-                        {/* Time Spent */}
-                        <Td borderColor={borderColor} pt="8px" pb="8px">
-                          <Text color={textColor} fontSize="sm">
-                            {item.time_spent
-                              ? moment.duration(item.time_spent, 'seconds').format('m [min] s [sec]')
-                              : '--'}
-                          </Text>
-                        </Td>
-                        {/* Page Load Time */}
-                        <Td borderColor={borderColor} pt="8px" pb="8px">
-                          <Text color={textColor} fontSize="sm">
-                            {item.page_load_time ? `${Math.abs(item.page_load_time)} sec` : '--'}
-                          </Text>
-                        </Td>
-                        {/* Device Type */}
-                        <Td borderColor={borderColor} pt="8px" pb="8px">
-                          <Text color={textColor} fontSize="sm">
-                            {item.device_type || '--'}
-                          </Text>
-                        </Td>
-                        {/* Telecom Provider */}
-                        <Td borderColor={borderColor} pt="8px" pb="8px" >
-                          <Text color={textColor} fontSize="sm">
-                            {item.telecom_provider || '--'}
-                          </Text>
-                        </Td>
-                        {/* Browser */}
-                        <Td borderColor={borderColor} pt="8px" pb="8px" >
-                          <Text color={textColor} fontSize="sm">
-                            {item.browser || '--'}
-                          </Text>
-                        </Td>
-                        {/* Source - Static "web" */}
-                        <Td borderColor={borderColor} pt="8px" pb="8px" >
-                          <Text color={textColor} fontSize="sm">
-                            web
-                          </Text>
-                        </Td>
-                        {/* Page Visit */}
-                        <Td borderColor={borderColor} maxW="450px" pt="8px" pb="8px" >
-                          <Tooltip label={item.url || ''} placement="top">
-                            <Text
-                              color={textColor}
-                              fontSize="sm"
-                              whiteSpace="normal"
-                              wordBreak="break-word"
-                              noOfLines={3}
-                              cursor="pointer"
-                            >
-                              {item.url || '--'}
+                          </Td>
+                          {/* Industry */}
+                          <Td borderColor={borderColor} pt="8px" pb="8px" >
+                            <Text color={textColor} fontSize="sm">
+                              {item.industry_name || '--'}
                             </Text>
-                          </Tooltip>
-                        </Td>
-                        {/* Role */}
-                        <Td borderColor={borderColor} pt="8px" pb="8px" >
-                          <Text color={textColor} fontSize="sm">
-                            {item.role || '--'}
-                          </Text>
-                        </Td>
-                        {/* Industry */}
-                        <Td borderColor={borderColor} pt="8px" pb="8px" >
-                          <Text color={textColor} fontSize="sm">
-                            {item.industry_name || '--'}
-                          </Text>
-                        </Td>
-                      </Tr>
-                    );
-                  })}
+                          </Td>
+                        </Tr>
+                      );
+                    })}
                   </Tbody>
                 </Table>
               </Box>
