@@ -180,7 +180,9 @@ export const freelancerDataSlice = createSlice({
         .addCase(freelancerCompleteData.fulfilled, (state, { payload }) => {
             state.completeDataLoading = false;
             state.completeDataSuccess = true;
-            state.completeData = payload?.data?.data || null;
+            // Handle both response structures: payload.data.data or payload.data
+            const responseData = payload?.data?.data || payload?.data || null;
+            state.completeData = responseData;
         })
         .addCase(freelancerCompleteData.rejected, (state) => {
             state.completeDataLoading = false;
