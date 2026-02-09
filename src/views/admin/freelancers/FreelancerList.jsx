@@ -636,6 +636,13 @@ const FreelancerDetailContent = ({ completeData, tabIndex, onTabChange }) => {
       return <Text color="gray.500">No projects data available.</Text>;
     }
 
+    const getProjectTypeLabel = (projectType) => {
+      if (projectType === '1') return 'Support';
+      if (projectType === '2') return 'New Development';
+      if (projectType === '3') return 'New Development Cum Support';
+      return '--';
+    };
+
     return (
       <VStack align="stretch" spacing={4}>
         <Card bg={cardBg} p={6}>
@@ -647,89 +654,98 @@ const FreelancerDetailContent = ({ completeData, tabIndex, onTabChange }) => {
           </HStack>
 
           <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4}>
-            {projectsData.map((project, index) => (
-              <Card key={project.id || index} bg={hoverBg} p={4} border="1px solid" borderColor={borderColor}>
-                <VStack align="stretch" spacing={3}>
-                  <Text fontSize="md" fontWeight="bold" color={textColor}>
-                    {project.project_name || `Project ${index + 1}`}
-                  </Text>
+            {projectsData.map((project, index) => {
+              const platforms = [
+                { name: 'Web', active: project.is_web_platform },
+                { name: 'Mobile', active: project.is_mobile_platform },
+                { name: 'Desktop', active: project.is_desktop_platform },
+                { name: 'Embedding', active: project.is_embedding_platform }
+              ].filter(platform => platform.active);
+              
+              const hasPlatforms = platforms.length > 0;
 
-                  <Grid templateColumns="repeat(2, 1fr)" gap={2}>
-                    {renderInfoItem(<MdCalendarToday />, 'Duration', project.duration ? `${project.duration} months` : null)}
-                    {renderInfoItem(<MdLocationOn />, 'Location', project.project_location)}
-                  </Grid>
+              return (
+                <Card key={project.id || index} bg={hoverBg} p={4} border="1px solid" borderColor={borderColor}>
+                  <VStack align="stretch" spacing={3}>
+                    <Text fontSize="md" fontWeight="bold" color={textColor}>
+                      {project.project_name || `Project ${index + 1}`}
+                    </Text>
 
-                  {project.technologty_pre && (
-                    <Box>
-                      <HStack spacing={2} mb={2}>
-                        <MdBusiness size={16} />
-                        <Text fontSize="xs" fontWeight="600" color="gray.500" textTransform="uppercase">
-                          Technologies
+                    <Grid templateColumns="repeat(2, 1fr)" gap={2}>
+                      {renderInfoItem(<MdCalendarToday />, 'Duration', project.duration ? `${project.duration} months` : null)}
+                      {renderInfoItem(<MdLocationOn />, 'Location', project.project_location)}
+                      {renderInfoItem(<MdWork />, 'Type', getProjectTypeLabel(project.project_type))}
+                    </Grid>
+
+                    {project.technologty_pre && (
+                      <Box>
+                        <HStack spacing={2} mb={2}>
+                          <MdBusiness size={16} />
+                          <Text fontSize="xs" fontWeight="600" color="gray.500" textTransform="uppercase">
+                            Technologies
+                          </Text>
+                        </HStack>
+                        <HStack spacing={2} flexWrap="wrap">
+                          {project.technologty_pre.split(',').map((tech, techIndex) => (
+                            <Tag key={techIndex} colorScheme="brand" size="sm" borderRadius="md">
+                              {tech.trim()}
+                            </Tag>
+                          ))}
+                        </HStack>
+                      </Box>
+                    )}
+
+                    {hasPlatforms && (
+                      <Box>
+                        <HStack spacing={2} mb={2}>
+                          <MdPublic size={16} />
+                          <Text fontSize="xs" fontWeight="600" color="gray.500" textTransform="uppercase">
+                            Platforms
+                          </Text>
+                        </HStack>
+                        <HStack spacing={2} flexWrap="wrap">
+                          {platforms.map((platform, platformIndex) => (
+                            <Tag key={platformIndex} variant="outlined" size="sm" borderRadius="md">
+                              {platform.name}
+                            </Tag>
+                          ))}
+                        </HStack>
+                      </Box>
+                    )}
+
+                    {project.project_details && (
+                      <Box>
+                        <HStack spacing={2} mb={2}>
+                          <MdDescription size={16} />
+                          <Text fontSize="xs" fontWeight="600" color="gray.500" textTransform="uppercase">
+                            Description
+                          </Text>
+                        </HStack>
+                        <Text fontSize="sm" color={textColor} lineHeight="1.6">
+                          {project.project_details}
                         </Text>
-                      </HStack>
-                      <HStack spacing={2} flexWrap="wrap">
-                        {project.technologty_pre.split(',').map((tech, techIndex) => (
-                          <Tag key={techIndex} colorScheme="brand" size="sm" borderRadius="md">
-                            {tech.trim()}
-                          </Tag>
-                        ))}
-                      </HStack>
-                    </Box>
-                  )}
+                      </Box>
+                    )}
 
-                  <Box>
-                    <HStack spacing={2} mb={2}>
-                      <MdPublic size={16} />
-                      <Text fontSize="xs" fontWeight="600" color="gray.500" textTransform="uppercase">
-                        Platforms
-                      </Text>
-                    </HStack>
-                    <HStack spacing={2} flexWrap="wrap">
-                      {[
-                        { name: 'Web', active: project.is_web_platform },
-                        { name: 'Mobile', active: project.is_mobile_platform },
-                        { name: 'Desktop', active: project.is_desktop_platform },
-                        { name: 'Embedding', active: project.is_embedding_platform }
-                      ].filter(platform => platform.active).map((platform, platformIndex) => (
-                        <Tag key={platformIndex} variant="outlined" size="sm" borderRadius="md">
-                          {platform.name}
-                        </Tag>
-                      ))}
-                    </HStack>
-                  </Box>
-
-                  {project.project_details && (
-                    <Box>
-                      <HStack spacing={2} mb={2}>
-                        <MdDescription size={16} />
-                        <Text fontSize="xs" fontWeight="600" color="gray.500" textTransform="uppercase">
-                          Description
-                        </Text>
-                      </HStack>
-                      <Text fontSize="sm" color={textColor} lineHeight="1.6">
-                        {project.project_details}
-                      </Text>
-                    </Box>
-                  )}
-
-                  {project.project_link && (
-                    <Link 
-                      href={project.project_link} 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      color="brand.500"
-                      fontSize="sm"
-                      isExternal
-                    >
-                      <HStack spacing={1}>
-                        <MdLink />
-                        <Text>View Project</Text>
-                      </HStack>
-                    </Link>
-                  )}
-                </VStack>
-              </Card>
-            ))}
+                    {project.project_link && (
+                      <Link 
+                        href={project.project_link} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        color="brand.500"
+                        fontSize="sm"
+                        isExternal
+                      >
+                        <HStack spacing={1}>
+                          <MdLink />
+                          <Text>View Project</Text>
+                        </HStack>
+                      </Link>
+                    )}
+                  </VStack>
+                </Card>
+              );
+            })}
           </SimpleGrid>
         </Card>
       </VStack>
