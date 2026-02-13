@@ -40,6 +40,13 @@ import {
   Link,
   Tag,
   SimpleGrid,
+  NumberInput,
+  NumberInputField,
+  NumberInputStepper,
+  NumberIncrementStepper,
+  NumberDecrementStepper,
+  FormControl,
+  FormLabel,
 } from '@chakra-ui/react';
 import { 
   MdVisibility, 
@@ -61,6 +68,9 @@ import {
   MdGetApp,
   MdPublic,
   MdDescription,
+  MdNotifications,
+  MdSchedule,
+  MdInfo,
 } from 'react-icons/md';
 import { useDispatch, useSelector } from 'react-redux';
 import { MdRefresh } from 'react-icons/md';
@@ -71,6 +81,8 @@ import {
   freelancerData,
   freelancerCompleteData,
 } from '../../../features/admin/freelancerManagementSlice';
+import { postApi } from '../../../services/api';
+import { config } from '../../../config/config';
 
 function FreelancerList() {
   const dispatch = useDispatch();
@@ -83,7 +95,16 @@ function FreelancerList() {
   const [detailTabIndex, setDetailTabIndex] = useState(0);
   const detailsModal = useDisclosure();
   const statusModal = useDisclosure();
+  const reminderModal = useDisclosure();
+  const reminderViewModal = useDisclosure();
   const [selectedStatus, setSelectedStatus] = useState('');
+  const [reminderData, setReminderData] = useState({
+    first_reminder_in_days: '',
+    second_reminder_in_days: '',
+    third_reminder_in_days: '',
+  });
+  const [isReminderLoading, setIsReminderLoading] = useState(false);
+  const [selectedReminderData, setSelectedReminderData] = useState(null);
   const statusOptions = ['Pending', 'Approved', 'Rejected', 'Under Review', 'Suspended'];
 
   // Determine if this is the Management -> Freelancers page (approved only)
@@ -150,6 +171,83 @@ function FreelancerList() {
       showError('Failed to update status');
     } finally {
       closeStatus();
+    }
+  };
+
+  const openReminder = (freelancer) => {
+    setSelectedFreelancer(freelancer);
+    setReminderData({
+      first_reminder_in_days: '',
+      second_reminder_in_days: '',
+      third_reminder_in_days: '',
+    });
+    reminderModal.onOpen();
+  };
+
+  const closeReminder = () => {
+    reminderModal.onClose();
+    setSelectedFreelancer(null);
+    setReminderData({
+      first_reminder_in_days: '',
+      second_reminder_in_days: '',
+      third_reminder_in_days: '',
+    });
+  };
+
+  const handleReminderSubmit = async () => {
+    if (!selectedFreelancer) return;
+
+    // Validate that at least one reminder day is provided
+    if (!reminderData.first_reminder_in_days && !reminderData.second_reminder_in_days && !reminderData.third_reminder_in_days) {
+      showError('Please provide at least one reminder day');
+      return;
+    }
+
+    setIsReminderLoading(true);
+    try {
+      const apiData = {
+        userId: selectedFreelancer.id,
+        first_reminder_in_days: reminderData.first_reminder_in_days || null,
+        second_reminder_in_days: reminderData.second_reminder_in_days || null,
+        third_reminder_in_days: reminderData.third_reminder_in_days || null,
+      };
+
+      await postApi(`${config.apiBaseUrl}/admin/profile-complete-reminder`, apiData);
+      showSuccess('Profile complete reminder set successfully');
+      closeReminder();
+      // Refetch freelancer data to update the list
+      dispatch(freelancerData({ page, pageLimit, status: statusFilter, excludeStatus: excludeStatusFilter }));
+    } catch (error) {
+      console.error('Error setting reminder:', error);
+      showError(error?.response?.data?.message || 'Failed to set reminder');
+    } finally {
+      setIsReminderLoading(false);
+    }
+  };
+
+  const openReminderView = (freelancer) => {
+    setSelectedFreelancer(freelancer);
+    setSelectedReminderData(freelancer.profile_complete_reminder || null);
+    reminderViewModal.onOpen();
+  };
+
+  const closeReminderView = () => {
+    reminderViewModal.onClose();
+    setSelectedFreelancer(null);
+    setSelectedReminderData(null);
+  };
+
+  const formatDate = (dateString) => {
+    if (!dateString) return '--';
+    try {
+      const date = new Date(dateString);
+      return date.toLocaleDateString('en-GB', {
+        day: 'numeric',
+        month: 'numeric',
+        year: 'numeric',
+      });
+    } catch (e) {
+      return '--';
     }
   };
 
@@ -228,12 +326,22 @@ function FreelancerList() {
                       <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="capitalize" textAlign="center" bg={bgColor}>
                         View
                       </Th>
+                      {!isManagementPage && (
+                        <>
+                          <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="capitalize" textAlign="center" bg={bgColor}>
+                            Reminder Dates
+                          </Th>
+                          <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="capitalize" textAlign="center" bg={bgColor}>
+                            Reminder
+                          </Th>
+                        </>
+                      )}
                     </Tr>
                   </Thead>
                   <Tbody>
                     {rows.length === 0 ? (
                       <Tr>
-                        <Td colSpan={7} textAlign="center" py="40px">
+                        <Td colSpan={isManagementPage ? 7 : 9} textAlign="center" py="40px">
                           <Text color="black">No freelancers found</Text>
                         </Td>
                       </Tr>
@@ -315,6 +423,64 @@ function FreelancerList() {
                                 />
                               </Tooltip>
                             </Td>
+                            {!isManagementPage && (
+                              <>
+                                <Td borderColor={borderColor} textAlign="center" pt="8px" pb="8px">
+                                  {fr.profile_complete_reminder ? (
+                                    <VStack spacing={1} align="center">
+                                      {fr.profile_complete_reminder.first_reminder_date && (
+                                        <Text fontSize="xs" color={textColor}>
+                                          1st: {formatDate(fr.profile_complete_reminder.first_reminder_date)}
+                                        </Text>
+                                      )}
+                                      {fr.profile_complete_reminder.second_reminder_date && (
+                                        <Text fontSize="xs" color={textColor}>
+                                          2nd: {formatDate(fr.profile_complete_reminder.second_reminder_date)}
+                                        </Text>
+                                      )}
+                                      {fr.profile_complete_reminder.third_reminder_date && (
+                                        <Text fontSize="xs" color={textColor}>
+                                          3rd: {formatDate(fr.profile_complete_reminder.third_reminder_date)}
+                                        </Text>
+                                      )}
+                                      {!fr.profile_complete_reminder.first_reminder_date && 
+                                       !fr.profile_complete_reminder.second_reminder_date && 
+                                       !fr.profile_complete_reminder.third_reminder_date && (
+                                        <Text fontSize="xs" color="gray.500">--</Text>
+                                      )}
+                                    </VStack>
+                                  ) : (
+                                    <Text fontSize="xs" color="gray.500">--</Text>
+                                  )}
+                                </Td>
+                                <Td borderColor={borderColor} textAlign="center" pt="8px" pb="8px">
+                                  <HStack spacing={2} justify="center">
+                                    <Tooltip label="Set Profile Complete Reminder">
+                                      <IconButton
+                                        aria-label="Set reminder"
+                                        icon={<MdNotifications />}
+                                        size="sm"
+                                        variant="ghost"
+                                        style={{ color: 'rgb(32, 33, 36)' }}
+                                        onClick={() => openReminder(fr)}
+                                      />
+                                    </Tooltip>
+                                    {fr.profile_complete_reminder && (
+                                      <Tooltip label="View Reminder Details">
+                                        <IconButton
+                                          aria-label="View reminder"
+                                          icon={<MdInfo />}
+                                          size="sm"
+                                          variant="ghost"
+                                          style={{ color: 'rgb(32, 33, 36)' }}
+                                          onClick={() => openReminderView(fr)}
+                                        />
+                                      </Tooltip>
+                                    )}
+                                  </HStack>
+                                </Td>
+                              </>
+                            )}
                           </Tr>
                         );
                       })
@@ -391,6 +557,141 @@ function FreelancerList() {
           <ModalFooter>
             <Button variant="ghost" mr={3} onClick={closeStatus}>Cancel</Button>
             <Button colorScheme="brand" onClick={applyStatusChange}>OK</Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+
+      {/* Reminder View Modal */}
+      <Modal isOpen={reminderViewModal.isOpen} onClose={closeReminderView} isCentered>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Profile Complete Reminder Details</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            {selectedReminderData ? (
+              <VStack spacing={4} align="stretch">
+                <Box>
+                  <Text fontSize="sm" fontWeight="600" mb={2} color="gray.600">
+                    First Reminder Date
+                  </Text>
+                  <Text fontSize="md" color={textColor}>
+                    {formatDate(selectedReminderData.first_reminder_date) || 'Not set'}
+                  </Text>
+                </Box>
+                <Box>
+                  <Text fontSize="sm" fontWeight="600" mb={2} color="gray.600">
+                    Second Reminder Date
+                  </Text>
+                  <Text fontSize="md" color={textColor}>
+                    {formatDate(selectedReminderData.second_reminder_date) || 'Not set'}
+                  </Text>
+                </Box>
+                <Box>
+                  <Text fontSize="sm" fontWeight="600" mb={2} color="gray.600">
+                    Third Reminder Date
+                  </Text>
+                  <Text fontSize="md" color={textColor}>
+                    {formatDate(selectedReminderData.third_reminder_date) || 'Not set'}
+                  </Text>
+                </Box>
+              </VStack>
+            ) : (
+              <Text color="gray.500">No reminder data available</Text>
+            )}
+          </ModalBody>
+          <ModalFooter>
+            <Button variant="ghost" onClick={closeReminderView}>Close</Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+
+      {/* Reminder Modal */}
+      <Modal isOpen={reminderModal.isOpen} onClose={closeReminder} isCentered>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Set Profile Complete Reminder</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <VStack spacing={4} align="stretch">
+              <FormControl>
+                <FormLabel fontSize="sm" fontWeight="500">
+                  First Reminder (Days)
+                </FormLabel>
+                <NumberInput
+                  value={reminderData.first_reminder_in_days || ''}
+                  onChange={(valueString, valueNumber) =>
+                    setReminderData({
+                      ...reminderData,
+                      first_reminder_in_days: isNaN(valueNumber) ? '' : valueNumber,
+                    })
+                  }
+                  min={0}
+                >
+                  <NumberInputField placeholder="Enter days" />
+                  <NumberInputStepper>
+                    <NumberIncrementStepper />
+                    <NumberDecrementStepper />
+                  </NumberInputStepper>
+                </NumberInput>
+              </FormControl>
+
+              <FormControl>
+                <FormLabel fontSize="sm" fontWeight="500">
+                  Second Reminder (Days)
+                </FormLabel>
+                <NumberInput
+                  value={reminderData.second_reminder_in_days || ''}
+                  onChange={(valueString, valueNumber) =>
+                    setReminderData({
+                      ...reminderData,
+                      second_reminder_in_days: isNaN(valueNumber) ? '' : valueNumber,
+                    })
+                  }
+                  min={0}
+                >
+                  <NumberInputField placeholder="Enter days" />
+                  <NumberInputStepper>
+                    <NumberIncrementStepper />
+                    <NumberDecrementStepper />
+                  </NumberInputStepper>
+                </NumberInput>
+              </FormControl>
+
+              <FormControl>
+                <FormLabel fontSize="sm" fontWeight="500">
+                  Third Reminder (Days)
+                </FormLabel>
+                <NumberInput
+                  value={reminderData.third_reminder_in_days || ''}
+                  onChange={(valueString, valueNumber) =>
+                    setReminderData({
+                      ...reminderData,
+                      third_reminder_in_days: isNaN(valueNumber) ? '' : valueNumber,
+                    })
+                  }
+                  min={0}
+                >
+                  <NumberInputField placeholder="Enter days" />
+                  <NumberInputStepper>
+                    <NumberIncrementStepper />
+                    <NumberDecrementStepper />
+                  </NumberInputStepper>
+                </NumberInput>
+              </FormControl>
+            </VStack>
+          </ModalBody>
+          <ModalFooter>
+            <Button variant="ghost" mr={3} onClick={closeReminder} isDisabled={isReminderLoading}>
+              Cancel
+            </Button>
+            <Button
+              colorScheme="brand"
+              onClick={handleReminderSubmit}
+              isLoading={isReminderLoading}
+              loadingText="Saving..."
+            >
+              Save
+            </Button>
           </ModalFooter>
         </ModalContent>
       </Modal>
