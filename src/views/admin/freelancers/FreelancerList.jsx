@@ -352,21 +352,16 @@ function FreelancerList() {
                         View
                       </Th>
                       {!isManagementPage && (
-                        <>
-                          <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="capitalize" textAlign="center" bg={bgColor}>
-                            Reminder Dates
-                          </Th>
-                          <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="capitalize" textAlign="center" bg={bgColor}>
-                            Reminder
-                          </Th>
-                        </>
+                        <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="capitalize" textAlign="center" bg={bgColor}>
+                          Reminder
+                        </Th>
                       )}
                     </Tr>
                   </Thead>
                   <Tbody>
                     {rows.length === 0 ? (
                       <Tr>
-                        <Td colSpan={isManagementPage ? 7 : 9} textAlign="center" py="40px">
+                        <Td colSpan={isManagementPage ? 7 : 8} textAlign="center" py="40px">
                           <Text color="black">No freelancers found</Text>
                         </Td>
                       </Tr>
@@ -471,36 +466,7 @@ function FreelancerList() {
                               </HStack>
                             </Td>
                             {!isManagementPage && (
-                              <>
-                                <Td borderColor={borderColor} textAlign="center" pt="8px" pb="8px">
-                                  {fr.profile_complete_reminder ? (
-                                    <VStack spacing={1} align="center">
-                                      {fr.profile_complete_reminder.first_reminder_date && (
-                                        <Text fontSize="xs" color={textColor}>
-                                          1st: {formatDate(fr.profile_complete_reminder.first_reminder_date)}
-                                        </Text>
-                                      )}
-                                      {fr.profile_complete_reminder.second_reminder_date && (
-                                        <Text fontSize="xs" color={textColor}>
-                                          2nd: {formatDate(fr.profile_complete_reminder.second_reminder_date)}
-                                        </Text>
-                                      )}
-                                      {fr.profile_complete_reminder.third_reminder_date && (
-                                        <Text fontSize="xs" color={textColor}>
-                                          3rd: {formatDate(fr.profile_complete_reminder.third_reminder_date)}
-                                        </Text>
-                                      )}
-                                      {!fr.profile_complete_reminder.first_reminder_date && 
-                                       !fr.profile_complete_reminder.second_reminder_date && 
-                                       !fr.profile_complete_reminder.third_reminder_date && (
-                                        <Text fontSize="xs" color="gray.500">--</Text>
-                                      )}
-                                    </VStack>
-                                  ) : (
-                                    <Text fontSize="xs" color="gray.500">--</Text>
-                                  )}
-                                </Td>
-                                <Td borderColor={borderColor} textAlign="center" pt="8px" pb="8px">
+                              <Td borderColor={borderColor} textAlign="center" pt="8px" pb="8px">
                                   <HStack spacing={2} justify="center">
                                     <Tooltip label="Set Profile Complete Reminder">
                                       <IconButton
@@ -526,7 +492,6 @@ function FreelancerList() {
                                     )}
                                   </HStack>
                                 </Td>
-                              </>
                             )}
                           </Tr>
                         );
