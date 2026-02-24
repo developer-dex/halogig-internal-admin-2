@@ -55,6 +55,8 @@ export const apiEndPoints = {
   DELETE_ALL_WEBSITE_DATA: "admin/website-data",
   CREATE_WEBSITE_DATA: "admin/website-data",
   UPDATE_WEBSITE_DATA: "admin/website-data",
+  GET_WEBSITE_CATEGORIES: "admin/website-data/categories",
+  GET_WEBSITE_DATA_BY_CATEGORY_ADMIN: "admin/website-data/category",
   
   // Freelancer Country Preferences endpoints
   GET_FREELANCER_COUNTRY_PREFERENCES: "admin/freelancer",

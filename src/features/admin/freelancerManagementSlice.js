@@ -35,23 +35,32 @@ const initialState = {
 
 // Removed TypeScript type annotations
 export const freelancerData = createAsyncThunk(
-    "/freelancerData",
-    async ({ page, pageLimit, status, excludeStatus }) => { // Updated to accept page, pageLimit, status, and excludeStatus
-        try {
-            let url = `${apiEndPoints.GET_FRELANCER_DATA}?page=${page}&limit=${pageLimit}`;
-            if (status) {
-                url += `&status=${status}`;
-            }
-            if (excludeStatus) {
-                url += `&excludeStatus=${excludeStatus}`;
-            }
-            const payload = await getApi(url); // Updated API call
-            return payload;
-        } catch (e) {
-            showError(e.response.data.message);
-            // return e;
-        }
+  '/freelancerData',
+  async ({
+    page,
+    pageLimit,
+    status,
+    excludeStatus,
+    isReferralPartner,
+  }) => {
+    try {
+      let url = `${apiEndPoints.GET_FRELANCER_DATA}?page=${page}&limit=${pageLimit}`;
+      if (status) {
+        url += `&status=${status}`;
+      }
+      if (excludeStatus) {
+        url += `&excludeStatus=${excludeStatus}`;
+      }
+      if (typeof isReferralPartner === 'boolean') {
+        url += `&is_referral_partner=${isReferralPartner ? 'true' : 'false'}`;
+      }
+      const payload = await getApi(url);
+      return payload;
+    } catch (e) {
+      showError(e.response.data.message);
+      // return e;
     }
+  },
 );
 
 // New async thunk for getting complete freelancer data

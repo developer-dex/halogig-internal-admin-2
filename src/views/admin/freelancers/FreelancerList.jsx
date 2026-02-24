@@ -107,6 +107,7 @@ function FreelancerList() {
   const reminderModal = useDisclosure();
   const reminderViewModal = useDisclosure();
   const emailModal = useDisclosure();
+  const addProfileModal = useDisclosure();
   const [selectedStatus, setSelectedStatus] = useState('');
   const [reminderData, setReminderData] = useState({
     first_reminder_in_days: '',
@@ -117,11 +118,24 @@ function FreelancerList() {
   const [selectedReminderData, setSelectedReminderData] = useState(null);
   const statusOptions = ['Pending', 'Approved', 'Rejected', 'Under Review', 'Suspended'];
 
-  // Determine if this is the Management -> Freelancers page (approved only)
-  // Registration -> Freelancers is at /freelancers, Management -> Freelancers is at /freelancers-management
-  const isManagementPage = location.pathname === '/admin/freelancers-management';
+  // Add Profile modal state
+  const [profileCategory, setProfileCategory] = useState('');
+  const [profileSlugId, setProfileSlugId] = useState('');
+  const [websiteCategories, setWebsiteCategories] = useState([]);
+  const [websiteSlugsByCategory, setWebsiteSlugsByCategory] = useState([]);
+  const [isProfileModalLoading, setIsProfileModalLoading] = useState(false);
+  const [isSlugLoading, setIsSlugLoading] = useState(false);
 
-  // Set filters: Management page shows only approved, Registration shows all others (exclude approved)
+  // Determine which page variant is active based on path
+  // Registration -> Freelancers is at /freelancers
+  // Management -> Freelancers is at /freelancers-management
+  // Registration -> Referral Partners is at /referral-partners
+  const isManagementPage = location.pathname === '/admin/freelancers-management';
+  const isReferralPartnerPage = location.pathname === '/admin/referral-partners';
+
+  // Set filters:
+  // - Management page shows only approved
+  // - Registration (Freelancers / Referral Partners) shows all others (exclude approved)
   const statusFilter = isManagementPage ? 'approved' : null;
   const excludeStatusFilter = !isManagementPage ? 'approved' : null;
 
@@ -142,8 +156,14 @@ function FreelancerList() {
   }, [responseData]);
 
   useEffect(() => {
-    dispatch(freelancerData({ page, pageLimit, status: statusFilter, excludeStatus: excludeStatusFilter }));
-  }, [dispatch, page, pageLimit, statusFilter, excludeStatusFilter]);
+    dispatch(freelancerData({
+      page,
+      pageLimit,
+      status: statusFilter,
+      excludeStatus: excludeStatusFilter,
+      isReferralPartner: isReferralPartnerPage ? true : undefined,
+    }));
+  }, [dispatch, page, pageLimit, statusFilter, excludeStatusFilter, isReferralPartnerPage]);
 
   const openDetails = (userId) => {
     setSelectedFreelancer(userId);
@@ -186,7 +206,13 @@ function FreelancerList() {
       await dispatch(statusChange({ id: selectedFreelancer.id, apiData: { status: selectedStatus } }));
       showSuccess('Status updated successfully');
       // refetch with current filters
-      dispatch(freelancerData({ page, pageLimit, status: statusFilter, excludeStatus: excludeStatusFilter }));
+      dispatch(freelancerData({
+        page,
+        pageLimit,
+        status: statusFilter,
+        excludeStatus: excludeStatusFilter,
+        isReferralPartner: isReferralPartnerPage ? true : undefined,
+      }));
     } catch (e) {
       showError('Failed to update status');
     } finally {
@@ -236,7 +262,13 @@ function FreelancerList() {
       showSuccess('Profile complete reminder set successfully');
       closeReminder();
       // Refetch freelancer data to update the list
-      dispatch(freelancerData({ page, pageLimit, status: statusFilter, excludeStatus: excludeStatusFilter }));
+      dispatch(freelancerData({
+        page,
+        pageLimit,
+        status: statusFilter,
+        excludeStatus: excludeStatusFilter,
+        isReferralPartner: isReferralPartnerPage ? true : undefined,
+      }));
     } catch (error) {
       console.error('Error setting reminder:', error);
       showError(error?.response?.data?.message || 'Failed to set reminder');
@@ -260,6 +292,64 @@ function FreelancerList() {
     reminderViewModal.onClose();
     setSelectedFreelancer(null);
     setSelectedReminderData(null);
+  };
+
+  // Add Profile modal handlers
+  const fetchWebsiteCategories = async () => {
+    if (websiteCategories.length > 0) {
+      return;
+    }
+
+    setIsProfileModalLoading(true);
+    try {
+      const response = await getApi(apiEndPoints.GET_WEBSITE_CATEGORIES);
+      const data = response?.data?.data || [];
+      setWebsiteCategories(Array.isArray(data) ? data : []);
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error('fetchWebsiteCategories error:', error);
+      showError(error?.response?.data?.message || 'Failed to fetch website categories');
+    } finally {
+      setIsProfileModalLoading(false);
+    }
+  };
+
+  const fetchSlugsForCategory = async (categoryName) => {
+    if (!categoryName) {
+      setWebsiteSlugsByCategory([]);
+      return;
+    }
+
+    setIsSlugLoading(true);
+    try {
+      const response = await getApi(`${apiEndPoints.GET_WEBSITE_DATA_BY_CATEGORY_ADMIN}/${encodeURIComponent(categoryName)}`);
+      const data = response?.data?.data || [];
+      setWebsiteSlugsByCategory(Array.isArray(data) ? data : []);
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error('fetchSlugsForCategory error:', error);
+      showError(error?.response?.data?.message || 'Failed to fetch website slugs for selected category');
+      setWebsiteSlugsByCategory([]);
+    } finally {
+      setIsSlugLoading(false);
+    }
+  };
+
+  const openAddProfile = async (freelancer) => {
+    setSelectedFreelancer(freelancer);
+    setProfileCategory('');
+    setProfileSlugId('');
+    setWebsiteSlugsByCategory([]);
+    addProfileModal.onOpen();
+    await fetchWebsiteCategories();
+  };
+
+  const closeAddProfile = () => {
+    addProfileModal.onClose();
+    setSelectedFreelancer(null);
+    setProfileCategory('');
+    setProfileSlugId('');
+    setWebsiteSlugsByCategory([]);
   };
 
   const formatDate = (dateString) => {
@@ -310,7 +400,7 @@ function FreelancerList() {
       <Card bg={bgColor}>
         <Box p="12px">
           <Text color={textColor} fontSize="l" fontWeight="700" mb="10px">
-            Freelancers
+            {isReferralPartnerPage ? 'Referral Partners' : 'Freelancers'}
           </Text>
 
           {isLoading && rows.length === 0 ? (
@@ -351,6 +441,11 @@ function FreelancerList() {
                       <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="capitalize" textAlign="center" bg={bgColor}>
                         View
                       </Th>
+                      {isManagementPage && (
+                        <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="capitalize" textAlign="center" bg={bgColor}>
+                          Add Profile
+                        </Th>
+                      )}
                       {!isManagementPage && (
                         <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="capitalize" textAlign="center" bg={bgColor}>
                           Reminder
@@ -465,6 +560,19 @@ function FreelancerList() {
                                 </Tooltip>
                               </HStack>
                             </Td>
+                            {isManagementPage && (
+                              <Td borderColor={borderColor} textAlign="center" pt="8px" pb="8px">
+                                <Button
+                                  size="sm"
+                                  leftIcon={<MdAdd />}
+                                  variant="outline"
+                                  colorScheme="brand"
+                                  onClick={() => openAddProfile(fr)}
+                                >
+                                  Add Profile
+                                </Button>
+                              </Td>
+                            )}
                             {!isManagementPage && (
                               <Td borderColor={borderColor} textAlign="center" pt="8px" pb="8px">
                                   <HStack spacing={2} justify="center">
@@ -703,6 +811,75 @@ function FreelancerList() {
               loadingText="Saving..."
             >
               Save
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+
+      {/* Add Profile Modal */}
+      <Modal isOpen={addProfileModal.isOpen} onClose={closeAddProfile} isCentered size="lg">
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Add Profile</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <VStack spacing={4} align="stretch">
+              <FormControl isRequired>
+                <FormLabel fontSize="sm" fontWeight="500">
+                  Select Category
+                </FormLabel>
+                <Select
+                  placeholder={isProfileModalLoading ? 'Loading categories...' : 'Select category'}
+                  value={profileCategory}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    setProfileCategory(value);
+                    setProfileSlugId('');
+                    fetchSlugsForCategory(value);
+                  }}
+                  isDisabled={isProfileModalLoading}
+                >
+                  {websiteCategories.map((category) => (
+                    <option key={category} value={category}>
+                      {category}
+                    </option>
+                  ))}
+                </Select>
+              </FormControl>
+
+              <FormControl isRequired>
+                <FormLabel fontSize="sm" fontWeight="500">
+                  Select Slug URL
+                </FormLabel>
+                <Select
+                  placeholder={
+                    !profileCategory
+                      ? 'Select category first'
+                      : isSlugLoading
+                        ? 'Loading slugs...'
+                        : 'Select slug URL'
+                  }
+                  value={profileSlugId}
+                  onChange={(e) => setProfileSlugId(e.target.value)}
+                  isDisabled={!profileCategory || isSlugLoading}
+                >
+                  {websiteSlugsByCategory.map((item) => (
+                    <option key={item.id} value={item.id}>
+                      {item.slug_link || item.full_slug || item.service_name}
+                    </option>
+                  ))}
+                </Select>
+                {profileCategory && !isSlugLoading && websiteSlugsByCategory.length === 0 && (
+                  <Text fontSize="xs" color="gray.500" mt={1}>
+                    No slugs found for selected category.
+                  </Text>
+                )}
+              </FormControl>
+            </VStack>
+          </ModalBody>
+          <ModalFooter>
+            <Button variant="ghost" onClick={closeAddProfile}>
+              Close
             </Button>
           </ModalFooter>
         </ModalContent>
@@ -2279,6 +2456,11 @@ const FreelancerDetailContent = ({ completeData, tabIndex, onTabChange, isEditMo
       return <Text color="gray.500">No professional experience data available.</Text>;
     }
 
+    // Prepare sub category display string (supports multiple subcategories)
+    const subCategoryDisplay = Array.isArray(subCategory)
+      ? subCategory.map((sub) => sub?.name).filter(Boolean).join(', ')
+      : subCategory?.name;
+
     return (
       <VStack align="stretch" spacing={6}>
         <Card bg={cardBg} p={6}>
@@ -2515,8 +2697,29 @@ const FreelancerDetailContent = ({ completeData, tabIndex, onTabChange, isEditMo
               <>
                 <Grid templateColumns={{ base: '1fr', md: 'repeat(2, 1fr)', lg: 'repeat(3, 1fr)' }} gap={4}>
                   {data.profile_headline && renderInfoItem(<MdWork />, 'Profile Headline', data.profile_headline, true)}
-                  {renderInfoItem(<MdBusiness />, 'Category', category?.name)}
-                  {renderInfoItem(<MdBusiness />, 'Sub Category', subCategory?.name)}
+                  <GridItem colSpan={{ base: 12, md: 6, lg: 4 }}>
+                    <VStack align="start" spacing={1} mb={4}>
+                      <HStack spacing={2}>
+                        <MdBusiness />
+                        <Text fontSize="xs" fontWeight="600" color="gray.500" textTransform="uppercase">
+                          Category
+                        </Text>
+                      </HStack>
+                      <Text fontSize="sm" fontWeight="500" color={textColor}>
+                        {category?.name || '--'}
+                      </Text>
+                      {subCategoryDisplay && (
+                        <>
+                          <Text fontSize="xs" fontWeight="600" color="gray.500" textTransform="uppercase" mt={4}>
+                            Sub Category
+                          </Text>
+                          <Text fontSize="sm" fontWeight="500" color={textColor}>
+                            {subCategoryDisplay}
+                          </Text>
+                        </>
+                      )}
+                    </VStack>
+                  </GridItem>
                   {renderInfoItem(<MdAttachMoney />, 'Rate per Hour', formatCurrency(data.rateperhour_2, data.currency?.split('-')[1]))}
                   {renderInfoItem(<MdLanguage />, 'Languages', data.languages)}
                 </Grid>

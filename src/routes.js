@@ -107,6 +107,13 @@ const routes = [
         icon: <Icon as={MdWork} width="20px" height="20px" color="inherit" />,
         component: <FreelancerList />,
       },
+      {
+        name: 'Referral Partners',
+        layout: '/admin',
+        path: '/referral-partners',
+        icon: <Icon as={MdWork} width="20px" height="20px" color="inherit" />,
+        component: <FreelancerList />,
+      },
     ],
   },
   // {
