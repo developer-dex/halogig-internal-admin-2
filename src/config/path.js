@@ -105,4 +105,6 @@ export const apiEndPoints = {
   
   // Web Rotation Data endpoints
   GET_WEB_ROT_DATA: "admin/web-rot-data",
+  GET_WEB_ROT_UNIQUE_INDUSTRIES: "admin/web-rot-data/unique-industries",
+  GET_WEB_ROT_UNIQUE_SLUG_LINKS: "admin/web-rot-data/unique-slug-links",
 };

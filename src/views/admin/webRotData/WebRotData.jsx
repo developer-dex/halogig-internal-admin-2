@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
+import axios from 'axios';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   Box,
@@ -26,10 +27,13 @@ import {
   ModalContent,
   ModalHeader,
   ModalBody,
+  ModalFooter,
   ModalCloseButton,
   useDisclosure,
   VStack,
   Divider,
+  FormControl,
+  FormLabel,
 } from '@chakra-ui/react';
 import {
   MdRefresh,
@@ -43,15 +47,25 @@ import {
   getWebRotData,
 } from '../../../features/admin/webRotDataSlice';
 import Card from 'components/card/Card';
+import { getApi } from '../../../services/api';
+import { apiEndPoints } from '../../../config/path';
+import { showError, showSuccess } from '../../../helpers/messageHelper';
 
 export default function WebRotData() {
   const dispatch = useDispatch();
   const detailsModal = useDisclosure();
+  const refreshModal = useDisclosure();
 
   const [currentPage, setCurrentPage] = useState(1);
   const [webRotData, setWebRotData] = useState([]);
   const [totalCount, setTotalCount] = useState(0);
   const [selectedRecord, setSelectedRecord] = useState(null);
+  const [uniqueIndustries, setUniqueIndustries] = useState([]);
+  const [uniqueSlugLinks, setUniqueSlugLinks] = useState([]);
+  const [selectedRefreshIndustry, setSelectedRefreshIndustry] = useState('');
+  const [selectedRefreshSlugLink, setSelectedRefreshSlugLink] = useState('');
+  const [isRefreshOptionsLoading, setIsRefreshOptionsLoading] = useState(false);
+  const [isSubmittingRefresh, setIsSubmittingRefresh] = useState(false);
   const [serviceFilter, setServiceFilter] = useState('');
   const [industryFilter, setIndustryFilter] = useState('');
   const [slugLinkFilter, setSlugLinkFilter] = useState('');
@@ -233,6 +247,77 @@ export default function WebRotData() {
   const parsedSelectedServiceList = parseJsonField(selectedRecord?.service_list);
   const parsedSelectedMainApps = parseJsonField(selectedRecord?.main_application_list);
 
+  const fetchRefreshOptions = async () => {
+    try {
+      setIsRefreshOptionsLoading(true);
+
+      const [industriesResponse, slugLinksResponse] = await Promise.all([
+        getApi(apiEndPoints.GET_WEB_ROT_UNIQUE_INDUSTRIES),
+        getApi(apiEndPoints.GET_WEB_ROT_UNIQUE_SLUG_LINKS),
+      ]);
+
+      setUniqueIndustries(industriesResponse?.data?.data || []);
+      setUniqueSlugLinks(slugLinksResponse?.data?.data || []);
+    } catch (error) {
+      showError(error?.response?.data?.message || 'Failed to load refresh options');
+    } finally {
+      setIsRefreshOptionsLoading(false);
+    }
+  };
+
+  const handleOpenRefreshModal = async () => {
+    setSelectedRefreshIndustry('');
+    setSelectedRefreshSlugLink('');
+    refreshModal.onOpen();
+    await fetchRefreshOptions();
+  };
+
+  const handleSubmitRefresh = async () => {
+    if (!selectedRefreshIndustry) {
+      showError('Please select an industry');
+      return;
+    }
+
+    if (!selectedRefreshSlugLink) {
+      showError('Please select a slug link');
+      return;
+    }
+
+    const selectedSlugData = uniqueSlugLinks.find(
+      (item) => item.slug_link === selectedRefreshSlugLink
+    );
+
+    if (!selectedSlugData?.service_id || !selectedSlugData?.service_name) {
+      showError('Unable to prepare refresh request for the selected slug link');
+      return;
+    }
+
+    const aiBaseUrl = process.env.REACT_APP_AI_API_ENDPOINT;
+    if (!aiBaseUrl) {
+      showError('AI API endpoint is not configured (REACT_APP_AI_API_ENDPOINT)');
+      return;
+    }
+
+    try {
+      setIsSubmittingRefresh(true);
+
+      await axios.post(`${aiBaseUrl}/api/industry/refresh`, [
+        {
+          service_id: selectedSlugData.service_id,
+          service_name: selectedSlugData.service_name,
+          industry_to_be_updated: selectedRefreshIndustry,
+        },
+      ]);
+
+      showSuccess('Industry refresh request submitted successfully');
+      refreshModal.onClose();
+    } catch (error) {
+      showError(error?.response?.data?.message || 'Failed to submit refresh request');
+    } finally {
+      setIsSubmittingRefresh(false);
+    }
+  };
+
   return (
     <Box>
       {/* Header Section */}
@@ -251,7 +336,7 @@ export default function WebRotData() {
               leftIcon={<MdRefresh />}
               variant="outline"
               size="sm"
-              onClick={fetchWebRotData}
+              onClick={handleOpenRefreshModal}
               isDisabled={isLoading}
             >
               Refresh
@@ -268,49 +353,8 @@ export default function WebRotData() {
         px="0px"
         overflow="hidden"
       >
-        <Flex
-          px="16px"
-          py="12px"
-          align={{ base: 'flex-start', lg: 'center' }}
-          justify="space-between"
-          gap={3}
-          flexWrap="wrap"
-          borderBottom="1px solid"
-          borderColor={borderColor}
-          bg={filterBg}
-        >
-          <Box>
-            <Text color={textColor} fontSize="sm" fontWeight="700">
-              Filters
-            </Text>
-            <Text color={secondaryText} fontSize="xs">
-              Refine by service, industry, slug link, batch, and status
-            </Text>
-          </Box>
-          <HStack spacing={2}>
-            <Badge
-              borderRadius="full"
-              px="10px"
-              py="4px"
-              colorScheme={activeFilterCount > 0 ? 'blue' : 'gray'}
-              fontWeight="600"
-            >
-              {activeFilterCount} active
-            </Badge>
-            {activeFilterCount > 0 && (
-              <Button
-                leftIcon={<MdClose />}
-                variant="ghost"
-                size="sm"
-                onClick={clearFilters}
-              >
-                Reset
-              </Button>
-            )}
-          </HStack>
-        </Flex>
-        <Box px="16px" py="14px">
-          <SimpleGrid columns={{ base: 1, md: 2, xl: 5 }} spacing={3}>
+        <Box px="16px" py="14px" bg={filterBg}>
+          <SimpleGrid columns={{ base: 1, md: 2, xl: 6 }} spacing={3}>
             <InputGroup size="sm">
               <InputLeftElement pointerEvents="none">
                 <MdSearch color="gray.300" />
@@ -374,6 +418,18 @@ export default function WebRotData() {
               <option value="active">Active</option>
               <option value="inactive">Inactive</option>
             </Select>
+            <Flex align="center" justify={{ base: 'flex-start', xl: 'flex-end' }}>
+              {activeFilterCount > 0 && (
+                <Button
+                  leftIcon={<MdClose />}
+                  variant="ghost"
+                  size="sm"
+                  onClick={clearFilters}
+                >
+                  Reset
+                </Button>
+              )}
+            </Flex>
           </SimpleGrid>
         </Box>
       </Card>
@@ -626,6 +682,62 @@ export default function WebRotData() {
               </VStack>
             )}
           </ModalBody>
+        </ModalContent>
+      </Modal>
+
+      <Modal isOpen={refreshModal.isOpen} onClose={refreshModal.onClose} size="lg">
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Refresh Industry Data</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody pb="20px">
+            <VStack spacing={4} align="stretch">
+              <FormControl>
+                <FormLabel fontSize="sm" fontWeight="600">Industry</FormLabel>
+                <Select
+                  placeholder={isRefreshOptionsLoading ? 'Loading industries...' : 'Select industry'}
+                  value={selectedRefreshIndustry}
+                  onChange={(e) => setSelectedRefreshIndustry(e.target.value)}
+                  isDisabled={isRefreshOptionsLoading || isSubmittingRefresh}
+                >
+                  {uniqueIndustries.map((industry) => (
+                    <option key={industry} value={industry}>
+                      {industry}
+                    </option>
+                  ))}
+                </Select>
+              </FormControl>
+
+              <FormControl>
+                <FormLabel fontSize="sm" fontWeight="600">Slug Link</FormLabel>
+                <Select
+                  placeholder={isRefreshOptionsLoading ? 'Loading slug links...' : 'Select slug link'}
+                  value={selectedRefreshSlugLink}
+                  onChange={(e) => setSelectedRefreshSlugLink(e.target.value)}
+                  isDisabled={isRefreshOptionsLoading || isSubmittingRefresh}
+                >
+                  {uniqueSlugLinks.map((item) => (
+                    <option key={`${item.slug_link}-${item.service_id}`} value={item.slug_link}>
+                      {item.slug_link}
+                    </option>
+                  ))}
+                </Select>
+              </FormControl>
+            </VStack>
+          </ModalBody>
+          <ModalFooter>
+            <Button variant="ghost" mr={3} onClick={refreshModal.onClose} isDisabled={isSubmittingRefresh}>
+              Cancel
+            </Button>
+            <Button
+              colorScheme="blue"
+              onClick={handleSubmitRefresh}
+              isLoading={isSubmittingRefresh}
+              loadingText="Submitting"
+            >
+              Submit
+            </Button>
+          </ModalFooter>
         </ModalContent>
       </Modal>
     </Box>
