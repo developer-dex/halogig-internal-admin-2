@@ -58,6 +58,7 @@ import FreelancerTickets from 'views/admin/freelancerTickets';
 import ClientTickets from 'views/admin/clientTickets';
 import HalogigTestimonials from 'views/admin/testimonials';
 import AdminProjects from 'views/admin/adminProjects';
+import WebRotData from 'views/admin/webRotData';
 const ProjectBidsPage = () => <ProjectBids />;
 const HalogigBidsPage = () => <HalogigBids />;
 const NewOrderPage = () => <NewOrder />;
@@ -249,6 +250,13 @@ const routes = [
         path: '/website-data',
         icon: <Icon as={MdWeb} width="20px" height="20px" color="inherit" />,
         component: <WebsiteDataPage />,
+      },
+      {
+        name: 'AI Website Data',
+        layout: '/admin',
+        path: '/ai-website-data',
+        icon: <Icon as={MdWeb} width="20px" height="20px" color="inherit" />,
+        component: <WebRotData />,
       },
       {
         name: 'Visitor Analytics',

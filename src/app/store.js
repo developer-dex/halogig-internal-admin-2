@@ -16,6 +16,7 @@ import { pendingViewCountsReducer } from "../features/admin/pendingViewCountsSli
 import { freelancerPaymentsReducer } from "../features/admin/freelancerPaymentsSlice";
 import { disputeManagementReducer } from "../features/admin/disputeManagementSlice";
 import { testimonialReducer } from "../features/admin/testimonialSlice";
+import { webRotDataReducer } from "../features/admin/webRotDataSlice";
 
 const store = configureStore({
   reducer: {
@@ -36,6 +37,7 @@ const store = configureStore({
     freelancerPayments: freelancerPaymentsReducer,
     disputeManagement: disputeManagementReducer,
     testimonial: testimonialReducer,
+    webRotData: webRotDataReducer,
   },
   middleware: getDefaultMiddleware =>
     getDefaultMiddleware({

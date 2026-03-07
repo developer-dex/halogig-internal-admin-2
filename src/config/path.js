@@ -102,4 +102,7 @@ export const apiEndPoints = {
   GET_ALL_TESTIMONIALS: "admin/testimonials",
   UPDATE_TESTIMONIAL: "admin/testimonial",
   DELETE_TESTIMONIAL: "admin/testimonial",
+  
+  // Web Rotation Data endpoints
+  GET_WEB_ROT_DATA: "admin/web-rot-data",
 };
