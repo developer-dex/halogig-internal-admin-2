@@ -34,6 +34,7 @@ import {
   CheckboxGroup,
   RadioGroup,
   Radio,
+  Image,
 } from '@chakra-ui/react';
 import {
   MdArrowBack,
@@ -51,7 +52,8 @@ import {
   updateWebsiteDataOrder,
 } from '../../../features/admin/websiteDataSlice';
 import { showError, showSuccess } from '../../../helpers/messageHelper';
-import { patchApi } from '../../../services/api';
+import { patchApi, postApi } from '../../../services/api';
+import { config } from '../../../config/config';
 
 export default function WebsiteDataDetails() {
   const dispatch = useDispatch();
@@ -80,6 +82,8 @@ export default function WebsiteDataDetails() {
     usercaseListes: [''],
     metaTitle: '',
     metaDescription: '',
+    videoUrl: '',
+    videoThumbnailPath: '',
   });
 
   const [isEditing, setIsEditing] = useState(false);
@@ -90,6 +94,9 @@ export default function WebsiteDataDetails() {
   const [syncField, setSyncField] = useState('');
   const [syncValue, setSyncValue] = useState('');
   const [isSyncing, setIsSyncing] = useState(false);
+
+  // Video thumbnail upload state
+  const [isUploadingThumbnail, setIsUploadingThumbnail] = useState(false);
 
   // Sections order state
   const [sectionsOrder, setSectionsOrder] = useState([]);
@@ -172,6 +179,8 @@ export default function WebsiteDataDetails() {
             : [''],
           metaTitle: data.meta_title || '',
           metaDescription: data.meta_description || '',
+          videoUrl: data.video_url || '',
+          videoThumbnailPath: data.video_thumbnail_path || '',
         });
 
         // Initialize sections order
@@ -495,6 +504,8 @@ export default function WebsiteDataDetails() {
           : [''],
         metaTitle: originalData.meta_title || '',
         metaDescription: originalData.meta_description || '',
+        videoUrl: originalData.video_url || '',
+        videoThumbnailPath: originalData.video_thumbnail_path || '',
       });
     }
     setIsEditing(false);
@@ -689,6 +700,61 @@ export default function WebsiteDataDetails() {
       interlinking: 'Interlinking',
     };
     return names[key] || key;
+  };
+
+  // Handle video thumbnail upload
+  const handleThumbnailUpload = async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      showError('Please select a valid image file');
+      return;
+    }
+
+    // Validate file size (5MB limit)
+    if (file.size > 5 * 1024 * 1024) {
+      showError('File size must be less than 5MB');
+      return;
+    }
+
+    try {
+      setIsUploadingThumbnail(true);
+      
+      const formData = new FormData();
+      formData.append('video_thumbnail', file);
+
+      const response = await postApi(
+        `${config.apiBaseUrl}/admin/website-data/${id}/video-thumbnail`,
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        }
+      );
+
+      if (response?.data?.success) {
+        // Update the form data with new thumbnail path
+        setFormData(prev => ({
+          ...prev,
+          videoThumbnailPath: response.data.data.video_thumbnail_path
+        }));
+        showSuccess('Video thumbnail uploaded successfully');
+        // Refresh data from backend to ensure UI is in sync
+        await fetchWebsiteData();
+      } else {
+        showError(response?.data?.message || 'Failed to upload thumbnail');
+      }
+    } catch (error) {
+      console.error('Error uploading thumbnail:', error);
+      showError(error?.response?.data?.message || 'Failed to upload thumbnail');
+    } finally {
+      setIsUploadingThumbnail(false);
+      // Clear the file input
+      event.target.value = '';
+    }
   };
 
   if (isLoading && !originalData) {
@@ -1398,6 +1464,88 @@ export default function WebsiteDataDetails() {
                     </VStack>
                   </Box>
                 ))}
+              </VStack>
+            </Box>
+
+            {/* Video Section */}
+            <Box>
+              <Text color={textColor} fontSize="lg" fontWeight="700" mb={4}>
+                Video Information
+              </Text>
+              <VStack align="stretch" spacing={4}>
+                <FormControl>
+                  <FormLabel fontSize="sm">Video URL</FormLabel>
+                  <Input
+                    value={formData.videoUrl}
+                    onChange={(e) => handleInputChange('videoUrl', e.target.value)}
+                    isDisabled={!isEditing}
+                    placeholder="https://example.com/video.mp4"
+                  />
+                </FormControl>
+
+                <FormControl>
+                  <FormLabel fontSize="sm">Video Thumbnail</FormLabel>
+                  {formData.videoThumbnailPath ? (
+                    <VStack align="start" spacing={3}>
+                      <Image
+                        src={formData.videoThumbnailPath.startsWith('http') ? formData.videoThumbnailPath : `${config.apiBaseUrl}${formData.videoThumbnailPath}`}
+                        alt="Video Thumbnail"
+                        maxW="300px"
+                        maxH="200px"
+                        objectFit="cover"
+                        border="1px solid"
+                        borderColor={borderColor}
+                        borderRadius="md"
+                      />
+                      {isEditing && (
+                        <Button
+                          as="label"
+                          size="sm"
+                          variant="outline"
+                          colorScheme="brand"
+                          cursor="pointer"
+                          isLoading={isUploadingThumbnail}
+                          loadingText="Uploading..."
+                        >
+                          Update Thumbnail
+                          <Input
+                            type="file"
+                            accept="image/*"
+                            onChange={handleThumbnailUpload}
+                            display="none"
+                          />
+                        </Button>
+                      )}
+                    </VStack>
+                  ) : (
+                    <Box>
+                      {isEditing ? (
+                        <Button
+                          as="label"
+                          size="sm"
+                          leftIcon={<MdAdd />}
+                          variant="outline"
+                          colorScheme="brand"
+                          cursor="pointer"
+                          isLoading={isUploadingThumbnail}
+                          loadingText="Uploading..."
+                        >
+                          Upload Thumbnail
+                          <Input
+                            type="file"
+                            accept="image/*"
+                            onChange={handleThumbnailUpload}
+                            display="none"
+                          />
+                        </Button>
+                      ) : (
+                        <Text fontSize="sm" color="gray.500">
+                          No thumbnail uploaded
+                        </Text>
+                      )}
+                    </Box>
+                  )}
+                </FormControl>
               </VStack>
             </Box>
           </VStack>

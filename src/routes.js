@@ -22,6 +22,7 @@ import {
   MdArticle,
   MdScience,
   MdSupport,
+  MdAssignment,
 } from 'react-icons/md';
 
 // Admin Imports
@@ -45,6 +46,7 @@ import VerifyOtp from 'views/auth/verifyOtp';
 // Admin Page Imports
 import ClientList from 'views/admin/clients';
 import FreelancerList from 'views/admin/freelancers';
+import SalesReferralLeadList from 'views/admin/salesReferral';
 import ProjectList from 'views/admin/projects';
 import ContactList from 'views/admin/contacts';
 import WebsiteData from 'views/admin/websiteData';
@@ -176,6 +178,13 @@ const routes = [
         path: '/project-bids',
         icon: <Icon as={MdGavel} width="20px" height="20px" color="inherit" />,
         component: <ProjectBidsPage />,
+      },
+      {
+        name: 'Sales Referral Leads',
+        layout: '/admin',
+        path: '/sales-referral-leads',
+        icon: <Icon as={MdAssignment} width="20px" height="20px" color="inherit" />,
+        component: <SalesReferralLeadList />,
       },
     ],
   },

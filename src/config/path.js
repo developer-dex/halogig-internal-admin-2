@@ -97,6 +97,11 @@ export const apiEndPoints = {
   // Disputes endpoint
   GET_DISPUTES_BY_TYPE: "admin/disputes",
   
+  // Sales Referral Leads (Admin)
+  GET_ADMIN_SALES_REFERRAL_LEADS: "admin/sales-referral-leads",
+  GET_ADMIN_SALES_REFERRAL_LEAD_DETAIL: "admin/sales-referral-leads",
+  UPDATE_ADMIN_SALES_REFERRAL_LEAD_STATUS: "admin/sales-referral-leads",
+  
   // Testimonial endpoints
   CREATE_TESTIMONIAL: "admin/testimonial",
   GET_ALL_TESTIMONIALS: "admin/testimonials",
