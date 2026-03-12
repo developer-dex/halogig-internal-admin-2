@@ -54,6 +54,11 @@ import {
 import { showError, showSuccess } from '../../../helpers/messageHelper';
 import { patchApi, postApi } from '../../../services/api';
 import { config } from '../../../config/config';
+import { Editor } from 'react-draft-wysiwyg';
+import { EditorState, convertToRaw, ContentState } from 'draft-js';
+import draftToHtml from 'draftjs-to-html';
+import htmlToDraft from 'html-to-draftjs';
+import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
 
 export default function WebsiteDataDetails() {
   const dispatch = useDispatch();
@@ -84,6 +89,8 @@ export default function WebsiteDataDetails() {
     metaDescription: '',
     videoUrl: '',
     videoThumbnailPath: '',
+    videoTitle: '',
+    videoDescription: '',
   });
 
   const [isEditing, setIsEditing] = useState(false);
@@ -97,6 +104,9 @@ export default function WebsiteDataDetails() {
 
   // Video thumbnail upload state
   const [isUploadingThumbnail, setIsUploadingThumbnail] = useState(false);
+  
+  // Rich text editor state for video description
+  const [videoDescriptionEditorState, setVideoDescriptionEditorState] = useState(EditorState.createEmpty());
 
   // Sections order state
   const [sectionsOrder, setSectionsOrder] = useState([]);
@@ -181,7 +191,22 @@ export default function WebsiteDataDetails() {
           metaDescription: data.meta_description || '',
           videoUrl: data.video_url || '',
           videoThumbnailPath: data.video_thumbnail_path || '',
+          videoTitle: data.video_title || '',
+          videoDescription: data.video_description || '',
         });
+
+        // Initialize video description editor state
+        if (data.video_description) {
+          const contentBlock = htmlToDraft(data.video_description);
+          if (contentBlock) {
+            const contentState = ContentState.createFromBlockArray(contentBlock.contentBlocks);
+            setVideoDescriptionEditorState(EditorState.createWithContent(contentState));
+          } else {
+            setVideoDescriptionEditorState(EditorState.createEmpty());
+          }
+        } else {
+          setVideoDescriptionEditorState(EditorState.createEmpty());
+        }
 
         // Initialize sections order
         if (data.order) {
@@ -506,7 +531,22 @@ export default function WebsiteDataDetails() {
         metaDescription: originalData.meta_description || '',
         videoUrl: originalData.video_url || '',
         videoThumbnailPath: originalData.video_thumbnail_path || '',
+        videoTitle: originalData.video_title || '',
+        videoDescription: originalData.video_description || '',
       });
+      
+      // Reset video description editor state
+      if (originalData?.video_description) {
+        const contentBlock = htmlToDraft(originalData.video_description);
+        if (contentBlock) {
+          const contentState = ContentState.createFromBlockArray(contentBlock.contentBlocks);
+          setVideoDescriptionEditorState(EditorState.createWithContent(contentState));
+        } else {
+          setVideoDescriptionEditorState(EditorState.createEmpty());
+        }
+      } else {
+        setVideoDescriptionEditorState(EditorState.createEmpty());
+      }
     }
     setIsEditing(false);
   };
@@ -755,6 +795,13 @@ export default function WebsiteDataDetails() {
       // Clear the file input
       event.target.value = '';
     }
+  };
+
+  // Handle video description editor change
+  const handleVideoDescriptionEditorChange = (editorState) => {
+    setVideoDescriptionEditorState(editorState);
+    const htmlContent = draftToHtml(convertToRaw(editorState.getCurrentContent()));
+    handleInputChange('videoDescription', htmlContent);
   };
 
   if (isLoading && !originalData) {
@@ -1541,6 +1588,61 @@ export default function WebsiteDataDetails() {
                       ) : (
                         <Text fontSize="sm" color="gray.500">
                           No thumbnail uploaded
+                        </Text>
+                      )}
+                    </Box>
+                  )}
+                </FormControl>
+
+                <FormControl>
+                  <FormLabel fontSize="sm">Video Title</FormLabel>
+                  <Input
+                    value={formData.videoTitle}
+                    onChange={(e) => handleInputChange('videoTitle', e.target.value)}
+                    isDisabled={!isEditing}
+                    placeholder="Enter video title"
+                  />
+                </FormControl>
+
+                <FormControl>
+                  <FormLabel fontSize="sm">Video Description</FormLabel>
+                  {isEditing ? (
+                    <Box border="1px solid" borderColor={borderColor} borderRadius="md">
+                      <Editor
+                        editorState={videoDescriptionEditorState}
+                        onEditorStateChange={handleVideoDescriptionEditorChange}
+                        toolbar={{
+                          options: ['inline', 'blockType', 'fontSize', 'list', 'textAlign', 'link', 'history'],
+                          inline: { inDropdown: false, options: ['bold', 'italic', 'underline'] },
+                          blockType: { inDropdown: true, options: ['Normal', 'H1', 'H2', 'H3'] },
+                          fontSize: { options: [8, 9, 10, 11, 12, 14, 16, 18, 24, 30] },
+                          list: { inDropdown: false, options: ['unordered', 'ordered'] },
+                          textAlign: { inDropdown: false, options: ['left', 'center', 'right'] },
+                        }}
+                        editorStyle={{
+                          minHeight: '150px',
+                          padding: '10px',
+                          border: 'none',
+                        }}
+                        wrapperStyle={{
+                          width: '100%',
+                        }}
+                      />
+                    </Box>
+                  ) : (
+                    <Box
+                      border="1px solid"
+                      borderColor={borderColor}
+                      borderRadius="md"
+                      p={3}
+                      minH="150px"
+                      bg="gray.50"
+                    >
+                      {formData.videoDescription ? (
+                        <div dangerouslySetInnerHTML={{ __html: formData.videoDescription }} />
+                      ) : (
+                        <Text fontSize="sm" color="gray.500">
+                          No video description
                         </Text>
                       )}
                     </Box>
