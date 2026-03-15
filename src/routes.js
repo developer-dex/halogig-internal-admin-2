@@ -24,6 +24,7 @@ import {
   MdSupport,
   MdAssignment,
 } from 'react-icons/md';
+import { FaLinkedin } from 'react-icons/fa';
 
 // Admin Imports
 import MainDashboard from 'views/admin/default';
@@ -61,6 +62,7 @@ import ClientTickets from 'views/admin/clientTickets';
 import HalogigTestimonials from 'views/admin/testimonials';
 import AdminProjects from 'views/admin/adminProjects';
 import WebRotData from 'views/admin/webRotData';
+import LinkedInAccessToken from 'views/admin/linkedinAccessToken';
 const ProjectBidsPage = () => <ProjectBids />;
 const HalogigBidsPage = () => <HalogigBids />;
 const NewOrderPage = () => <NewOrder />;
@@ -294,6 +296,19 @@ const routes = [
         icon: <Icon as={MdFolder} width="20px" height="20px" color="inherit" />,
         component: <AdminProjects />,
       }
+    ],
+  },
+  {
+    category: 'LinkedIn',
+    layout: '/admin',
+    items: [
+      {
+        name: 'Access Token',
+        layout: '/admin',
+        path: '/linkedin/access-token',
+        icon: <Icon as={FaLinkedin} width="20px" height="20px" color="inherit" />,
+        component: <LinkedInAccessToken />,
+      },
     ],
   },
   {

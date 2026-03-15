@@ -112,4 +112,11 @@ export const apiEndPoints = {
   GET_WEB_ROT_DATA: "admin/web-rot-data",
   GET_WEB_ROT_UNIQUE_INDUSTRIES: "admin/web-rot-data/unique-industries",
   GET_WEB_ROT_UNIQUE_SLUG_LINKS: "admin/web-rot-data/unique-slug-links",
+
+  // LinkedIn token management
+  LINKEDIN_AUTHORIZE: "admin/linkedin/authorize",
+  LINKEDIN_GENERATE_TOKENS: "admin/linkedin/generate-tokens",
+  LINKEDIN_TOKEN_DETAILS: "admin/linkedin/token-details",
+  LINKEDIN_TOGGLE_STATUS: "admin/linkedin/toggle-status",
+  LINKEDIN_CLEAR_TOKENS: "admin/linkedin/clear-tokens",
 };
