@@ -119,4 +119,17 @@ export const apiEndPoints = {
   LINKEDIN_TOKEN_DETAILS: "admin/linkedin/token-details",
   LINKEDIN_TOGGLE_STATUS: "admin/linkedin/toggle-status",
   LINKEDIN_CLEAR_TOKENS: "admin/linkedin/clear-tokens",
+
+  // Google token management
+  GOOGLE_AUTHORIZE: "admin/google-meet/authorize",
+  GOOGLE_GENERATE_TOKENS: "admin/google-meet/generate-tokens",
+  GOOGLE_TOKEN_DETAILS: "admin/google-meet/token-details",
+  GOOGLE_CLEAR_TOKENS: "admin/google-meet/clear-tokens",
+
+  // Twitter token management
+  TWITTER_SAVE_TOKENS: "admin/twitter/save-tokens",
+  TWITTER_TOKEN_DETAILS: "admin/twitter/token-details",
+  TWITTER_CLEAR_TOKENS: "admin/twitter/clear-tokens",
+  TWITTER_TOGGLE_STATUS: "admin/twitter/toggle-status",
+  TWITTER_TEST_CONNECTION: "admin/twitter/test-connection",
 };

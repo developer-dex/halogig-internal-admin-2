@@ -1,0 +1,319 @@
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import {
+  Box,
+  Button,
+  Flex,
+  FormControl,
+  FormLabel,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
+  Select,
+  Spinner,
+  Table,
+  Tbody,
+  Td,
+  Text,
+  Th,
+  Thead,
+  Tr,
+  useColorModeValue,
+  useDisclosure,
+  VStack,
+} from "@chakra-ui/react";
+import { MdAdd, MdRefresh } from "react-icons/md";
+import { showError, showSuccess } from "../../../helpers/messageHelper";
+
+const getAiBaseUrl = () => {
+  const base = process.env.REACT_APP_AI_API_ENDPOINT;
+  if (!base || typeof base !== "string") return "";
+  return base.replace(/\/$/, "");
+};
+
+const Instantly = () => {
+  const textColor = useColorModeValue("rgb(32, 33, 36)", "white");
+  const borderColor = useColorModeValue("gray.200", "whiteAlpha.100");
+  const bgColor = useColorModeValue("#FFFFFF", "black");
+  const hoverBg = useColorModeValue("gray.50", "whiteAlpha.50");
+  const theadBg = useColorModeValue("gray.50", "whiteAlpha.50");
+
+  const createModal = useDisclosure();
+
+  const [batchNames, setBatchNames] = useState([]);
+  const [campaigns, setCampaigns] = useState([]);
+  const [isLoadingLists, setIsLoadingLists] = useState(false);
+  const [isRefreshingTable, setIsRefreshingTable] = useState(false);
+  const [selectedBatchName, setSelectedBatchName] = useState("");
+  const [selectedCampaignName, setSelectedCampaignName] = useState("");
+  const [isExecuting, setIsExecuting] = useState(false);
+
+  const loadLists = async () => {
+    const aiBaseUrl = getAiBaseUrl();
+    if (!aiBaseUrl) {
+      showError("AI API endpoint is not configured (REACT_APP_AI_API_ENDPOINT)");
+      return;
+    }
+
+    setIsLoadingLists(true);
+    try {
+      const [batchRes, campaignsRes] = await Promise.all([
+        axios.get(`${aiBaseUrl}/api/draft/batch-names`),
+        axios.get(`${aiBaseUrl}/api/instantly/campaigns`, {
+          params: {
+            limit: 100,
+          },
+        }),
+      ]);
+
+      const names = batchRes?.data?.batch_names;
+      const normalizedNames = Array.isArray(names)
+        ? names
+            .map((n) => (typeof n === "string" ? n : n?.batch_name ?? ""))
+            .filter(Boolean)
+        : [];
+      setBatchNames(normalizedNames);
+
+      const camp = campaignsRes?.data?.campaigns;
+      setCampaigns(Array.isArray(camp) ? camp : []);
+    } catch (err) {
+      console.error("Instantly — load lists error:", err);
+      const msg =
+        err?.response?.data?.message ||
+        err?.message ||
+        "Failed to load batch names or campaigns";
+      showError(msg);
+      setBatchNames([]);
+      setCampaigns([]);
+    } finally {
+      setIsLoadingLists(false);
+    }
+  };
+
+  const handleOpenCreate = () => {
+    setSelectedBatchName("");
+    setSelectedCampaignName("");
+    createModal.onOpen();
+  };
+
+  useEffect(() => {
+    if (!createModal.isOpen) return;
+    loadLists();
+  }, [createModal.isOpen]);
+
+  const handleReloadLists = () => loadLists();
+
+  const handleRefreshTable = async () => {
+    setIsRefreshingTable(true);
+    try {
+      // Reserved for future push history / table data.
+      await new Promise((r) => setTimeout(r, 150));
+    } finally {
+      setIsRefreshingTable(false);
+    }
+  };
+
+  const handleCancelModal = () => {
+    createModal.onClose();
+    setSelectedBatchName("");
+    setSelectedCampaignName("");
+  };
+
+  const handleExecute = async () => {
+    if (!selectedBatchName.trim()) {
+      showError("Please select a batch name");
+      return;
+    }
+    if (!selectedCampaignName.trim()) {
+      showError("Please select a campaign");
+      return;
+    }
+
+    const aiBaseUrl = getAiBaseUrl();
+    if (!aiBaseUrl) {
+      showError("AI API endpoint is not configured (REACT_APP_AI_API_ENDPOINT)");
+      return;
+    }
+
+    setIsExecuting(true);
+    try {
+      const { data } = await axios.post(`${aiBaseUrl}/api/instantly/push-leads`, {
+        batch_name: selectedBatchName.trim(),
+        campaign_name: selectedCampaignName.trim(),
+      });
+
+      if (data?.success === false) {
+        showError(data?.message || "Push to Instantly failed");
+        return;
+      }
+
+      const sent = data?.total_leads_sent ?? data?.leads_uploaded ?? "—";
+      showSuccess(
+        `Push completed. Leads sent: ${sent}. Drafts: ${data?.total_drafts ?? "—"}`
+      );
+      createModal.onClose();
+      setSelectedBatchName("");
+      setSelectedCampaignName("");
+    } catch (err) {
+      console.error("Instantly — push-leads error:", err);
+      const msg =
+        err?.response?.data?.message || err?.message || "Failed to push leads to Instantly";
+      showError(msg);
+    } finally {
+      setIsExecuting(false);
+    }
+  };
+
+  return (
+    <Box>
+      <Flex justify="flex-end" align="center" gap={3} mb={4} flexWrap="wrap">
+        <Button
+          leftIcon={<MdAdd />}
+          colorScheme="brand"
+          size="sm"
+          onClick={handleOpenCreate}
+        >
+          Create
+        </Button>
+        <Button
+          leftIcon={<MdRefresh />}
+          variant="outline"
+          size="sm"
+          borderColor={borderColor}
+          onClick={handleRefreshTable}
+          isLoading={isRefreshingTable}
+          loadingText="Refreshing"
+        >
+          Refresh
+        </Button>
+      </Flex>
+
+      <Box overflowX="auto" borderWidth="1px" borderColor={borderColor} borderRadius="md">
+        <Table size="sm" variant="simple">
+          <Thead bg={theadBg}>
+            <Tr>
+              <Th color={textColor} borderColor={borderColor}>
+                Push ID
+              </Th>
+              <Th color={textColor} borderColor={borderColor}>
+                Batch name
+              </Th>
+              <Th color={textColor} borderColor={borderColor}>
+                Campaign
+              </Th>
+              <Th color={textColor} borderColor={borderColor}>
+                Drafts
+              </Th>
+              <Th color={textColor} borderColor={borderColor}>
+                Leads sent
+              </Th>
+              <Th color={textColor} borderColor={borderColor}>
+                Status
+              </Th>
+            </Tr>
+          </Thead>
+          <Tbody bg={bgColor}>
+            <Tr _hover={{ bg: hoverBg }}>
+              <Td colSpan={6} textAlign="center" py={10} borderColor={borderColor}>
+                <Text color="gray.500" fontSize="sm">
+                  No data yet. Use Create to push drafts to an Instantly campaign.
+                </Text>
+              </Td>
+            </Tr>
+          </Tbody>
+        </Table>
+      </Box>
+
+      <Modal isOpen={createModal.isOpen} onClose={handleCancelModal} isCentered size="lg">
+        <ModalOverlay />
+        <ModalContent mx={4}>
+          <ModalHeader color={textColor}>Push drafts to Instantly</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <VStack spacing={4} align="stretch">
+              <Flex justify="space-between" align="center" gap={3} flexWrap="wrap">
+                <Text fontSize="sm" color="gray.500" flex="1" minW={0}>
+                  Choose the email draft batch and the Instantly campaign. Lists load when this
+                  dialog opens.
+                </Text>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={handleReloadLists}
+                  isLoading={isLoadingLists}
+                  flexShrink={0}
+                >
+                  Reload lists
+                </Button>
+              </Flex>
+
+              {isLoadingLists ? (
+                <Flex justify="center" py={8}>
+                  <Spinner />
+                </Flex>
+              ) : (
+                <>
+                  <FormControl isRequired>
+                    <FormLabel fontSize="sm">Batch name</FormLabel>
+                    <Select
+                      placeholder="Select batch name"
+                      value={selectedBatchName}
+                      onChange={(e) => setSelectedBatchName(e.target.value)}
+                    >
+                      {batchNames.map((name) => (
+                        <option key={String(name)} value={name}>
+                          {name}
+                        </option>
+                      ))}
+                    </Select>
+                  </FormControl>
+
+                  <FormControl isRequired>
+                    <FormLabel fontSize="sm">Campaign name</FormLabel>
+                    <Select
+                      placeholder="Select campaign"
+                      value={selectedCampaignName}
+                      onChange={(e) => setSelectedCampaignName(e.target.value)}
+                    >
+                      {campaigns
+                        .filter((c) => c?.name)
+                        .map((c) => {
+                          const name = c.name;
+                          return (
+                            <option key={String(c?.id ?? name)} value={name}>
+                              {name}
+                              {/* {c?.status ? ` (${c.status})` : ""} */}
+                            </option>
+                          );
+                        })}
+                    </Select>
+                  </FormControl>
+                </>
+              )}
+            </VStack>
+          </ModalBody>
+          <ModalFooter gap={2}>
+            <Button variant="ghost" onClick={handleCancelModal} isDisabled={isExecuting}>
+              Cancel
+            </Button>
+            <Button
+              colorScheme="brand"
+              onClick={handleExecute}
+              isLoading={isExecuting}
+              loadingText="Executing"
+              isDisabled={isLoadingLists}
+            >
+              Execute
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+    </Box>
+  );
+};
+
+export default Instantly;

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useDeferredValue } from 'react';
 import {
   Box,
   Card,
@@ -20,12 +20,15 @@ import {
   AlertIcon,
   HStack,
   IconButton,
-  VStack,
   Checkbox,
-  CheckboxGroup,
+  Menu,
+  MenuButton,
+  MenuList,
+  MenuItem,
 } from '@chakra-ui/react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { ArrowBackIcon } from '@chakra-ui/icons';
+import { MdExpandMore } from 'react-icons/md';
 import { getApi, postApi } from '../../../services/api';
 import { apiEndPoints } from '../../../config/path';
 import { showError, showSuccess } from '../../../helpers/messageHelper';
@@ -38,8 +41,9 @@ export default function CreateClientProject() {
   const clientInfo = location.state || {};
 
   const textColor = useColorModeValue('secondaryGray.900', 'white');
-  const borderColor = useColorModeValue('gray.200', 'whiteAlpha.100');
   const bgColor = useColorModeValue('#F4F7FE', 'black');
+  const cardBg = useColorModeValue('white', 'navy.800');
+  const sectionBorderColor = useColorModeValue('gray.200', 'whiteAlpha.100');
 
   // Form state
   const [formData, setFormData] = useState({
@@ -71,16 +75,81 @@ export default function CreateClientProject() {
   const [subCategories, setSubCategories] = useState([]);
   const [technologies, setTechnologies] = useState([]);
   const [industries, setIndustries] = useState([]);
+  const [categorySearchTerm, setCategorySearchTerm] = useState('');
+  const [subCategorySearchTerm, setSubCategorySearchTerm] = useState('');
+  const [technologySearchTerm, setTechnologySearchTerm] = useState('');
+  const [subCategoryRenderLimit, setSubCategoryRenderLimit] = useState(80);
+  const [technologyRenderLimit, setTechnologyRenderLimit] = useState(80);
 
   // Location state
   const [userCity, setUserCity] = useState('');
   const [userCountry, setUserCountry] = useState('');
 
-  // Pricing model visibility
-  const [hourlyVisible, setHourlyVisible] = useState(true);
-  const [retainershipVisible, setRetainershipVisible] = useState(false);
-  const [fixedPriceVisible, setFixedPriceVisible] = useState(false);
-  const [halogigVisible, setHalogigVisible] = useState(false);
+  const deferredCategorySearchTerm = useDeferredValue(categorySearchTerm);
+  const deferredSubCategorySearchTerm = useDeferredValue(subCategorySearchTerm);
+  const deferredTechnologySearchTerm = useDeferredValue(technologySearchTerm);
+
+  const filteredCategories = useMemo(() => {
+    const query = deferredCategorySearchTerm.trim().toLowerCase();
+    if (!query) return categories;
+    return categories.filter((cat) => (cat?.name || cat?.title || '').toLowerCase().includes(query));
+  }, [categories, deferredCategorySearchTerm]);
+
+  const filteredSubCategories = useMemo(() => {
+    const query = deferredSubCategorySearchTerm.trim().toLowerCase();
+    if (!query) return subCategories;
+    return subCategories.filter((sub) => (sub?.name || sub?.title || '').toLowerCase().includes(query));
+  }, [subCategories, deferredSubCategorySearchTerm]);
+
+  const filteredTechnologies = useMemo(() => {
+    const query = deferredTechnologySearchTerm.trim().toLowerCase();
+    if (!query) return technologies;
+    return technologies.filter((tech) => (tech?.name || tech?.title || '').toLowerCase().includes(query));
+  }, [technologies, deferredTechnologySearchTerm]);
+
+  const orderedFilteredSubCategories = useMemo(() => {
+    const selectedSet = new Set((formData.projectSubCategories || []).map((id) => String(id)));
+    const selected = [];
+    const unselected = [];
+
+    filteredSubCategories.forEach((sub) => {
+      const subId = String(sub.id || sub._id);
+      if (selectedSet.has(subId)) {
+        selected.push(sub);
+      } else {
+        unselected.push(sub);
+      }
+    });
+
+    return [...selected, ...unselected];
+  }, [filteredSubCategories, formData.projectSubCategories]);
+
+  const orderedFilteredTechnologies = useMemo(() => {
+    const selectedSet = new Set((formData.technologyPreference || []).map((id) => String(id)));
+    const selected = [];
+    const unselected = [];
+
+    filteredTechnologies.forEach((tech) => {
+      const techId = String(tech.id || tech._id);
+      if (selectedSet.has(techId)) {
+        selected.push(tech);
+      } else {
+        unselected.push(tech);
+      }
+    });
+
+    return [...selected, ...unselected];
+  }, [filteredTechnologies, formData.technologyPreference]);
+
+  const visibleSubCategories = useMemo(
+    () => orderedFilteredSubCategories.slice(0, subCategoryRenderLimit),
+    [orderedFilteredSubCategories, subCategoryRenderLimit],
+  );
+
+  const visibleTechnologies = useMemo(
+    () => orderedFilteredTechnologies.slice(0, technologyRenderLimit),
+    [orderedFilteredTechnologies, technologyRenderLimit],
+  );
 
   // Fetch categories
   const fetchCategories = async () => {
@@ -213,13 +282,14 @@ export default function CreateClientProject() {
   };
 
   // Handle category change
-  const handleCategoryChange = (e) => {
-    const categoryId = e.target.value;
+  const handleCategoryChange = (categoryId) => {
     setFormData(prev => ({
       ...prev,
       projectCategory: categoryId,
       projectSubCategories: []
     }));
+    setSubCategorySearchTerm('');
+    setSubCategoryRenderLimit(80);
     if (categoryId) {
       fetchSubCategories(categoryId);
     } else {
@@ -230,13 +300,28 @@ export default function CreateClientProject() {
   // Handle pricing model change
   const handlePricingModelChange = (value) => {
     setFormData(prev => ({ ...prev, pricingModel: value }));
-
-    // Update visibility
-    setHourlyVisible(value === 'hourly');
-    setRetainershipVisible(value === 'retainer');
-    setFixedPriceVisible(value === 'fixed');
-    setHalogigVisible(value === 'halogig');
   };
+
+  const hourlyVisible = formData.pricingModel === 'hourly';
+  const retainershipVisible = formData.pricingModel === 'retainer';
+  const fixedPriceVisible = formData.pricingModel === 'fixed';
+  const halogigVisible = formData.pricingModel === 'halogig';
+
+  const selectedCategoryLabel = useMemo(() => {
+    if (!formData.projectCategory) return 'Select a Project Category';
+    const selectedCategory = categories.find(
+      (cat) => String(cat.id || cat._id) === String(formData.projectCategory),
+    );
+    return selectedCategory?.name || selectedCategory?.title || 'Select a Project Category';
+  }, [categories, formData.projectCategory]);
+
+  useEffect(() => {
+    setSubCategoryRenderLimit(80);
+  }, [deferredSubCategorySearchTerm]);
+
+  useEffect(() => {
+    setTechnologyRenderLimit(80);
+  }, [deferredTechnologySearchTerm]);
 
   // Handle form submission
   const handleSubmit = async (e) => {
@@ -390,9 +475,9 @@ export default function CreateClientProject() {
   }
 
   return (
-    <Box>
-      <Card bg={bgColor}>
-        <Box p="24px">
+    <Box bg={bgColor} minH="100%">
+      <Card bg={cardBg} borderRadius="2xl" borderWidth="1px" borderColor={sectionBorderColor} boxShadow="sm">
+        <Box p={{ base: 4, md: 6 }}>
           {/* Header */}
           <HStack mb="24px" spacing="16px">
             <IconButton
@@ -436,44 +521,125 @@ export default function CreateClientProject() {
               {/* Project Category */}
               <FormControl isRequired>
                 <FormLabel>Project Category *</FormLabel>
-                <Select
-                  value={formData.projectCategory}
-                  onChange={handleCategoryChange}
-                  placeholder="Select a Project Category"
-                >
-                  {categories.map((cat) => (
-                    <option key={cat.id || cat._id} value={cat.id || cat._id}>
-                      {cat.name || cat.title}
-                    </option>
-                  ))}
-                </Select>
+                <Menu closeOnSelect isLazy lazyBehavior="unmount">
+                  <MenuButton
+                    as={Button}
+                    rightIcon={<MdExpandMore />}
+                    variant="outline"
+                    width="100%"
+                    textAlign="left"
+                    justifyContent="space-between"
+                    fontWeight="normal"
+                  >
+                    {selectedCategoryLabel}
+                  </MenuButton>
+                  <MenuList maxH="280px" overflowY="auto" minW="320px">
+                    <Box p={2}>
+                      <Input
+                        placeholder="Search category..."
+                        size="sm"
+                        value={categorySearchTerm}
+                        onChange={(e) => setCategorySearchTerm(e.target.value)}
+                        onClick={(e) => e.stopPropagation()}
+                        onKeyDown={(e) => e.stopPropagation()}
+                      />
+                    </Box>
+                    {filteredCategories.length > 0 ? (
+                      filteredCategories.map((cat) => {
+                        const categoryId = String(cat.id || cat._id);
+                        return (
+                          <MenuItem
+                            key={categoryId}
+                            onClick={() => handleCategoryChange(categoryId)}
+                          >
+                            {cat.name || cat.title}
+                          </MenuItem>
+                        );
+                      })
+                    ) : (
+                      <MenuItem isDisabled>No categories found</MenuItem>
+                    )}
+                  </MenuList>
+                </Menu>
               </FormControl>
 
               {/* Project Sub Categories */}
               <FormControl isInvalid={validated && (!formData.projectSubCategories || formData.projectSubCategories.length === 0)}>
                 <FormLabel>Project Sub Categories *</FormLabel>
-                <CheckboxGroup
-                  value={formData.projectSubCategories || []}
-                  onChange={(values) => {
-                    setFormData(prev => ({ ...prev, projectSubCategories: values || [] }));
-                  }}
+                <Menu
+                  closeOnSelect={false}
+                  isLazy
+                  lazyBehavior="unmount"
+                  onClose={() => setSubCategoryRenderLimit(80)}
                 >
-                  <VStack align="start" spacing={2} maxH="200px" overflowY="auto" p={2} border="1px solid" borderColor={borderColor} borderRadius="8px">
-                    {subCategories.map((sub) => {
-                      const subId = String(sub.id || sub._id);
-                      return (
-                        <Checkbox key={subId} value={subId}>
-                          {sub.name || sub.title}
-                        </Checkbox>
-                      );
-                    })}
-                    {subCategories.length === 0 && (
-                      <Text fontSize="sm" color="gray.500">
-                        {formData.projectCategory ? 'No sub-categories available' : 'Please select a category first'}
-                      </Text>
+                  <MenuButton
+                    as={Button}
+                    rightIcon={<MdExpandMore />}
+                    variant="outline"
+                    width="100%"
+                    textAlign="left"
+                    justifyContent="space-between"
+                    fontWeight="normal"
+                    isDisabled={!formData.projectCategory}
+                  >
+                    {formData.projectSubCategories?.length > 0
+                      ? `${formData.projectSubCategories.length} sub-categor${formData.projectSubCategories.length === 1 ? 'y' : 'ies'} selected`
+                      : (formData.projectCategory ? 'Select sub categories' : 'Select a category first')}
+                  </MenuButton>
+                  <MenuList maxH="280px" overflowY="auto" minW="320px">
+                    <Box p={2}>
+                      <Input
+                        placeholder="Search sub category..."
+                        size="sm"
+                        value={subCategorySearchTerm}
+                        onChange={(e) => setSubCategorySearchTerm(e.target.value)}
+                        onClick={(e) => e.stopPropagation()}
+                        onKeyDown={(e) => e.stopPropagation()}
+                        isDisabled={!formData.projectCategory}
+                      />
+                    </Box>
+                    {visibleSubCategories.length > 0 ? (
+                      visibleSubCategories.map((sub) => {
+                        const subId = String(sub.id || sub._id);
+                        const isChecked = formData.projectSubCategories?.includes(subId);
+                        return (
+                          <MenuItem
+                            key={subId}
+                            onClick={() => {
+                              setFormData((prev) => {
+                                const current = prev.projectSubCategories || [];
+                                const next = current.includes(subId)
+                                  ? current.filter((id) => id !== subId)
+                                  : [...current, subId];
+                                return { ...prev, projectSubCategories: next };
+                              });
+                            }}
+                          >
+                            <Checkbox isChecked={isChecked} pointerEvents="none" mr={2}>
+                              {sub.name || sub.title}
+                            </Checkbox>
+                          </MenuItem>
+                        );
+                      })
+                    ) : (
+                      <MenuItem isDisabled>
+                        {formData.projectCategory ? 'No sub-categories found' : 'Please select a category first'}
+                      </MenuItem>
                     )}
-                  </VStack>
-                </CheckboxGroup>
+                    {orderedFilteredSubCategories.length > subCategoryRenderLimit && (
+                      <MenuItem
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSubCategoryRenderLimit((prev) => prev + 80);
+                        }}
+                        fontWeight="600"
+                        color="brand.500"
+                      >
+                        Load more ({orderedFilteredSubCategories.length - subCategoryRenderLimit} remaining)
+                      </MenuItem>
+                    )}
+                  </MenuList>
+                </Menu>
                 {validated && (!formData.projectSubCategories || formData.projectSubCategories.length === 0) && (
                   <Text fontSize="xs" color="red.500" mt={1}>
                     Please select at least one sub-category
@@ -502,23 +668,76 @@ export default function CreateClientProject() {
               {/* Technology Preference */}
               <FormControl isInvalid={validated && (!formData.technologyPreference || formData.technologyPreference.length === 0)}>
                 <FormLabel>Technology Preference *</FormLabel>
-                <CheckboxGroup
-                  value={formData.technologyPreference || []}
-                  onChange={(values) => {
-                    setFormData(prev => ({ ...prev, technologyPreference: values || [] }));
-                  }}
+                <Menu
+                  closeOnSelect={false}
+                  isLazy
+                  lazyBehavior="unmount"
+                  onClose={() => setTechnologyRenderLimit(80)}
                 >
-                  <VStack align="start" spacing={2} maxH="200px" overflowY="auto" p={2} border="1px solid" borderColor={borderColor} borderRadius="8px">
-                    {technologies.map((tech) => {
-                      const techId = String(tech.id || tech._id);
-                      return (
-                        <Checkbox key={techId} value={techId}>
-                          {tech.name || tech.title}
-                        </Checkbox>
-                      );
-                    })}
-                  </VStack>
-                </CheckboxGroup>
+                  <MenuButton
+                    as={Button}
+                    rightIcon={<MdExpandMore />}
+                    variant="outline"
+                    width="100%"
+                    textAlign="left"
+                    justifyContent="space-between"
+                    fontWeight="normal"
+                  >
+                    {formData.technologyPreference?.length > 0
+                      ? `${formData.technologyPreference.length} technolog${formData.technologyPreference.length === 1 ? 'y' : 'ies'} selected`
+                      : 'Select technologies'}
+                  </MenuButton>
+                  <MenuList maxH="280px" overflowY="auto" minW="320px">
+                    <Box p={2}>
+                      <Input
+                        placeholder="Search technology..."
+                        size="sm"
+                        value={technologySearchTerm}
+                        onChange={(e) => setTechnologySearchTerm(e.target.value)}
+                        onClick={(e) => e.stopPropagation()}
+                        onKeyDown={(e) => e.stopPropagation()}
+                      />
+                    </Box>
+                    {visibleTechnologies.length > 0 ? (
+                      visibleTechnologies.map((tech) => {
+                        const techId = String(tech.id || tech._id);
+                        const isChecked = formData.technologyPreference?.includes(techId);
+                        return (
+                          <MenuItem
+                            key={techId}
+                            onClick={() => {
+                              setFormData((prev) => {
+                                const current = prev.technologyPreference || [];
+                                const next = current.includes(techId)
+                                  ? current.filter((id) => id !== techId)
+                                  : [...current, techId];
+                                return { ...prev, technologyPreference: next };
+                              });
+                            }}
+                          >
+                            <Checkbox isChecked={isChecked} pointerEvents="none" mr={2}>
+                              {tech.name || tech.title}
+                            </Checkbox>
+                          </MenuItem>
+                        );
+                      })
+                    ) : (
+                      <MenuItem isDisabled>No technologies found</MenuItem>
+                    )}
+                    {orderedFilteredTechnologies.length > technologyRenderLimit && (
+                      <MenuItem
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setTechnologyRenderLimit((prev) => prev + 80);
+                        }}
+                        fontWeight="600"
+                        color="brand.500"
+                      >
+                        Load more ({orderedFilteredTechnologies.length - technologyRenderLimit} remaining)
+                      </MenuItem>
+                    )}
+                  </MenuList>
+                </Menu>
                 {validated && (!formData.technologyPreference || formData.technologyPreference.length === 0) && (
                   <Text fontSize="xs" color="red.500" mt={1}>
                     Please select at least one technology preference

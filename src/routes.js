@@ -24,7 +24,7 @@ import {
   MdSupport,
   MdAssignment,
 } from 'react-icons/md';
-import { FaLinkedin } from 'react-icons/fa';
+import { FaGoogle, FaLinkedin, FaTwitter } from 'react-icons/fa';
 
 // Admin Imports
 import MainDashboard from 'views/admin/default';
@@ -63,6 +63,8 @@ import HalogigTestimonials from 'views/admin/testimonials';
 import AdminProjects from 'views/admin/adminProjects';
 import WebRotData from 'views/admin/webRotData';
 import LinkedInAccessToken from 'views/admin/linkedinAccessToken';
+import Google from 'views/admin/google';
+import TwitterAccessToken from 'views/admin/twitterAccessToken';
 const ProjectBidsPage = () => <ProjectBids />;
 const HalogigBidsPage = () => <HalogigBids />;
 const NewOrderPage = () => <NewOrder />;
@@ -299,15 +301,29 @@ const routes = [
     ],
   },
   {
-    category: 'LinkedIn',
+    category: 'Token Management',
     layout: '/admin',
     items: [
       {
-        name: 'Access Token',
+        name: 'Google',
         layout: '/admin',
-        path: '/linkedin/access-token',
+        path: '/google',
+        icon: <Icon as={FaGoogle} width="20px" height="20px" color="inherit" />,
+        component: <Google />,
+      },
+      {
+        name: 'LinkedIn Access Token',
+        layout: '/admin',
+        path: '/linkedin-access-token',
         icon: <Icon as={FaLinkedin} width="20px" height="20px" color="inherit" />,
         component: <LinkedInAccessToken />,
+      },
+      {
+        name: 'Twitter Access Token',
+        layout: '/admin',
+        path: '/twitter-access-token',
+        icon: <Icon as={FaTwitter} width="20px" height="20px" color="inherit" />,
+        component: <TwitterAccessToken />,
       },
     ],
   },

@@ -13,9 +13,10 @@ const initialState = {
 
 export const projectData = createAsyncThunk(
     "/projectData",
-    async ({ page, limit }) => {
+    async ({ page, limit, byAdmin }) => {
         try {
-            const payload = await getApi(`${apiEndPoints.GET_CLIENT_PROJECTS}?page=${page}&limit=${limit}`);
+            const byAdminParam = byAdmin !== undefined ? `&byAdmin=${byAdmin}` : '';
+            const payload = await getApi(`${apiEndPoints.GET_CLIENT_PROJECTS}?page=${page}&limit=${limit}${byAdminParam}`);
             return payload;
         } catch (e) {
             console.error('API Error:', e);

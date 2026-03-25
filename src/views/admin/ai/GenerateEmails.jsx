@@ -18,21 +18,120 @@ import {
   Checkbox,
   VStack,
   HStack,
-  Divider,
   Input,
+  Textarea,
+  useDisclosure,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  ModalCloseButton,
+  Card,
+  CardBody,
+  CardHeader,
+  Heading,
+  Badge,
+  Icon,
+  Code,
+  Alert,
+  AlertIcon,
+  AlertTitle,
+  AlertDescription,
+  Accordion,
+  AccordionItem,
+  AccordionButton,
+  AccordionPanel,
+  AccordionIcon,
+  Portal,
 } from "@chakra-ui/react";
-import { MdClose, MdExpandMore, MdPreview } from "react-icons/md";
+import { MdClose, MdExpandMore, MdInfoOutline } from "react-icons/md";
 import axios from "axios";
 import { getApi, postApi } from "../../../services/api";
 import { apiEndPoints } from "../../../config/path";
 import { showError, showSuccess } from "../../../helpers/messageHelper";
 
+/** Placeholders for email / subject prompts (Generate Emails). */
+const EMAIL_PROMPT_TEMPLATE_VARIABLES = [
+  {
+    token: "<first_name>",
+    description: "Recipient's first name.",
+    examplePrompt: "Hi <first_name>,",
+    exampleResult: "Hi Anurag,",
+    requiresFlag: "include_first_name = true",
+  },
+  {
+    token: "<full_name>",
+    description: "Recipient's full name.",
+    examplePrompt: "Dear <full_name>,",
+    exampleResult: "Dear Anurag Tandon,",
+    requiresFlag: "include_full_name = true",
+  },
+  {
+    token: "<designation>",
+    description: "Recipient's job title.",
+    examplePrompt: "As a <designation> at <company_name>...",
+    exampleResult: "As a VP Engineering at Tata Motors...",
+    requiresFlag: "include_designation = true",
+  },
+  {
+    token: "<company_name>",
+    description: "Company name from email domain.",
+    examplePrompt: "I noticed <company_name> is growing fast.",
+    exampleResult: "I noticed Flipkart is growing fast.",
+    alwaysAvailable: true,
+  },
+  {
+    token: "<business_nature>",
+    description: "What the company does (Manufacturer, Trader, etc).",
+    examplePrompt: "As a leading <business_nature>...",
+    exampleResult: "As a leading Kitchen Appliances Manufacturer...",
+    alwaysAvailable: true,
+  },
+  {
+    token: "<industry>",
+    description: "Industry sector.",
+    examplePrompt: "The <industry> sector is adopting AI.",
+    exampleResult: "The Building Materials sector is adopting AI.",
+    alwaysAvailable: true,
+  },
+  {
+    token: "<category_name>",
+    description: "Service category being promoted.",
+    examplePrompt: "Our <category_name> team can help.",
+    exampleResult: "Our AI Developer team can help.",
+    alwaysAvailable: true,
+  },
+  {
+    token: "<subcategory_name>",
+    description: "Specific service being promoted.",
+    examplePrompt: "We offer <subcategory_name> services.",
+    exampleResult: "We offer Machine Learning Developer services.",
+    alwaysAvailable: true,
+  },
+  {
+    token: "<email>",
+    description: "Recipient's email address.",
+    examplePrompt: "Sent to <email>",
+    exampleResult: "Sent to john@flipkart.com",
+    alwaysAvailable: true,
+  },
+];
+
 const GenerateEmails = () => {
   const textColor = useColorModeValue("rgb(32, 33, 36)", "white");
   const borderColor = useColorModeValue("gray.200", "whiteAlpha.100");
-  const bgColor = useColorModeValue("#F4F7FE", "black");
   const hoverBg = useColorModeValue("gray.50", "whiteAlpha.50");
   const cardBg = useColorModeValue("white", "gray.700");
+  const promptGuidelinesModal = useDisclosure();
+  const sampleModalHeaderIconBg = useColorModeValue("brand.50", "whiteAlpha.100");
+  const sampleCardBorder = useColorModeValue("gray.200", "whiteAlpha.200");
+  const sampleCardIconBg = useColorModeValue("white", "whiteAlpha.100");
+  const codeExampleBg = useColorModeValue("gray.50", "whiteAlpha.50");
+  const pageShellBg = useColorModeValue("gray.50", "gray.900");
+  const sectionHeaderBg = useColorModeValue("gray.50", "whiteAlpha.50");
+  const accordionBtnBg = useColorModeValue("white", "whiteAlpha.50");
 
   // State for special category type selection (1, 2, or 3)
   const [selectedCategoryType, setSelectedCategoryType] = useState("");
@@ -73,10 +172,8 @@ const GenerateEmails = () => {
   const [selectedBatchId, setSelectedBatchId] = useState("");
   const [isLoadingBatchNames, setIsLoadingBatchNames] = useState(false);
 
-  // State for HTML templates
-  const [htmlTemplates, setHtmlTemplates] = useState([]);
-  const [isLoadingTemplates, setIsLoadingTemplates] = useState(false);
-  const [selectedTemplateId, setSelectedTemplateId] = useState(null);
+  const [industries, setIndustries] = useState([]);
+  const [isLoadingIndustries, setIsLoadingIndustries] = useState(false);
 
   // State for execute operation
   const [isExecuting, setIsExecuting] = useState(false);
@@ -92,11 +189,11 @@ const GenerateEmails = () => {
     }
   }, [selectedCategoryType, selectedBatchId]);
 
-  // Fetch all categories, batch names, templates, and slugs on mount
+  // Fetch all categories, batch names, industries, and slugs on mount
   useEffect(() => {
     fetchCategories();
     fetchBatchNames();
-    fetchHtmlTemplates();
+    fetchIndustries();
     fetchWebsiteSlugs();
   }, []);
 
@@ -187,35 +284,18 @@ const GenerateEmails = () => {
     }
   };
 
-  const fetchHtmlTemplates = async () => {
-    setIsLoadingTemplates(true);
+  const fetchIndustries = async () => {
+    setIsLoadingIndustries(true);
     try {
-      const response = await getApi(apiEndPoints.GET_HTML_TEMPLATE);
+      const response = await getApi(apiEndPoints.GET_INDUSTRY);
       const data = response?.data?.data || [];
-      setHtmlTemplates(data);
+      setIndustries(Array.isArray(data) ? data : []);
     } catch (error) {
-      showError("Failed to fetch HTML templates");
-      console.error("fetchHtmlTemplates error:", error);
-      setHtmlTemplates([]);
+      showError("Failed to fetch industries");
+      console.error("fetchIndustries error:", error);
+      setIndustries([]);
     } finally {
-      setIsLoadingTemplates(false);
-    }
-  };
-
-  const handlePreviewTemplate = (htmlContent, templateType) => {
-    if (!htmlContent) {
-      showError("Template content is empty");
-      return;
-    }
-    
-    // Create a new window with the HTML content
-    const newWindow = window.open();
-    if (newWindow) {
-      newWindow.document.write(htmlContent);
-      newWindow.document.close();
-      newWindow.document.title = `${templateType} Template Preview`;
-    } else {
-      showError("Please allow popups to preview templates");
+      setIsLoadingIndustries(false);
     }
   };
 
@@ -254,7 +334,19 @@ const GenerateEmails = () => {
       setSelectedItems((prev) => [...prev, value]);
       setItemSelections((prev) => ({
         ...prev,
-        [value]: { categoryId: "", subCategoryId: "", slugId: "" },
+        [value]: {
+          categoryId: "",
+          subCategoryId: "",
+          slugId: "",
+          userPrompt: "",
+          subjectPrompt: "",
+          industry: "",
+          wordLimit: "",
+          mode: "",
+          include_first_name: false,
+          include_full_name: false,
+          include_designation: false,
+        },
       }));
     }
   };
@@ -344,6 +436,47 @@ const GenerateEmails = () => {
     }));
   };
 
+  const handleItemFieldChange = (itemValue, field, value) => {
+    setItemSelections((prev) => ({
+      ...prev,
+      [itemValue]: {
+        ...prev[itemValue],
+        [field]: value,
+      },
+    }));
+  };
+
+  const handleModeChange = (itemValue, mode) => {
+    setItemSelections((prev) => ({
+      ...prev,
+      [itemValue]: {
+        ...prev[itemValue],
+        mode,
+        // Reset optional flags on mode change to avoid stale values
+        include_first_name: false,
+        include_full_name: false,
+        include_designation: false,
+      },
+    }));
+  };
+
+  const getVisibleIncludeFields = (mode) => {
+    switch (mode) {
+      case "firstname_emails":
+        return ["include_first_name"];
+      case "fullname_emails":
+        return ["include_full_name"];
+      case "firstname_designation_emails":
+        return ["include_first_name", "include_designation"];
+      case "fullname_designation_emails":
+        return ["include_full_name", "include_designation"];
+      case "exa_emails":
+      case "validated_emails":
+      default:
+        return [];
+    }
+  };
+
   const fetchWebsiteSlugs = async () => {
     setIsLoadingSlugs(true);
     try {
@@ -366,18 +499,24 @@ const GenerateEmails = () => {
     setItemSelections({});
     setSelectedBatchName("");
     setSelectedBatchId("");
-    setSelectedTemplateId(null);
   };
 
   const handleExecute = async () => {
     // Validate that all items have category, sub-category, and slug selected
     const incompleteItems = selectedItems.filter((item) => {
       const selection = itemSelections[item];
-      return !selection?.categoryId || !selection?.subCategoryId || !selection?.slugId;
+      return (
+        !selection?.categoryId ||
+        !selection?.subCategoryId ||
+        !selection?.slugId ||
+        !selection?.mode ||
+        !selection?.industry ||
+        !selection?.wordLimit
+      );
     });
 
     if (incompleteItems.length > 0) {
-      showError("Please select category, sub-category, and slug for all items");
+      showError("Please fill all required fields for each selected item");
       return;
     }
 
@@ -388,11 +527,6 @@ const GenerateEmails = () => {
 
     if (!selectedBatchName) {
       showError("Please select a batch name");
-      return;
-    }
-
-    if (!selectedTemplateId) {
-      showError("Please select an HTML template");
       return;
     }
 
@@ -421,6 +555,7 @@ const GenerateEmails = () => {
       const fullSlug = selectedSlug?.full_slug 
         ? `https://halogig.com/${selectedSlug.full_slug}` 
         : "";
+      const visibleIncludeFields = getVisibleIncludeFields(selection?.mode);
 
       return {
         specialCategoryType: selectedCategoryType,
@@ -431,8 +566,21 @@ const GenerateEmails = () => {
         subCategoryName: subCategoryName,
         slugUrl: `/${selectedSlug?.full_slug?.split('/').pop()}`,
         batchName: selectedBatchName,
-        htmlId: Number(selectedTemplateId),
         fullSlugUrl: fullSlug,
+        user_prompt: selection?.userPrompt?.trim() || "",
+        subject_prompt: selection?.subjectPrompt?.trim() || "",
+        industry: selection?.industry || "",
+        word_limit: Number(selection?.wordLimit),
+        mode: selection?.mode || "",
+        ...(visibleIncludeFields.includes("include_first_name")
+          ? { include_first_name: Boolean(selection?.include_first_name) }
+          : {}),
+        ...(visibleIncludeFields.includes("include_full_name")
+          ? { include_full_name: Boolean(selection?.include_full_name) }
+          : {}),
+        ...(visibleIncludeFields.includes("include_designation")
+          ? { include_designation: Boolean(selection?.include_designation) }
+          : {}),
       };
     });
 
@@ -447,7 +595,7 @@ const GenerateEmails = () => {
     // Call the API
     setIsExecuting(true);
     try {
-      const response = await axios.post(`${aiBaseUrl}/api/campaign/send`, {
+      const response = await axios.post(`${aiBaseUrl}/api/draft/generate`, {
         emailData: emailData,
       });
       
@@ -466,132 +614,233 @@ const GenerateEmails = () => {
   };
 
   return (
-    <Box>
-      {/* Batch Name Selection - Moved to First */}
-      <Box mb={6}>
-        <Text color={textColor} fontSize="md" fontWeight="600" mb={3}>
-          Select Batch Name:
-        </Text>
-        <Select
-          placeholder={
-            isLoadingBatchNames
-              ? "Loading batch names..."
-              : batchNames.length === 0
-              ? "No batch names available"
-              : "Select batch name"
-          }
-          value={selectedBatchName}
-          onChange={(e) => handleBatchNameChange(e.target.value)}
-          isDisabled={isLoadingBatchNames || batchNames.length === 0}
-          maxW="400px"
-        >
-          {batchNames.map((batch, index) => (
-            <option key={index} value={batch.batch_name}>
-              {batch.batch_name}
-            </option>
-          ))}
-        </Select>
-      </Box>
-
-      {/* Special Category Type Selection - Moved to Second */}
-      <Box mb={6}>
-        <Text color={textColor} fontSize="md" fontWeight="600" mb={3}>
-          Select the Category you want to generate:
-        </Text>
-        <RadioGroup 
-          value={selectedCategoryType} 
-          onChange={handleCategoryTypeChange}
-        >
-          <Stack direction="row" spacing={6}>
-            <Radio 
-              value="1" 
-              colorScheme="brand"
-              isDisabled={!selectedBatchId}
+    <Box bg={pageShellBg} borderRadius="2xl" py={{ base: 4, md: 6 }} px={{ base: 3, md: 5 }}>
+      <VStack spacing={5} align="stretch">
+        {/* Page hero — Chakra Card pattern (v3-style title + description + action) */}
+        <Card variant="outline" borderRadius="xl" borderColor={borderColor} boxShadow="sm" bg={cardBg} overflow="hidden">
+          <CardBody py={{ base: 4, md: 5 }} px={{ base: 4, md: 6 }}>
+            <Flex
+              direction={{ base: "column", md: "row" }}
+              align={{ base: "stretch", md: "flex-start" }}
+              justify="space-between"
+              gap={4}
             >
-              <Text color={textColor} fontSize="sm">Special Category 1</Text>
-            </Radio>
-            <Radio 
-              value="2" 
-              colorScheme="brand"
-              isDisabled={!selectedBatchId}
-            >
-              <Text color={textColor} fontSize="sm">Special Category 2</Text>
-            </Radio>
-            <Radio 
-              value="3" 
-              colorScheme="brand"
-              isDisabled={!selectedBatchId}
-            >
-              <Text color={textColor} fontSize="sm">Special Category 3</Text>
-            </Radio>
-          </Stack>
-        </RadioGroup>
-        {!selectedBatchId && (
-          <Text color="gray.500" fontSize="xs" mt={2}>
-            Please select a batch name first
-          </Text>
-        )}
-      </Box>
-
-      {/* Special Category Values Multi-Select */}
-      {selectedCategoryType && selectedBatchId && (
-        <Box mb={6}>
-          <Text color={textColor} fontSize="md" fontWeight="600" mb={3}>
-            Select Special Category Values:
-          </Text>
-          
-          {isLoadingSpecialCategories ? (
-            <Flex align="center" gap={2}>
-              <Spinner size="sm" color="brand.500" />
-              <Text color="gray.500" fontSize="sm">Loading values...</Text>
-            </Flex>
-          ) : specialCategoryValues.length === 0 ? (
-            <Text color="gray.500" fontSize="sm">No values found for this category in the selected batch</Text>
-          ) : (
-            <Menu closeOnSelect={false} isOpen={isMultiSelectOpen} onClose={() => setIsMultiSelectOpen(false)}>
-              <MenuButton
-                as={Button}
-                rightIcon={<MdExpandMore />}
+              <Box flex="1" minW={0}>
+                <Heading as="h1" size="lg" color={textColor} fontWeight="700" letterSpacing="-0.02em">
+                  Generate emails
+                </Heading>
+                <Text fontSize="sm" color="gray.500" mt={2} lineHeight="tall" maxW="2xl">
+                  Pick a batch and special-category values, configure prompts per row, then execute. Open{" "}
+                  <Text as="span" fontWeight="600" color="brand.600">
+                    Prompt Guidelines
+                  </Text>{" "}
+                  for supported template variables.
+                </Text>
+              </Box>
+              <Button
+                leftIcon={<Icon as={MdInfoOutline} boxSize={5} />}
                 variant="outline"
-                width="100%"
-                maxW="400px"
-                textAlign="left"
-                fontWeight="normal"
-                onClick={() => setIsMultiSelectOpen(!isMultiSelectOpen)}
+                size="sm"
+                borderColor={borderColor}
+                onClick={promptGuidelinesModal.onOpen}
+                _hover={{ borderColor: "brand.500", bg: sampleModalHeaderIconBg }}
+                alignSelf={{ base: "stretch", md: "center" }}
+                flexShrink={0}
               >
-                {selectedItems.length > 0
-                  ? `${selectedItems.length} item(s) selected`
-                  : "Select values..."}
-              </MenuButton>
-              <MenuList maxH="300px" overflowY="auto" minW="400px">
-                {specialCategoryValues.map((value, index) => (
-                  <MenuItem
-                    key={index}
-                    onClick={() => handleSpecialCategorySelect(value)}
-                    _hover={{ bg: hoverBg }}
-                  >
-                    <Checkbox
-                      isChecked={selectedItems.includes(value)}
-                      colorScheme="brand"
-                      pointerEvents="none"
-                      mr={3}
-                    />
-                    <Text fontSize="sm" color={textColor}>{value}</Text>
-                  </MenuItem>
-                ))}
-              </MenuList>
-            </Menu>
-          )}
-        </Box>
-      )}
+                Prompt Guidelines
+              </Button>
+            </Flex>
+          </CardBody>
+        </Card>
 
-      {/* Selected Items List */}
-      {selectedItems.length > 0 && (
-        <Box mb={6}>
-          <Text color={textColor} fontSize="md" fontWeight="600" mb={3}>
-            Selected Items:
-          </Text>
-          <VStack spacing={3} align="stretch">
+        {/* Batch name */}
+        <Card variant="outline" borderRadius="xl" borderColor={borderColor} boxShadow="sm" bg={cardBg} overflow="hidden">
+          <CardHeader
+            py={3}
+            px={{ base: 4, md: 5 }}
+            bg={sectionHeaderBg}
+            borderBottomWidth="1px"
+            borderColor={borderColor}
+          >
+            <Heading size="sm" color={textColor} fontWeight="700">
+              1 · Batch name
+            </Heading>
+            <Text fontSize="xs" color="gray.500" fontWeight="normal" mt={1}>
+              All downstream filters use this batch.
+            </Text>
+          </CardHeader>
+          <CardBody px={{ base: 4, md: 5 }} py={4}>
+            <Select
+              placeholder={
+                isLoadingBatchNames
+                  ? "Loading batch names..."
+                  : batchNames.length === 0
+                  ? "No batch names available"
+                  : "Select batch name"
+              }
+              value={selectedBatchName}
+              onChange={(e) => handleBatchNameChange(e.target.value)}
+              isDisabled={isLoadingBatchNames || batchNames.length === 0}
+              maxW="420px"
+              size="md"
+              borderRadius="lg"
+              borderColor={borderColor}
+              _hover={{ borderColor: "gray.300" }}
+              focusBorderColor="brand.500"
+            >
+              {batchNames.map((batch, index) => (
+                <option key={index} value={batch.batch_name}>
+                  {batch.batch_name}
+                </option>
+              ))}
+            </Select>
+          </CardBody>
+        </Card>
+
+        {/* Category type */}
+        <Card variant="outline" borderRadius="xl" borderColor={borderColor} boxShadow="sm" bg={cardBg} overflow="hidden">
+          <CardHeader
+            py={3}
+            px={{ base: 4, md: 5 }}
+            bg={sectionHeaderBg}
+            borderBottomWidth="1px"
+            borderColor={borderColor}
+          >
+            <Heading size="sm" color={textColor} fontWeight="700">
+              2 · Special category
+            </Heading>
+            <Text fontSize="xs" color="gray.500" fontWeight="normal" mt={1}>
+              Choose which special category column to target.
+            </Text>
+          </CardHeader>
+          <CardBody px={{ base: 4, md: 5 }} py={4}>
+            <RadioGroup value={selectedCategoryType} onChange={handleCategoryTypeChange}>
+              <Stack direction={{ base: "column", sm: "row" }} spacing={5} flexWrap="wrap">
+                <Radio value="1" colorScheme="brand" isDisabled={!selectedBatchId}>
+                  <Text color={textColor} fontSize="sm">
+                    Special Category 1
+                  </Text>
+                </Radio>
+                <Radio value="2" colorScheme="brand" isDisabled={!selectedBatchId}>
+                  <Text color={textColor} fontSize="sm">
+                    Special Category 2
+                  </Text>
+                </Radio>
+                <Radio value="3" colorScheme="brand" isDisabled={!selectedBatchId}>
+                  <Text color={textColor} fontSize="sm">
+                    Special Category 3
+                  </Text>
+                </Radio>
+              </Stack>
+            </RadioGroup>
+            {!selectedBatchId && (
+              <Text color="gray.500" fontSize="xs" mt={3}>
+                Select a batch name first.
+              </Text>
+            )}
+          </CardBody>
+        </Card>
+
+        {/* Special category values */}
+        {selectedCategoryType && selectedBatchId && (
+          <Card variant="outline" borderRadius="xl" borderColor={borderColor} boxShadow="sm" bg={cardBg} overflow="hidden">
+            <CardHeader
+              py={3}
+              px={{ base: 4, md: 5 }}
+              bg={sectionHeaderBg}
+              borderBottomWidth="1px"
+              borderColor={borderColor}
+            >
+              <Heading size="sm" color={textColor} fontWeight="700">
+                3 · Category values
+              </Heading>
+              <Text fontSize="xs" color="gray.500" fontWeight="normal" mt={1}>
+                Multi-select rows to include in this run.
+              </Text>
+            </CardHeader>
+            <CardBody px={{ base: 4, md: 5 }} py={4}>
+              {isLoadingSpecialCategories ? (
+                <Flex align="center" gap={2}>
+                  <Spinner size="sm" color="brand.500" />
+                  <Text color="gray.500" fontSize="sm">
+                    Loading values...
+                  </Text>
+                </Flex>
+              ) : specialCategoryValues.length === 0 ? (
+                <Text color="gray.500" fontSize="sm">
+                  No values found for this category in the selected batch.
+                </Text>
+              ) : (
+                <Menu closeOnSelect={false} isOpen={isMultiSelectOpen} onClose={() => setIsMultiSelectOpen(false)}>
+                  <MenuButton
+                    as={Button}
+                    rightIcon={<MdExpandMore />}
+                    variant="outline"
+                    width="100%"
+                    maxW="420px"
+                    textAlign="left"
+                    fontWeight="normal"
+                    borderRadius="lg"
+                    borderColor={borderColor}
+                    onClick={() => setIsMultiSelectOpen(!isMultiSelectOpen)}
+                    _hover={{ borderColor: "brand.400", bg: hoverBg }}
+                  >
+                    {selectedItems.length > 0
+                      ? `${selectedItems.length} item(s) selected`
+                      : "Select values..."}
+                  </MenuButton>
+                  <Portal>
+                    <MenuList
+                      maxH="300px"
+                      overflowY="auto"
+                      minW="400px"
+                      borderRadius="lg"
+                      zIndex="dropdown"
+                    >
+                      {specialCategoryValues.map((value, index) => (
+                        <MenuItem
+                          key={index}
+                          onClick={() => handleSpecialCategorySelect(value)}
+                          _hover={{ bg: hoverBg }}
+                        >
+                          <Checkbox
+                            isChecked={selectedItems.includes(value)}
+                            colorScheme="brand"
+                            pointerEvents="none"
+                            mr={3}
+                          />
+                          <Text fontSize="sm" color={textColor}>
+                            {value}
+                          </Text>
+                        </MenuItem>
+                      ))}
+                    </MenuList>
+                  </Portal>
+                </Menu>
+              )}
+            </CardBody>
+          </Card>
+        )}
+
+        {/* Per-item configuration */}
+        {selectedItems.length > 0 && (
+          <Card variant="outline" borderRadius="xl" borderColor={borderColor} boxShadow="sm" bg={cardBg} overflow="hidden">
+            <CardHeader
+              py={3}
+              px={{ base: 4, md: 5 }}
+              bg={sectionHeaderBg}
+              borderBottomWidth="1px"
+              borderColor={borderColor}
+            >
+              <Heading size="sm" color={textColor} fontWeight="700">
+                4 · Draft inputs per value
+              </Heading>
+              <Text fontSize="xs" color="gray.500" fontWeight="normal" mt={1}>
+                Map category, sub-category, slug, and prompts for each selected row.
+              </Text>
+            </CardHeader>
+            <CardBody px={{ base: 3, md: 4 }} py={4}>
+          <VStack spacing={4} align="stretch">
             {selectedItems.map((item, index) => {
               const selection = itemSelections[item] || {};
               const selectedCategoryId = selection.categoryId;
@@ -619,14 +868,132 @@ const GenerateEmails = () => {
               );
 
               return (
-                <Box
+                <Card
                   key={index}
-                  p={4}
-                  bg={cardBg}
-                  border="1px solid"
+                  variant="outline"
+                  borderRadius="xl"
                   borderColor={borderColor}
-                  borderRadius="8px"
+                  borderLeftWidth="4px"
+                  borderLeftColor="brand.400"
+                  bg={cardBg}
+                  boxShadow="xs"
                 >
+                  <CardBody p={{ base: 3, md: 4 }}>
+                  <Text color={textColor} fontSize="sm" fontWeight="600" mb={3}>
+                    Draft generation inputs
+                  </Text>
+                  <VStack spacing={3} align="stretch" mb={4}>
+                    <Box>
+                      <Text color="gray.500" fontSize="xs" mb={1}>
+                        User Prompt
+                      </Text>
+                      <Textarea
+                        placeholder="Enter user prompt..."
+                        value={selection.userPrompt || ""}
+                        onChange={(e) => handleItemFieldChange(item, "userPrompt", e.target.value)}
+                        size="sm"
+                        minH="110px"
+                        resize="vertical"
+                        borderRadius="lg"
+                        borderColor={borderColor}
+                        _hover={{ borderColor: "gray.300" }}
+                        focusBorderColor="brand.500"
+                      />
+                    </Box>
+                    <Box>
+                      <Text color="gray.500" fontSize="xs" mb={1}>
+                        Subject Prompt
+                      </Text>
+                      <Textarea
+                        placeholder="Enter subject prompt..."
+                        value={selection.subjectPrompt || ""}
+                        onChange={(e) => handleItemFieldChange(item, "subjectPrompt", e.target.value)}
+                        size="sm"
+                        minH="90px"
+                        resize="vertical"
+                        borderRadius="lg"
+                        borderColor={borderColor}
+                        _hover={{ borderColor: "gray.300" }}
+                        focusBorderColor="brand.500"
+                      />
+                    </Box>
+                    <Box>
+                      <Text color="gray.500" fontSize="xs" mb={1}>
+                        Mode
+                      </Text>
+                      <Select
+                        placeholder="Select mode"
+                        value={selection.mode || ""}
+                        onChange={(e) => handleModeChange(item, e.target.value)}
+                        size="sm"
+                      >
+                        <option value="exa_emails">Exa Emails</option>
+                        <option value="validated_emails">Validated Emails</option>
+                        <option value="firstname_emails">First Name Emails</option>
+                        <option value="fullname_emails">Full Name Emails</option>
+                        <option value="firstname_designation_emails">First Name Designation Emails</option>
+                        <option value="fullname_designation_emails">Full Name Designation Emails</option>
+                      </Select>
+                    </Box>
+                    {getVisibleIncludeFields(selection.mode).includes("include_first_name") && (
+                      <Checkbox
+                        isChecked={Boolean(selection.include_first_name)}
+                        onChange={(e) => handleItemFieldChange(item, "include_first_name", e.target.checked)}
+                      >
+                        Include First Name
+                      </Checkbox>
+                    )}
+                    {getVisibleIncludeFields(selection.mode).includes("include_full_name") && (
+                      <Checkbox
+                        isChecked={Boolean(selection.include_full_name)}
+                        onChange={(e) => handleItemFieldChange(item, "include_full_name", e.target.checked)}
+                      >
+                        Include Full Name
+                      </Checkbox>
+                    )}
+                    {getVisibleIncludeFields(selection.mode).includes("include_designation") && (
+                      <Checkbox
+                        isChecked={Boolean(selection.include_designation)}
+                        onChange={(e) => handleItemFieldChange(item, "include_designation", e.target.checked)}
+                      >
+                        Include Designation
+                      </Checkbox>
+                    )}
+                    <Box>
+                      <Text color="gray.500" fontSize="xs" mb={1}>
+                        Industry
+                      </Text>
+                      <Select
+                        placeholder={isLoadingIndustries ? "Loading industries..." : "Select industry"}
+                        value={selection.industry || ""}
+                        onChange={(e) => handleItemFieldChange(item, "industry", e.target.value)}
+                        isDisabled={isLoadingIndustries || industries.length === 0}
+                        size="sm"
+                      >
+                        {industries.map((industry, indIndex) => {
+                          const value = industry?.name || industry?.industry || industry?.industry_name || "";
+                          return (
+                            <option key={industry?.id || indIndex} value={value}>
+                              {value}
+                            </option>
+                          );
+                        })}
+                      </Select>
+                    </Box>
+                    <Box>
+                      <Text color="gray.500" fontSize="xs" mb={1}>
+                        Word Limit
+                      </Text>
+                      <Input
+                        placeholder="Enter word limit"
+                        type="number"
+                        min={1}
+                        value={selection.wordLimit || ""}
+                        onChange={(e) => handleItemFieldChange(item, "wordLimit", e.target.value)}
+                        size="sm"
+                      />
+                    </Box>
+                  </VStack>
                   <Flex
                     direction={{ base: "column", md: "row" }}
                     align={{ base: "stretch", md: "center" }}
@@ -835,131 +1202,232 @@ const GenerateEmails = () => {
                       alignSelf={{ base: "flex-end", md: "center" }}
                     />
                   </Flex>
-                </Box>
+                  </CardBody>
+                </Card>
               );
             })}
           </VStack>
-        </Box>
-      )}
-
-      {/* HTML Templates Section */}
-      <Box mb={6}>
-        <Text color={textColor} fontSize="md" fontWeight="600" mb={3}>
-          HTML Templates:
-        </Text>
-        
-        {isLoadingTemplates ? (
-          <Flex align="center" justify="center" py={8}>
-            <Spinner size="md" color="brand.500" />
-            <Text color="gray.500" fontSize="sm" ml={3}>Loading templates...</Text>
-          </Flex>
-        ) : htmlTemplates.length === 0 ? (
-          <Text color="gray.500" fontSize="sm" py={4}>
-            No HTML templates found
-          </Text>
-        ) : (
-          <VStack spacing={4} align="stretch">
-            {htmlTemplates.map((template) => {
-              const isSelected = selectedTemplateId === template.html_id;
-              return (
-              <Box
-                key={template.html_id}
-                p={4}
-                bg={isSelected ? "brand.50" : cardBg}
-                border="2px solid"
-                borderColor={isSelected ? "brand.500" : borderColor}
-                borderRadius="8px"
-                cursor="pointer"
-                transition="all 0.2s"
-                _hover={{
-                  borderColor: isSelected ? "brand.500" : "brand.300",
-                  boxShadow: isSelected ? "md" : "sm",
-                }}
-                onClick={() => setSelectedTemplateId(template.html_id)}
-              >
-                <Flex
-                  direction={{ base: "column", md: "row" }}
-                  align={{ base: "stretch", md: "center" }}
-                  justify="space-between"
-                  gap={4}
-                >
-                  <Box flex="1">
-                    <Text color="gray.500" fontSize="xs" mb={1}>
-                      Template ID
-                    </Text>
-                    <Text color={textColor} fontSize="sm" fontWeight="500">
-                      #{template.html_id}
-                    </Text>
-                    {template.created_at && (
-                      <>
-                        <Text color="gray.500" fontSize="xs" mt={2} mb={1}>
-                          Created At
-                        </Text>
-                        <Text color={textColor} fontSize="xs">
-                          {new Date(template.created_at).toLocaleString()}
-                        </Text>
-                      </>
-                    )}
-                  </Box>
-                  
-                  <HStack spacing={3}>
-                    <Button
-                      leftIcon={<MdPreview />}
-                      size="sm"
-                      variant="outline"
-                      colorScheme="blue"
-                      onClick={() => handlePreviewTemplate(template.general_template, "General")}
-                      isDisabled={!template.general_template}
-                    >
-                      Preview General
-                    </Button>
-                    <Button
-                      leftIcon={<MdPreview />}
-                      size="sm"
-                      variant="outline"
-                      colorScheme="purple"
-                      onClick={() => handlePreviewTemplate(template.dummy_template, "Dummy")}
-                      isDisabled={!template.dummy_template}
-                    >
-                      Preview Dummy
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant={selectedTemplateId === template.html_id ? "solid" : "outline"}
-                      colorScheme={selectedTemplateId === template.html_id ? "brand" : "gray"}
-                      onClick={() => setSelectedTemplateId(template.html_id)}
-                    >
-                      {selectedTemplateId === template.html_id ? "Selected" : "Select"}
-                    </Button>
-                  </HStack>
-                </Flex>
-              </Box>
-              );
-            })}
-          </VStack>
+            </CardBody>
+          </Card>
         )}
-      </Box>
 
-      {/* Action Buttons */}
-      <Divider my={6} />
-      <Flex justify="flex-end" gap={4}>
-        <Button
-          variant="outline"
-          onClick={handleReset}
-          isDisabled={!selectedCategoryType && selectedItems.length === 0}
+        <Card variant="outline" borderRadius="xl" borderColor={borderColor} bg={cardBg} boxShadow="sm">
+          <CardBody py={4} px={{ base: 4, md: 5 }}>
+            <Flex justify="flex-end" gap={3} flexWrap="wrap">
+              <Button
+                variant="outline"
+                borderRadius="lg"
+                onClick={handleReset}
+                isDisabled={!selectedCategoryType && selectedItems.length === 0}
+              >
+                Reset
+              </Button>
+              <Button
+                colorScheme="brand"
+                borderRadius="lg"
+                onClick={handleExecute}
+                isDisabled={selectedItems.length === 0 || !selectedBatchName || isExecuting}
+                isLoading={isExecuting}
+                loadingText="Executing..."
+              >
+                Execute
+              </Button>
+            </Flex>
+          </CardBody>
+        </Card>
+      </VStack>
+
+      <Modal
+        isOpen={promptGuidelinesModal.isOpen}
+        onClose={promptGuidelinesModal.onClose}
+        isCentered
+        size="4xl"
+        motionPreset="slideInBottom"
+        scrollBehavior="inside"
+      >
+        {/* Chakra MCP dialog-with-backdrop-blur pattern (v2 ModalOverlay mapping) */}
+        <ModalOverlay bg="blackAlpha.600" backdropFilter="blur(10px)" />
+        <ModalContent
+          borderRadius="2xl"
+          mx={4}
+          maxH="92vh"
+          overflow="hidden"
+          borderWidth="1px"
+          borderColor={borderColor}
+          boxShadow="xl"
         >
-          Reset
-        </Button>
-        <Button
-          colorScheme="brand"
-          onClick={handleExecute}
-          isDisabled={selectedItems.length === 0 || !selectedBatchName || !selectedTemplateId || isExecuting}
-          isLoading={isExecuting}
-          loadingText="Executing..."
-        >
-          Execute
-        </Button>
-      </Flex>
+          <ModalHeader pb={3} borderBottomWidth="1px" borderColor={borderColor} bg={sectionHeaderBg}>
+            <HStack align="center" spacing={3}>
+              <Flex
+                align="center"
+                justify="center"
+                w="44px"
+                h="44px"
+                borderRadius="xl"
+                bg={sampleModalHeaderIconBg}
+                color="brand.500"
+                flexShrink={0}
+              >
+                <Icon as={MdInfoOutline} boxSize={6} />
+              </Flex>
+              <Heading as="h2" size="md" color={textColor} fontWeight="700" lineHeight="short">
+                Template variables for email prompts
+              </Heading>
+            </HStack>
+          </ModalHeader>
+          <ModalCloseButton />
+          <ModalBody pt={4} pb={4} px={{ base: 4, md: 6 }} overflowY="auto">
+            <Text fontSize="sm" color="gray.600" lineHeight="tall" mb={4}>
+              Use these placeholders in your user prompt and subject prompt. They are replaced with real recipient
+              data when drafts are generated.
+            </Text>
+            <Alert status="info" variant="subtle" borderRadius="xl" mb={5}>
+              <AlertIcon />
+              <Box>
+                <AlertTitle fontSize="sm">Copy tokens exactly</AlertTitle>
+                <AlertDescription fontSize="xs" display="block">
+                  Include the angle brackets. Some variables need matching include flags on the request — see each row.
+                </AlertDescription>
+              </Box>
+            </Alert>
+            <Accordion
+              allowMultiple
+              defaultIndex={EMAIL_PROMPT_TEMPLATE_VARIABLES.map((_, i) => i)}
+            >
+              {EMAIL_PROMPT_TEMPLATE_VARIABLES.map((row) => (
+                <AccordionItem
+                  key={row.token}
+                  border="1px solid"
+                  borderColor={sampleCardBorder}
+                  borderRadius="xl"
+                  overflow="hidden"
+                  bg={cardBg}
+                  mb={2}
+                >
+                  <h2>
+                    <AccordionButton
+                      px={4}
+                      py={3}
+                      bg={accordionBtnBg}
+                      _expanded={{ bg: sampleModalHeaderIconBg }}
+                      _hover={{ bg: codeExampleBg }}
+                    >
+                      <HStack flex="1" textAlign="left" spacing={3} align="flex-start">
+                        <Code
+                          fontSize="sm"
+                          px={2}
+                          py={1}
+                          borderRadius="md"
+                          colorScheme="brand"
+                          fontWeight="700"
+                        >
+                          {row.token}
+                        </Code>
+                        <Box flex="1" minW={0}>
+                          <Text fontSize="sm" fontWeight="600" color={textColor}>
+                            {row.description}
+                          </Text>
+                          <HStack mt={1} spacing={2} flexWrap="wrap">
+                            {row.alwaysAvailable ? (
+                              <Badge colorScheme="green" variant="subtle" fontSize="0.65em">
+                                Always available
+                              </Badge>
+                            ) : (
+                              <Badge colorScheme="purple" variant="subtle" fontSize="0.65em">
+                                Requires flag
+                              </Badge>
+                            )}
+                          </HStack>
+                        </Box>
+                      </HStack>
+                      <AccordionIcon />
+                    </AccordionButton>
+                  </h2>
+                  <AccordionPanel px={4} pb={4} pt={0}>
+                    <Box
+                      p={3}
+                      borderRadius="lg"
+                      bg={codeExampleBg}
+                      border="1px solid"
+                      borderColor={borderColor}
+                    >
+                      <Text
+                        fontSize="xs"
+                        fontWeight="700"
+                        color="gray.500"
+                        textTransform="uppercase"
+                        letterSpacing="0.06em"
+                        mb={2}
+                      >
+                        Example
+                      </Text>
+                      <VStack align="stretch" spacing={2}>
+                        <HStack align="flex-start" spacing={2} flexWrap="wrap">
+                          <Badge variant="outline" fontSize="0.65em" colorScheme="gray">
+                            Prompt
+                          </Badge>
+                          <Code
+                            fontSize="xs"
+                            whiteSpace="pre-wrap"
+                            wordBreak="break-word"
+                            display="block"
+                            w="100%"
+                            p={2}
+                            borderRadius="md"
+                            bg={sampleCardIconBg}
+                          >
+                            {row.examplePrompt}
+                          </Code>
+                        </HStack>
+                        <HStack align="center" spacing={2} color="gray.400" fontSize="sm">
+                          <Text as="span" aria-hidden>
+                            →
+                          </Text>
+                          <Text fontSize="xs" fontWeight="600" color="gray.500">
+                            After replacement
+                          </Text>
+                        </HStack>
+                        <HStack align="flex-start" spacing={2} flexWrap="wrap">
+                          <Badge variant="outline" fontSize="0.65em" colorScheme="green">
+                            Result
+                          </Badge>
+                          <Code
+                            fontSize="xs"
+                            whiteSpace="pre-wrap"
+                            wordBreak="break-word"
+                            display="block"
+                            w="100%"
+                            p={2}
+                            borderRadius="md"
+                            bg={sampleCardIconBg}
+                          >
+                            {row.exampleResult}
+                          </Code>
+                        </HStack>
+                      </VStack>
+                    </Box>
+                    {!row.alwaysAvailable && (
+                      <HStack mt={3} flexWrap="wrap" spacing={2} align="center">
+                        <Text fontSize="xs" fontWeight="600" color="gray.500">
+                          Requires:
+                        </Text>
+                        <Code fontSize="xs" px={2} py={0.5} borderRadius="md">
+                          {row.requiresFlag}
+                        </Code>
+                      </HStack>
+                    )}
+                  </AccordionPanel>
+                </AccordionItem>
+              ))}
+            </Accordion>
+          </ModalBody>
+          <ModalFooter pt={2} borderTopWidth="1px" borderColor={borderColor} bg={sectionHeaderBg} gap={2}>
+            <Button variant="outline" borderRadius="lg" onClick={promptGuidelinesModal.onClose}>
+              Close
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </Box>
   );
 };

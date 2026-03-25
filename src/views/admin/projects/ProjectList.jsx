@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useLocation } from 'react-router-dom';
 import {
   Box,
   Card,
@@ -18,6 +19,10 @@ import {
   HStack,
   Tooltip,
   Badge,
+  Menu,
+  MenuButton,
+  MenuList,
+  MenuItem,
   Modal,
   ModalOverlay,
   ModalContent,
@@ -38,7 +43,7 @@ import {
   SimpleGrid,
   FormHelperText,
 } from '@chakra-ui/react';
-import { MdChevronLeft, MdChevronRight, MdEdit, MdVisibility, MdContentCopy } from 'react-icons/md';
+import { MdChevronLeft, MdChevronRight, MdEdit, MdVisibility, MdContentCopy, MdExpandMore } from 'react-icons/md';
 import { projectData, updateProjectStatus, updateProject } from '../../../features/admin/projectManagementSlice';
 import {
   fetchCategories,
@@ -52,6 +57,7 @@ import { copyToClipboard } from '../../../utils/utils';
 
 export default function ProjectList() {
   const dispatch = useDispatch();
+  const location = useLocation();
   const [currentPage, setCurrentPage] = useState(1);
   const [projects, setProjects] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -63,6 +69,10 @@ export default function ProjectList() {
   const editModal = useDisclosure();
   const statusOptions = ['Pending', 'Approved', 'Rejected'];
   const [pageLimit, setPageLimit] = useState(50);
+  const [categorySearchTerm, setCategorySearchTerm] = useState('');
+  const [subCategorySearchTerm, setSubCategorySearchTerm] = useState('');
+  const [technologySearchTerm, setTechnologySearchTerm] = useState('');
+  const isOfflineProjectView = location.pathname.includes('/offline-projects');
 
   // Get dropdown data from Redux store
   const dropdownData = useSelector((state) => state.dropdownDataReducer);
@@ -92,6 +102,30 @@ export default function ProjectList() {
     location_preferancer: ''
   });
 
+  const filteredCategories = useMemo(() => {
+    if (!Array.isArray(categories)) return [];
+    const query = categorySearchTerm.trim().toLowerCase();
+    if (!query) return categories;
+    return categories.filter((category) => category?.name?.toLowerCase().includes(query));
+  }, [categories, categorySearchTerm]);
+
+  const filteredSubcategories = useMemo(() => {
+    if (!Array.isArray(subcategories)) return [];
+    const query = subCategorySearchTerm.trim().toLowerCase();
+    if (!query) return subcategories;
+    return subcategories.filter((subcategory) => subcategory?.name?.toLowerCase().includes(query));
+  }, [subcategories, subCategorySearchTerm]);
+
+  const filteredTechnologies = useMemo(() => {
+    if (!Array.isArray(technologies)) return [];
+    const query = technologySearchTerm.trim().toLowerCase();
+    if (!query) return technologies;
+    return technologies.filter((tech) => {
+      const label = typeof tech === 'string' ? tech : tech?.name;
+      return label?.toLowerCase().includes(query);
+    });
+  }, [technologies, technologySearchTerm]);
+
   const { isLoading: reduxLoading, responseData } = useSelector((s) => s.projectDataReducer || {});
 
   const textColor = useColorModeValue('rgb(32, 33, 36)', 'white');
@@ -106,7 +140,8 @@ export default function ProjectList() {
     try {
       const response = await dispatch(projectData({
         page: currentPage,
-        limit: pageLimit
+        limit: pageLimit,
+        byAdmin: isOfflineProjectView,
       }));
 
       if (response.payload?.data?.data?.projects) {
@@ -134,7 +169,7 @@ export default function ProjectList() {
 
   useEffect(() => {
     fetchProjects();
-  }, [currentPage]);
+  }, [currentPage, pageLimit, isOfflineProjectView]);
 
   // Fetch dropdown data when edit modal opens
   useEffect(() => {
@@ -240,6 +275,9 @@ export default function ProjectList() {
   // Edit Modal handlers
   const handleEditClick = (project) => {
     setSelectedProject(project);
+    setCategorySearchTerm('');
+    setSubCategorySearchTerm('');
+    setTechnologySearchTerm('');
 
     // Map model_engagement string values
     let pricingModel = project.model_engagement || 'hourly';
@@ -278,6 +316,9 @@ export default function ProjectList() {
   const handleCloseEditModal = () => {
     editModal.onClose();
     setSelectedProject(null);
+    setCategorySearchTerm('');
+    setSubCategorySearchTerm('');
+    setTechnologySearchTerm('');
     setFormData({
       project_category: '',
       project_sub_category: '',
@@ -783,46 +824,96 @@ export default function ProjectList() {
               {/* Project Category */}
               <FormControl>
                 <FormLabel fontWeight="600" fontSize="sm">Project Category</FormLabel>
-                <Select
-                  placeholder="Select Category"
-                  value={formData.project_category}
-                  onChange={(e) => handleCategoryChange(e.target.value)}
-                  bg={inputBg}
-                >
-                  {Array.isArray(categories) && categories.length > 0 ? (
-                    categories.map((category) => (
-                      <option key={category.id} value={category.id}>
-                        {category.name}
-                      </option>
-                    ))
-                  ) : (
-                    <option disabled>Loading categories...</option>
-                  )}
-                </Select>
+                <Menu closeOnSelect>
+                  <MenuButton
+                    as={Button}
+                    rightIcon={<MdExpandMore />}
+                    variant="outline"
+                    width="100%"
+                    justifyContent="space-between"
+                    textAlign="left"
+                    fontWeight="normal"
+                    bg={inputBg}
+                  >
+                    {formData.project_category
+                      ? categories.find((category) => String(category.id) === String(formData.project_category))?.name || 'Select Category'
+                      : 'Select Category'}
+                  </MenuButton>
+                  <MenuList maxH="300px" overflowY="auto" minW="300px">
+                    <Box p={2}>
+                      <Input
+                        placeholder="Search category..."
+                        size="sm"
+                        value={categorySearchTerm}
+                        onChange={(e) => setCategorySearchTerm(e.target.value)}
+                        onClick={(e) => e.stopPropagation()}
+                        onKeyDown={(e) => e.stopPropagation()}
+                      />
+                    </Box>
+                    {Array.isArray(filteredCategories) && filteredCategories.length > 0 ? (
+                      filteredCategories.map((category) => (
+                        <MenuItem
+                          key={category.id}
+                          onClick={() => handleCategoryChange(category.id)}
+                        >
+                          {category.name}
+                        </MenuItem>
+                      ))
+                    ) : (
+                      <MenuItem isDisabled>
+                        {Array.isArray(categories) && categories.length > 0 ? 'No categories found' : 'Loading categories...'}
+                      </MenuItem>
+                    )}
+                  </MenuList>
+                </Menu>
               </FormControl>
 
               {/* Project Sub Category */}
               <FormControl>
                 <FormLabel fontWeight="600" fontSize="sm">Project Sub Category</FormLabel>
-                <Select
-                  placeholder={formData.project_category ? "Select Sub Category" : "Select a category first"}
-                  value={formData.project_sub_category}
-                  onChange={(e) => handleInputChange('project_sub_category', e.target.value)}
-                  isDisabled={!formData.project_category}
-                  bg={inputBg}
-                >
-                  {Array.isArray(subcategories) && subcategories.length > 0 ? (
-                    subcategories.map((subcategory) => (
-                      <option key={subcategory.id} value={subcategory.id}>
-                        {subcategory.name}
-                      </option>
-                    ))
-                  ) : (
-                    <option disabled>
-                      {formData.project_category ? 'Loading subcategories...' : 'Select a category first'}
-                    </option>
-                  )}
-                </Select>
+                <Menu closeOnSelect>
+                  <MenuButton
+                    as={Button}
+                    rightIcon={<MdExpandMore />}
+                    variant="outline"
+                    width="100%"
+                    justifyContent="space-between"
+                    textAlign="left"
+                    fontWeight="normal"
+                    bg={inputBg}
+                    isDisabled={!formData.project_category}
+                  >
+                    {formData.project_sub_category
+                      ? subcategories.find((subcategory) => String(subcategory.id) === String(formData.project_sub_category))?.name || 'Select Sub Category'
+                      : (formData.project_category ? 'Select Sub Category' : 'Select a category first')}
+                  </MenuButton>
+                  <MenuList maxH="300px" overflowY="auto" minW="300px">
+                    <Box p={2}>
+                      <Input
+                        placeholder="Search sub category..."
+                        size="sm"
+                        value={subCategorySearchTerm}
+                        onChange={(e) => setSubCategorySearchTerm(e.target.value)}
+                        onClick={(e) => e.stopPropagation()}
+                        onKeyDown={(e) => e.stopPropagation()}
+                      />
+                    </Box>
+                    {Array.isArray(filteredSubcategories) && filteredSubcategories.length > 0 ? (
+                      filteredSubcategories.map((subcategory) => (
+                        <MenuItem
+                          key={subcategory.id}
+                          onClick={() => handleInputChange('project_sub_category', subcategory.id)}
+                        >
+                          {subcategory.name}
+                        </MenuItem>
+                      ))
+                    ) : (
+                      <MenuItem isDisabled>
+                        {Array.isArray(subcategories) && subcategories.length > 0 ? 'No sub categories found' : 'Loading subcategories...'}
+                      </MenuItem>
+                    )}
+                  </MenuList>
+                </Menu>
               </FormControl>
 
               {/* Project Title & Technology in a row */}
@@ -844,22 +935,49 @@ export default function ProjectList() {
 
                 <FormControl>
                   <FormLabel fontWeight="600" fontSize="sm">Technology Preference</FormLabel>
-                  <Select
-                    placeholder="Select Technology"
-                    value={formData.technologty_pre}
-                    onChange={(e) => handleInputChange('technologty_pre', e.target.value)}
-                    bg={inputBg}
-                  >
-                    {Array.isArray(technologies) && technologies.length > 0 ? (
-                      technologies.map((tech, index) => (
-                        <option key={index} value={typeof tech === 'string' ? tech : tech.name}>
-                          {typeof tech === 'string' ? tech : tech.name}
-                        </option>
-                      ))
-                    ) : (
-                      <option disabled>Loading technologies...</option>
-                    )}
-                  </Select>
+                  <Menu closeOnSelect>
+                    <MenuButton
+                      as={Button}
+                      rightIcon={<MdExpandMore />}
+                      variant="outline"
+                      width="100%"
+                      justifyContent="space-between"
+                      textAlign="left"
+                      fontWeight="normal"
+                      bg={inputBg}
+                    >
+                      {formData.technologty_pre || 'Select Technology'}
+                    </MenuButton>
+                    <MenuList maxH="300px" overflowY="auto" minW="300px">
+                      <Box p={2}>
+                        <Input
+                          placeholder="Search technology..."
+                          size="sm"
+                          value={technologySearchTerm}
+                          onChange={(e) => setTechnologySearchTerm(e.target.value)}
+                          onClick={(e) => e.stopPropagation()}
+                          onKeyDown={(e) => e.stopPropagation()}
+                        />
+                      </Box>
+                      {Array.isArray(filteredTechnologies) && filteredTechnologies.length > 0 ? (
+                        filteredTechnologies.map((tech, index) => {
+                          const techLabel = typeof tech === 'string' ? tech : tech.name;
+                          return (
+                            <MenuItem
+                              key={`${techLabel}-${index}`}
+                              onClick={() => handleInputChange('technologty_pre', techLabel)}
+                            >
+                              {techLabel}
+                            </MenuItem>
+                          );
+                        })
+                      ) : (
+                        <MenuItem isDisabled>
+                          {Array.isArray(technologies) && technologies.length > 0 ? 'No technologies found' : 'Loading technologies...'}
+                        </MenuItem>
+                      )}
+                    </MenuList>
+                  </Menu>
                 </FormControl>
               </SimpleGrid>
 

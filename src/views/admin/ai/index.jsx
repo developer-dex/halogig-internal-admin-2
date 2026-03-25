@@ -11,6 +11,7 @@ import {
   TabPanel,
 } from "@chakra-ui/react";
 import ProcessEmails from "./ProcessEmails";
+import Instantly from "./Instantly";
 import GenerateEmails from "./GenerateEmails";
 import EmailSent from "./EmailSent";
 
@@ -30,7 +31,8 @@ const EmailDomainAnalysis = () => {
             <TabList>
               <Tab>Process Emails</Tab>
               <Tab>Generate Emails</Tab>
-              <Tab>Email Sent</Tab>
+              <Tab>Instantly</Tab>
+              {/* <Tab>Email Sent</Tab> */}
             </TabList>
 
             <TabPanels>
@@ -39,15 +41,22 @@ const EmailDomainAnalysis = () => {
                 <ProcessEmails />
               </TabPanel>
 
+
+
               {/* Generate Emails Tab */}
               <TabPanel px={0} pt={4}>
                 <GenerateEmails />
               </TabPanel>
+              
+                            {/* Instantly Tab */}
+                            <TabPanel px={0} pt={4}>
+                <Instantly />
+              </TabPanel> 
 
               {/* Email Sent Tab */}
-              <TabPanel px={0} pt={4}>
+              {/* <TabPanel px={0} pt={4}>
                 <EmailSent />
-              </TabPanel>
+              </TabPanel> */}
             </TabPanels>
           </Tabs>
         </Box>

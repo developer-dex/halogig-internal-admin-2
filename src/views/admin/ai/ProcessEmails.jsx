@@ -27,17 +27,49 @@ import {
   HStack,
   FormControl,
   FormLabel,
+  FormHelperText,
   Input,
   Select,
+  Checkbox,
+  Divider,
+  Card,
+  CardBody,
+  LinkBox,
+  LinkOverlay,
+  Heading,
+  Badge,
+  Icon,
 } from "@chakra-ui/react";
-import { MdChevronLeft, MdChevronRight, MdCloudUpload, MdRefresh } from "react-icons/md";
+import {
+  MdChevronLeft,
+  MdChevronRight,
+  MdCloudUpload,
+  MdRefresh,
+  MdDownload,
+  MdDescription,
+} from "react-icons/md";
 import { fetchEmailDomainAnalysis } from "../../../features/admin/emailDomainAnalysisSlice";
 import { showError, showSuccess } from "../../../helpers/messageHelper";
+
+/** Exact filenames under `public/sampleFiles` (used for download URLs). */
+const SAMPLE_CSV_FILES = [
+  "emails_only_format - Sheet1.csv",
+  "emails_and_website_links_format - Sheet1.csv",
+  "emails_first_name - Sheet1.csv",
+  "emails_full_name - Sheet1.csv",
+  "emails_full_name_designation - Sheet1.csv",
+  "emails_first_name_designation - Sheet1.csv",
+];
+
+const formatSampleFileDisplayName = (fileName) => fileName.replace(/_/g, " ");
 
 const ProcessEmails = () => {
   const dispatch = useDispatch();
   const fileInputRef = useRef(null);
+  const detailsFileInputRef = useRef(null);
   const uploadModal = useDisclosure();
+  const uploadDetailsModal = useDisclosure();
+  const sampleCsvModal = useDisclosure();
   
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(50);
@@ -46,12 +78,24 @@ const ProcessEmails = () => {
   const [totalCount, setTotalCount] = useState(0);
   const [selectedFile, setSelectedFile] = useState(null);
   const [isUploading, setIsUploading] = useState(false);
+  const [isUploadingDetails, setIsUploadingDetails] = useState(false);
   const [batchName, setBatchName] = useState("");
+  const [enableNeverbounce, setEnableNeverbounce] = useState(false);
+  const [selectedDetailsFile, setSelectedDetailsFile] = useState(null);
 
   const textColor = useColorModeValue("rgb(32, 33, 36)", "white");
   const borderColor = useColorModeValue("gray.200", "whiteAlpha.100");
   const bgColor = useColorModeValue("#FFFFFF", "black");
   const hoverBg = useColorModeValue("gray.50", "whiteAlpha.50");
+  const sampleCardBg = useColorModeValue("gray.50", "whiteAlpha.50");
+  const sampleCardHoverBg = useColorModeValue("brand.50", "whiteAlpha.100");
+  const sampleCardBorder = useColorModeValue("gray.200", "whiteAlpha.200");
+  const sampleModalHeaderIconBg = useColorModeValue("brand.50", "whiteAlpha.100");
+  const sampleCardIconBg = useColorModeValue("white", "whiteAlpha.100");
+  const sampleCardHoverShadow = useColorModeValue(
+    "0 4px 12px rgba(67, 24, 255, 0.12)",
+    "0 4px 14px rgba(0, 0, 0, 0.35)"
+  );
 
   const fetchData = async () => {
     setIsLoading(true);
@@ -178,6 +222,26 @@ const ProcessEmails = () => {
     }
   };
 
+  const handleDetailsFileSelect = (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const validTypes = ['text/csv', 'application/vnd.ms-excel'];
+    const isValidExtension = file.name.toLowerCase().endsWith('.csv');
+
+    if (!validTypes.includes(file.type) && !isValidExtension) {
+      showError('Please select a valid CSV file (.csv)');
+      return;
+    }
+
+    if (file.size > 10 * 1024 * 1024) {
+      showError('File size must be less than 10MB');
+      return;
+    }
+
+    setSelectedDetailsFile(file);
+  };
+
   const handleUpload = async () => {
     if (!batchName.trim()) {
       showError('Please enter a batch name');
@@ -200,6 +264,7 @@ const ProcessEmails = () => {
       const formData = new FormData();
       formData.append("file", selectedFile);
       formData.append("batch_name", batchName.trim());
+      formData.append("neverbounce", enableNeverbounce ? "true" : "false");
 
       await axios.post(`${aiBaseUrl}/api/process`, formData, {
         headers: {
@@ -211,6 +276,7 @@ const ProcessEmails = () => {
       uploadModal.onClose();
       setSelectedFile(null);
       setBatchName("");
+      setEnableNeverbounce(false);
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
       }
@@ -228,8 +294,54 @@ const ProcessEmails = () => {
     uploadModal.onClose();
     setSelectedFile(null);
     setBatchName("");
+    setEnableNeverbounce(false);
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
+    }
+  };
+
+  const handleUploadDetails = async () => {
+    if (!selectedDetailsFile) {
+      showError('Please select a CSV file');
+      return;
+    }
+
+    const aiBaseUrl = process.env.REACT_APP_AI_API_ENDPOINT;
+    if (!aiBaseUrl) {
+      showError("AI API endpoint is not configured (REACT_APP_AI_API_ENDPOINT)");
+      return;
+    }
+
+    setIsUploadingDetails(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", selectedDetailsFile);
+
+      await axios.post(`${aiBaseUrl}/api/upload-names`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      showSuccess("Details file uploaded successfully");
+      uploadDetailsModal.onClose();
+      setSelectedDetailsFile(null);
+      if (detailsFileInputRef.current) {
+        detailsFileInputRef.current.value = '';
+      }
+    } catch (error) {
+      showError('Failed to upload details file');
+      console.error('Upload details error:', error);
+    } finally {
+      setIsUploadingDetails(false);
+    }
+  };
+
+  const handleCloseDetailsModal = () => {
+    uploadDetailsModal.onClose();
+    setSelectedDetailsFile(null);
+    if (detailsFileInputRef.current) {
+      detailsFileInputRef.current.value = '';
     }
   };
 
@@ -242,6 +354,10 @@ const ProcessEmails = () => {
     fetchData();
   };
 
+  const publicBase = process.env.PUBLIC_URL || "";
+  const sampleFileHref = (fileName) =>
+    `${publicBase}/sampleFiles/${encodeURIComponent(fileName)}`;
+
   return (
     <>
       <Flex justify="flex-end" align="center" mb="10px" gap="12px">
@@ -252,6 +368,23 @@ const ProcessEmails = () => {
           onChange={handleFileSelect}
           style={{ display: 'none' }}
         />
+        <input
+          ref={detailsFileInputRef}
+          type="file"
+          accept=".csv"
+          onChange={handleDetailsFileSelect}
+          style={{ display: 'none' }}
+        />
+        <Button
+          leftIcon={<MdDescription />}
+          variant="outline"
+          size="sm"
+          onClick={sampleCsvModal.onOpen}
+          borderColor={borderColor}
+          _hover={{ borderColor: "brand.500", bg: sampleCardHoverBg }}
+        >
+          Sample CSV Files
+        </Button>
         <Button
           leftIcon={<MdCloudUpload />}
           variant="outline"
@@ -261,6 +394,16 @@ const ProcessEmails = () => {
           loadingText="Uploading..."
         >
           Upload Emails
+        </Button>
+        <Button
+          leftIcon={<MdCloudUpload />}
+          variant="outline"
+          size="sm"
+          onClick={uploadDetailsModal.onOpen}
+          isLoading={isUploadingDetails}
+          loadingText="Uploading..."
+        >
+          Upload Details
         </Button>
         <Button
           leftIcon={<MdRefresh />}
@@ -491,56 +634,165 @@ const ProcessEmails = () => {
         </>
       )}
 
-      {/* Upload CSV Modal */}
-      <Modal isOpen={uploadModal.isOpen} onClose={handleCloseModal} isCentered>
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>Upload Emails CSV File</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
-            <VStack align="stretch" spacing={4}>
-              {/* Batch Name Field */}
+      {/* Upload emails — Chakra Modal + Form + Card preview */}
+      <Modal
+        isOpen={uploadModal.isOpen}
+        onClose={handleCloseModal}
+        isCentered
+        size="lg"
+        motionPreset="slideInBottom"
+        closeOnOverlayClick={!isUploading}
+      >
+        <ModalOverlay bg="blackAlpha.400" backdropFilter="blur(4px)" />
+        <ModalContent borderRadius="16px" mx={4} overflow="hidden">
+          <ModalHeader pb={3}>
+            <HStack align="flex-start" spacing={3}>
+              <Flex
+                align="center"
+                justify="center"
+                w="44px"
+                h="44px"
+                borderRadius="xl"
+                bg={sampleModalHeaderIconBg}
+                color="brand.500"
+                flexShrink={0}
+              >
+                <Icon as={MdCloudUpload} boxSize={6} />
+              </Flex>
+              <Box flex="1" minW={0}>
+                <Heading as="h2" size="md" color={textColor} fontWeight="700" lineHeight="short">
+                  Upload emails
+                </Heading>
+                <Text fontSize="sm" color="gray.500" mt={1.5} fontWeight="normal">
+                  Send a CSV to the processing API with a batch label. Max file size{" "}
+                  <Badge variant="subtle" colorScheme="brand" fontSize="0.65em" verticalAlign="middle">
+                    10 MB
+                  </Badge>
+                  .
+                </Text>
+              </Box>
+            </HStack>
+          </ModalHeader>
+          <ModalCloseButton isDisabled={isUploading} />
+          <ModalBody pt={0}>
+            <Divider mb={4} borderColor={borderColor} />
+            <VStack align="stretch" spacing={5}>
               <FormControl isRequired>
-                <FormLabel>Batch Name</FormLabel>
+                <FormLabel fontWeight="600" color={textColor}>
+                  Batch name
+                </FormLabel>
                 <Input
-                  placeholder="Enter batch name"
+                  placeholder="e.g. Q1 outreach"
                   value={batchName}
                   onChange={(e) => setBatchName(e.target.value)}
                   isDisabled={isUploading}
+                  size="md"
+                  borderColor={borderColor}
+                  borderRadius="lg"
+                  _hover={{ borderColor: "gray.300" }}
+                  _focusVisible={{
+                    borderColor: "brand.500",
+                    boxShadow: "0 0 0 1px var(--chakra-colors-brand-500)",
+                  }}
                 />
+                <FormHelperText mt={1.5}>Shown in the table so you can filter runs by batch.</FormHelperText>
               </FormControl>
 
-              {/* File Upload Field */}
               <FormControl isRequired>
-                <FormLabel>CSV File</FormLabel>
+                <FormLabel fontWeight="600" color={textColor}>
+                  CSV file
+                </FormLabel>
                 <Button
-                  leftIcon={<MdCloudUpload />}
+                  leftIcon={<Icon as={MdCloudUpload} boxSize={5} />}
                   variant="outline"
-                  size="sm"
+                  size="md"
+                  w="100%"
+                  h="auto"
+                  py={3}
+                  borderRadius="xl"
+                  borderColor={borderColor}
                   onClick={() => fileInputRef.current?.click()}
                   isDisabled={isUploading}
-                  width="100%"
+                  _hover={{ borderColor: "brand.400", bg: sampleCardHoverBg }}
                 >
-                  {selectedFile ? selectedFile.name : "Choose CSV File"}
+                  {selectedFile ? selectedFile.name : "Choose CSV file"}
                 </Button>
                 {selectedFile && (
-                  <VStack align="stretch" spacing={1} mt={2}>
-                    <Text fontSize="sm" color="gray.600">
-                      <strong>File:</strong> {selectedFile.name}
-                    </Text>
-                    <Text fontSize="sm" color="gray.600">
-                      <strong>Size:</strong> {(selectedFile.size / 1024 / 1024).toFixed(2)} MB
-                    </Text>
-                    <Text fontSize="sm" color="gray.600">
-                      <strong>Type:</strong> CSV file
-                    </Text>
-                  </VStack>
+                  <Card
+                    variant="outline"
+                    size="sm"
+                    mt={3}
+                    borderColor={sampleCardBorder}
+                    bg={sampleCardBg}
+                    borderRadius="xl"
+                  >
+                    <CardBody py={3} px={4}>
+                      <HStack justify="space-between" align="flex-start" mb={2} spacing={2}>
+                        <Text
+                          fontSize="xs"
+                          fontWeight="700"
+                          color="gray.500"
+                          textTransform="uppercase"
+                          letterSpacing="0.06em"
+                        >
+                          File preview
+                        </Text>
+                        <Badge colorScheme="brand" variant="subtle" fontSize="0.65em">
+                          CSV
+                        </Badge>
+                      </HStack>
+                      <Text
+                        fontSize="sm"
+                        fontWeight="600"
+                        color={textColor}
+                        noOfLines={2}
+                        wordBreak="break-word"
+                      >
+                        {selectedFile.name}
+                      </Text>
+                      <HStack mt={3} spacing={6} flexWrap="wrap">
+                        <Box>
+                          <Text fontSize="xs" color="gray.500">
+                            Size
+                          </Text>
+                          <Text fontSize="sm" fontWeight="600" color={textColor}>
+                            {(selectedFile.size / 1024 / 1024).toFixed(2)} MB
+                          </Text>
+                        </Box>
+                        <Box>
+                          <Text fontSize="xs" color="gray.500">
+                            Type
+                          </Text>
+                          <Text fontSize="sm" fontWeight="600" color={textColor}>
+                            Comma-separated values
+                          </Text>
+                        </Box>
+                      </HStack>
+                    </CardBody>
+                  </Card>
                 )}
+              </FormControl>
+
+              <FormControl>
+                <Checkbox
+                  isChecked={enableNeverbounce}
+                  onChange={(e) => setEnableNeverbounce(e.target.checked)}
+                  isDisabled={isUploading}
+                  colorScheme="brand"
+                  size="md"
+                >
+                  <Text as="span" fontWeight="500">
+                    Enable Neverbounce
+                  </Text>
+                </Checkbox>
+                <FormHelperText mt={1.5}>
+                  When on, addresses can be validated via Neverbounce before processing (if configured on the API).
+                </FormHelperText>
               </FormControl>
             </VStack>
           </ModalBody>
-          <ModalFooter>
-            <Button variant="ghost" mr={3} onClick={handleCloseModal} isDisabled={isUploading}>
+          <ModalFooter pt={2} gap={2} flexWrap="wrap">
+            <Button variant="ghost" onClick={handleCloseModal} isDisabled={isUploading}>
               Cancel
             </Button>
             <Button
@@ -549,6 +801,287 @@ const ProcessEmails = () => {
               isLoading={isUploading}
               loadingText="Uploading..."
               isDisabled={!batchName.trim() || !selectedFile}
+              borderRadius="lg"
+            >
+              Upload
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+
+      {/* Sample CSV downloads — Chakra Card + LinkBox / LinkOverlay pattern */}
+      <Modal
+        isOpen={sampleCsvModal.isOpen}
+        onClose={sampleCsvModal.onClose}
+        isCentered
+        size="lg"
+        motionPreset="slideInBottom"
+      >
+        <ModalOverlay bg="blackAlpha.400" backdropFilter="blur(4px)" />
+        <ModalContent borderRadius="16px" mx={4} overflow="hidden">
+          <ModalHeader pb={3}>
+            <HStack align="flex-start" spacing={3}>
+              <Flex
+                align="center"
+                justify="center"
+                w="44px"
+                h="44px"
+                borderRadius="xl"
+                bg={sampleModalHeaderIconBg}
+                color="brand.500"
+                flexShrink={0}
+              >
+                <Icon as={MdDescription} boxSize={6} />
+              </Flex>
+              <Box flex="1" minW={0}>
+                <Heading as="h2" size="md" color={textColor} fontWeight="700" lineHeight="short">
+                  Sample CSV files
+                </Heading>
+                <Text fontSize="sm" color="gray.500" mt={1.5} fontWeight="normal">
+                  Pick a template that matches your columns. Each row downloads the matching file from{" "}
+                  <Badge variant="subtle" colorScheme="brand" fontSize="0.65em" verticalAlign="middle">
+                    /sampleFiles
+                  </Badge>
+                  .
+                </Text>
+              </Box>
+            </HStack>
+          </ModalHeader>
+          <ModalCloseButton />
+          <ModalBody pt={0}>
+            <Divider mb={4} borderColor={borderColor} />
+            <VStack align="stretch" spacing={3} maxH="55vh" overflowY="auto" pr={1} sx={{ scrollbarGutter: "stable" }}>
+              {SAMPLE_CSV_FILES.map((fileName) => (
+                <LinkBox
+                  key={fileName}
+                  as={Card}
+                  variant="outline"
+                  size="sm"
+                  borderColor={sampleCardBorder}
+                  bg={sampleCardBg}
+                  borderRadius="xl"
+                  transition="all 0.2s ease"
+                  cursor="pointer"
+                  role="group"
+                  _hover={{
+                    borderColor: "brand.400",
+                    bg: sampleCardHoverBg,
+                    transform: "translateY(-2px)",
+                    boxShadow: sampleCardHoverShadow,
+                  }}
+                  _focusWithin={{
+                    borderColor: "brand.500",
+                    boxShadow: "0 0 0 1px var(--chakra-colors-brand-500)",
+                  }}
+                >
+                  <CardBody py={3.5} px={4}>
+                    <Flex align="center" justify="space-between" gap={3}>
+                      <HStack align="flex-start" spacing={3} flex="1" minW={0}>
+                        <Flex
+                          align="center"
+                          justify="center"
+                          flexShrink={0}
+                          w="40px"
+                          h="40px"
+                          borderRadius="lg"
+                          bg={sampleCardIconBg}
+                          border="1px solid"
+                          borderColor={borderColor}
+                          color="brand.500"
+                          transition="colors 0.2s"
+                          _groupHover={{ borderColor: "brand.300", color: "brand.600" }}
+                        >
+                          <Icon as={MdDescription} boxSize={5} />
+                        </Flex>
+                        <Box minW={0}>
+                          <Heading
+                            as="h3"
+                            size="sm"
+                            fontWeight="600"
+                            color={textColor}
+                            noOfLines={2}
+                            lineHeight="tall"
+                          >
+                            <LinkOverlay
+                              href={sampleFileHref(fileName)}
+                              download={fileName}
+                              _hover={{ textDecoration: "none" }}
+                            >
+                              {formatSampleFileDisplayName(fileName)}
+                            </LinkOverlay>
+                          </Heading>
+                          <HStack mt={1.5} spacing={2} flexWrap="wrap">
+                            <Badge colorScheme="brand" variant="subtle" fontSize="0.65em" textTransform="uppercase">
+                              CSV
+                            </Badge>
+                            <Text fontSize="xs" color="gray.500">
+                              Template
+                            </Text>
+                          </HStack>
+                        </Box>
+                      </HStack>
+                      <Flex
+                        align="center"
+                        justify="center"
+                        w="40px"
+                        h="40px"
+                        borderRadius="lg"
+                        bg="brand.500"
+                        color="white"
+                        flexShrink={0}
+                        transition="transform 0.2s"
+                        _groupHover={{ transform: "scale(1.05)" }}
+                        aria-hidden
+                      >
+                        <Icon as={MdDownload} boxSize={5} />
+                      </Flex>
+                    </Flex>
+                  </CardBody>
+                </LinkBox>
+              ))}
+            </VStack>
+          </ModalBody>
+          <ModalFooter pt={2} gap={2}>
+            <Button variant="ghost" onClick={sampleCsvModal.onClose}>
+              Close
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+
+      {/* Upload details — Chakra Modal + Form + Card preview */}
+      <Modal
+        isOpen={uploadDetailsModal.isOpen}
+        onClose={handleCloseDetailsModal}
+        isCentered
+        size="lg"
+        motionPreset="slideInBottom"
+        closeOnOverlayClick={!isUploadingDetails}
+      >
+        <ModalOverlay bg="blackAlpha.400" backdropFilter="blur(4px)" />
+        <ModalContent borderRadius="16px" mx={4} overflow="hidden">
+          <ModalHeader pb={3}>
+            <HStack align="flex-start" spacing={3}>
+              <Flex
+                align="center"
+                justify="center"
+                w="44px"
+                h="44px"
+                borderRadius="xl"
+                bg={sampleModalHeaderIconBg}
+                color="brand.500"
+                flexShrink={0}
+              >
+                <Icon as={MdCloudUpload} boxSize={6} />
+              </Flex>
+              <Box flex="1" minW={0}>
+                <Heading as="h2" size="md" color={textColor} fontWeight="700" lineHeight="short">
+                  Upload details
+                </Heading>
+                <Text fontSize="sm" color="gray.500" mt={1.5} fontWeight="normal">
+                  Upload a supplementary CSV to{" "}
+                  <Badge variant="subtle" colorScheme="brand" fontSize="0.65em" verticalAlign="middle">
+                    /api/upload-names
+                  </Badge>
+                  . Same limits as email upload.
+                </Text>
+              </Box>
+            </HStack>
+          </ModalHeader>
+          <ModalCloseButton isDisabled={isUploadingDetails} />
+          <ModalBody pt={0}>
+            <Divider mb={4} borderColor={borderColor} />
+            <VStack align="stretch" spacing={5}>
+              <FormControl isRequired>
+                <FormLabel fontWeight="600" color={textColor}>
+                  CSV file
+                </FormLabel>
+                <Button
+                  leftIcon={<Icon as={MdCloudUpload} boxSize={5} />}
+                  variant="outline"
+                  size="md"
+                  w="100%"
+                  h="auto"
+                  py={3}
+                  borderRadius="xl"
+                  borderColor={borderColor}
+                  onClick={() => detailsFileInputRef.current?.click()}
+                  isDisabled={isUploadingDetails}
+                  _hover={{ borderColor: "brand.400", bg: sampleCardHoverBg }}
+                >
+                  {selectedDetailsFile ? selectedDetailsFile.name : "Choose CSV file"}
+                </Button>
+                <FormHelperText mt={1.5}>
+                  Must be a valid <Badge variant="outline" fontSize="0.65em">.csv</Badge> file under 10 MB.
+                </FormHelperText>
+                {selectedDetailsFile && (
+                  <Card
+                    variant="outline"
+                    size="sm"
+                    mt={3}
+                    borderColor={sampleCardBorder}
+                    bg={sampleCardBg}
+                    borderRadius="xl"
+                  >
+                    <CardBody py={3} px={4}>
+                      <HStack justify="space-between" align="flex-start" mb={2} spacing={2}>
+                        <Text
+                          fontSize="xs"
+                          fontWeight="700"
+                          color="gray.500"
+                          textTransform="uppercase"
+                          letterSpacing="0.06em"
+                        >
+                          File preview
+                        </Text>
+                        <Badge colorScheme="brand" variant="subtle" fontSize="0.65em">
+                          CSV
+                        </Badge>
+                      </HStack>
+                      <Text
+                        fontSize="sm"
+                        fontWeight="600"
+                        color={textColor}
+                        noOfLines={2}
+                        wordBreak="break-word"
+                      >
+                        {selectedDetailsFile.name}
+                      </Text>
+                      <HStack mt={3} spacing={6} flexWrap="wrap">
+                        <Box>
+                          <Text fontSize="xs" color="gray.500">
+                            Size
+                          </Text>
+                          <Text fontSize="sm" fontWeight="600" color={textColor}>
+                            {(selectedDetailsFile.size / 1024 / 1024).toFixed(2)} MB
+                          </Text>
+                        </Box>
+                        <Box>
+                          <Text fontSize="xs" color="gray.500">
+                            Type
+                          </Text>
+                          <Text fontSize="sm" fontWeight="600" color={textColor}>
+                            Comma-separated values
+                          </Text>
+                        </Box>
+                      </HStack>
+                    </CardBody>
+                  </Card>
+                )}
+              </FormControl>
+            </VStack>
+          </ModalBody>
+          <ModalFooter pt={2} gap={2} flexWrap="wrap">
+            <Button variant="ghost" onClick={handleCloseDetailsModal} isDisabled={isUploadingDetails}>
+              Cancel
+            </Button>
+            <Button
+              colorScheme="brand"
+              onClick={handleUploadDetails}
+              isLoading={isUploadingDetails}
+              loadingText="Uploading..."
+              isDisabled={!selectedDetailsFile}
+              borderRadius="lg"
             >
               Upload
             </Button>
