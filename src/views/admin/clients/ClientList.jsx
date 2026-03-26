@@ -38,6 +38,7 @@ import {
 import { clientData, statusChange } from '../../../features/admin/clientManagementSlice';
 import { showSuccess, showError } from '../../../helpers/messageHelper';
 import { copyToClipboard } from '../../../utils/utils';
+import { UserStatus } from 'utils/enums';
 
 export default function ClientList() {
   const dispatch = useDispatch();
@@ -152,9 +153,9 @@ export default function ClientList() {
   const getStatusColorScheme = (status) => {
     const statusLower = status?.toLowerCase();
     switch (statusLower) {
-      case 'pending':
+      case UserStatus.INCOMPLETE:
         return { bg: 'transparent', color: 'black', border: 'black.600' };
-      case 'approved':
+      case UserStatus.APPROVED:
       case 'otpverified':
         return { bg: 'transparent', color: 'black', border: 'black.600' };
       case 'rejected':

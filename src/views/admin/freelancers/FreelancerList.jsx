@@ -91,6 +91,13 @@ import { postApi, getApi, putApi } from '../../../services/api';
 import { config } from '../../../config/config';
 import { Country, State, City } from 'country-state-city';
 import { apiEndPoints } from '../../../config/path';
+import { UserStatus } from 'utils/enums';
+
+const FREELANCER_STATUS_FILTER_OPTIONS = [
+  { label: 'Pending For Registration', value: 'incomplete' },
+  { label: 'Pending For Approval', value: 'pending' },
+  { label: 'On-Hold', value: 'onhold' },
+];
 
 function FreelancerList() {
   const dispatch = useDispatch();
@@ -109,6 +116,10 @@ function FreelancerList() {
   const emailModal = useDisclosure();
   const addProfileModal = useDisclosure();
   const [selectedStatus, setSelectedStatus] = useState('');
+  const [statusFilterValue, setStatusFilterValue] = useState('');
+  const [isSelectionMode, setIsSelectionMode] = useState(false);
+  const [selectedFreelancerIds, setSelectedFreelancerIds] = useState([]);
+  const [isBulkReminderMode, setIsBulkReminderMode] = useState(false);
   const [reminderData, setReminderData] = useState({
     first_reminder_in_days: '',
     second_reminder_in_days: '',
@@ -136,8 +147,8 @@ function FreelancerList() {
   // Set filters:
   // - Management page shows only approved
   // - Registration (Freelancers / Referral Partners) shows all others (exclude approved)
-  const statusFilter = isManagementPage ? 'approved' : null;
-  const excludeStatusFilter = !isManagementPage ? 'approved' : null;
+  const statusFilter = statusFilterValue || (isManagementPage ? UserStatus.APPROVED : null);
+  const excludeStatusFilter = statusFilterValue ? null : (!isManagementPage ? UserStatus.APPROVED : null);
 
   const {
     isLoading,
@@ -155,6 +166,16 @@ function FreelancerList() {
     return arr;
   }, [responseData]);
 
+  const currentPageFreelancerIds = useMemo(
+    () => rows.map((fr) => fr?.id).filter(Boolean),
+    [rows],
+  );
+  const isAllCurrentPageSelected = useMemo(
+    () => currentPageFreelancerIds.length > 0
+      && currentPageFreelancerIds.every((id) => selectedFreelancerIds.includes(id)),
+    [currentPageFreelancerIds, selectedFreelancerIds],
+  );
+
   useEffect(() => {
     dispatch(freelancerData({
       page,
@@ -164,6 +185,23 @@ function FreelancerList() {
       isReferralPartner: isReferralPartnerPage ? true : undefined,
     }));
   }, [dispatch, page, pageLimit, statusFilter, excludeStatusFilter, isReferralPartnerPage]);
+
+  useEffect(() => {
+    setSelectedFreelancerIds([]);
+  }, [page, pageLimit, statusFilterValue, isManagementPage, isReferralPartnerPage]);
+
+  useEffect(() => {
+    if (!isSelectionMode) {
+      setSelectedFreelancerIds([]);
+    }
+  }, [isSelectionMode]);
+
+  useEffect(() => {
+    if (isManagementPage) {
+      setIsSelectionMode(false);
+      setSelectedFreelancerIds([]);
+    }
+  }, [isManagementPage]);
 
   const openDetails = (userId) => {
     setSelectedFreelancer(userId);
@@ -222,6 +260,7 @@ function FreelancerList() {
 
   const openReminder = (freelancer) => {
     setSelectedFreelancer(freelancer);
+    setIsBulkReminderMode(false);
     setReminderData({
       first_reminder_in_days: '',
       second_reminder_in_days: '',
@@ -233,6 +272,7 @@ function FreelancerList() {
   const closeReminder = () => {
     reminderModal.onClose();
     setSelectedFreelancer(null);
+    setIsBulkReminderMode(false);
     setReminderData({
       first_reminder_in_days: '',
       second_reminder_in_days: '',
@@ -240,8 +280,39 @@ function FreelancerList() {
     });
   };
 
+  const openBulkReminder = () => {
+    if (selectedFreelancerIds.length === 0) {
+      showError('Please select at least one freelancer');
+      return;
+    }
+    setSelectedFreelancer(null);
+    setIsBulkReminderMode(true);
+    setReminderData({
+      first_reminder_in_days: '',
+      second_reminder_in_days: '',
+      third_reminder_in_days: '',
+    });
+    reminderModal.onOpen();
+  };
+
+  const handleSelectAllCurrentPage = (checked) => {
+    if (checked) {
+      setSelectedFreelancerIds((prev) => [...new Set([...prev, ...currentPageFreelancerIds])]);
+    } else {
+      setSelectedFreelancerIds((prev) => prev.filter((id) => !currentPageFreelancerIds.includes(id)));
+    }
+  };
+
+  const toggleFreelancerSelection = (freelancerId) => {
+    setSelectedFreelancerIds((prev) => (
+      prev.includes(freelancerId)
+        ? prev.filter((id) => id !== freelancerId)
+        : [...prev, freelancerId]
+    ));
+  };
+
   const handleReminderSubmit = async () => {
-    if (!selectedFreelancer) return;
+    if (!selectedFreelancer && !isBulkReminderMode) return;
 
     // Validate that at least one reminder day is provided
     if (!reminderData.first_reminder_in_days && !reminderData.second_reminder_in_days && !reminderData.third_reminder_in_days) {
@@ -251,15 +322,27 @@ function FreelancerList() {
 
     setIsReminderLoading(true);
     try {
-      const apiData = {
-        userId: selectedFreelancer.id,
+      const baseData = {
         first_reminder_in_days: reminderData.first_reminder_in_days || null,
         second_reminder_in_days: reminderData.second_reminder_in_days || null,
         third_reminder_in_days: reminderData.third_reminder_in_days || null,
       };
 
-      await postApi(`${config.apiBaseUrl}/admin/profile-complete-reminder`, apiData);
-      showSuccess('Profile complete reminder set successfully');
+      if (isBulkReminderMode) {
+        await postApi(`${config.apiBaseUrl}/admin/profile-complete-reminder/bulk`, {
+          userIds: selectedFreelancerIds,
+          ...baseData,
+        });
+        showSuccess('Profile complete reminder set for selected freelancers');
+        setSelectedFreelancerIds([]);
+        setIsSelectionMode(false);
+      } else {
+        await postApi(`${config.apiBaseUrl}/admin/profile-complete-reminder`, {
+          userId: selectedFreelancer.id,
+          ...baseData,
+        });
+        showSuccess('Profile complete reminder set successfully');
+      }
       closeReminder();
       // Refetch freelancer data to update the list
       dispatch(freelancerData({
@@ -375,16 +458,16 @@ function FreelancerList() {
   const getStatusColorScheme = (status) => {
     const statusLower = status?.toLowerCase();
     switch (statusLower) {
-      case 'pending':
+      case UserStatus.INCOMPLETE:
         return { bg: 'transparent', color: 'black', border: 'black.600' };
-      case 'approved':
+      case UserStatus.APPROVED:
       case 'otpverified':
         return { bg: 'transparent', color: 'black', border: 'black.600' };
       case 'rejected':
         return { bg: 'transparent', color: 'black', border: 'black.600' };
       case 'under review':
       case 'incomplete':
-      case 'approval':
+      case UserStatus.PENDING:
       case 'completed':
       case 'complete':
         return { bg: 'transparent', color: 'black', border: 'black.600' };
@@ -399,9 +482,57 @@ function FreelancerList() {
     <Box>
       <Card bg={bgColor}>
         <Box p="12px">
-          <Text color={textColor} fontSize="l" fontWeight="700" mb="10px">
-            {isReferralPartnerPage ? 'Referral Partners' : 'Freelancers'}
-          </Text>
+          <Flex justify="space-between" align={{ base: 'start', md: 'center' }} gap={3} mb="10px" flexWrap="wrap">
+            <Text color={textColor} fontSize="l" fontWeight="700" mb="0">
+              {isReferralPartnerPage ? 'Referral Partners' : 'Freelancers'}
+            </Text>
+
+            {!isManagementPage && (
+              <HStack spacing="10px" align="center">
+                <Text color="black" fontSize="sm" fontWeight="600" whiteSpace="nowrap">
+                  Status:
+                </Text>
+                <Select
+                  size="sm"
+                  w={{ base: '220px', md: '260px' }}
+                  value={statusFilterValue}
+                  onChange={(e) => {
+                    setStatusFilterValue(e.target.value);
+                    setPage(1);
+                  }}
+                  borderColor={borderColor}
+                  _hover={{ borderColor: 'brand.500' }}
+                >
+                  <option value="">All</option>
+                  {FREELANCER_STATUS_FILTER_OPTIONS.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </Select>
+                <Button
+                  size="sm"
+                  colorScheme="brand"
+                  leftIcon={<MdNotifications />}
+                  onClick={openBulkReminder}
+                  isDisabled={!isSelectionMode || selectedFreelancerIds.length === 0}
+                  whiteSpace="nowrap"
+                >
+                  Set Reminder
+                </Button>
+                {isSelectionMode && (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => setIsSelectionMode(false)}
+                    whiteSpace="nowrap"
+                  >
+                    Done
+                  </Button>
+                )}
+              </HStack>
+            )}
+          </Flex>
 
           {isLoading && rows.length === 0 ? (
             <Flex justify="center" align="center" minH="400px">
@@ -420,6 +551,32 @@ function FreelancerList() {
                 <Table variant="simple" color="gray.500" minW="1000px">
                   <Thead position="sticky" top="0" zIndex="1" bg={bgColor}>
                     <Tr>
+                      {!isManagementPage && (
+                        <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="capitalize" textAlign="center" bg={bgColor} w="110px">
+                          {!isSelectionMode ? (
+                            <Button
+                              size="xs"
+                              variant="ghost"
+                              onClick={() => setIsSelectionMode(true)}
+                              color="brand.500"
+                              fontWeight="700"
+                            >
+                              Select
+                            </Button>
+                          ) : (
+                            <HStack spacing={2} justify="center">
+                              <Checkbox
+                                isChecked={isAllCurrentPageSelected}
+                                onChange={(e) => handleSelectAllCurrentPage(e.target.checked)}
+                                colorScheme="brand"
+                              />
+                              <Text fontSize="xs" fontWeight="600" color="black" whiteSpace="nowrap">
+                                Select all
+                              </Text>
+                            </HStack>
+                          )}
+                        </Th>
+                      )}
                       <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="capitalize" bg={bgColor}>
                         First Name
                       </Th>
@@ -456,7 +613,7 @@ function FreelancerList() {
                   <Tbody>
                     {rows.length === 0 ? (
                       <Tr>
-                        <Td colSpan={isManagementPage ? 7 : 8} textAlign="center" py="40px">
+                        <Td colSpan={isManagementPage ? 8 : 9} textAlign="center" py="40px">
                           <Text color="black">No freelancers found</Text>
                         </Td>
                       </Tr>
@@ -494,6 +651,17 @@ function FreelancerList() {
 
                         return (
                           <Tr key={fr.id} bg={isOddRow ? '#F4F7FE' : 'transparent'} _hover={{ bg: hoverBg }} transition="all 0.2s">
+                            {!isManagementPage && (
+                              <Td borderColor={borderColor} textAlign="center" pt="8px" pb="8px">
+                                {isSelectionMode && (
+                                  <Checkbox
+                                    isChecked={selectedFreelancerIds.includes(fr.id)}
+                                    onChange={() => toggleFreelancerSelection(fr.id)}
+                                    colorScheme="brand"
+                                  />
+                                )}
+                              </Td>
+                            )}
                             <Td borderColor={borderColor} pt="8px" pb="8px">
                               <Text color={textColor} fontSize="sm" fontWeight="normal">{fr.first_name || '--'}</Text>
                             </Td>
@@ -729,7 +897,11 @@ function FreelancerList() {
       <Modal isOpen={reminderModal.isOpen} onClose={closeReminder} isCentered>
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader>Set Profile Complete Reminder</ModalHeader>
+          <ModalHeader>
+            {isBulkReminderMode
+              ? `Set Profile Complete Reminder (${selectedFreelancerIds.length} selected)`
+              : 'Set Profile Complete Reminder'}
+          </ModalHeader>
           <ModalCloseButton />
           <ModalBody>
             <VStack spacing={4} align="stretch">
@@ -2282,7 +2454,7 @@ const FreelancerDetailContent = ({ completeData, tabIndex, onTabChange, isEditMo
                       {`${displayData.first_name || ''} ${displayData.last_name || ''}`}
                     </Text>
                     <Badge 
-                      colorScheme={displayData.status === 'approval' ? 'green' : 'yellow'}
+                      colorScheme={displayData.status === UserStatus.PENDING ? 'green' : 'yellow'}
                       variant="solid"
                       fontSize="xs"
                     >
@@ -2420,7 +2592,7 @@ const FreelancerDetailContent = ({ completeData, tabIndex, onTabChange, isEditMo
                 {renderInfoItem(<MdEmail />, 'Email', displayData.email)}
                 {renderInfoItem(<MdPhone />, 'Mobile', displayData.mobile)}
                 {renderInfoItem(<MdPerson />, 'Gender', displayData.gender)}
-                {renderInfoItem(<MdBusiness />, 'Designation', designation?.name)}
+                {renderInfoItem(<MdBusiness />, 'Legal Entity Type', designation?.name)}
                 {renderInfoItem(<MdBusiness />, 'Company', displayData.company_name)}
                 {renderInfoItem(<MdLocationOn />, 'Location', 
                   [displayData.city, displayData.state, displayData.country].filter(Boolean).join(', ')

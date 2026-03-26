@@ -87,6 +87,11 @@ export const apiEndPoints = {
   UPDATE_WEBSITE_DATA_ORDER: "admin/website-data/update-order",
   CAMPAIGN_SEND: "campaign/send",
   GET_EMAIL_CAMPAIGNS: "admin/email-campaigns",
+
+  // Category / SubCategory / Technology management (CRUD)
+  CATEGORY_MANAGEMENT_CATEGORIES: "admin/category-management/categories",
+  SUBCATEGORY_MANAGEMENT_SUB_CATEGORIES: "admin/category-management/sub-categories",
+  TECHNOLOGY_MANAGEMENT_TECHNOLOGIES: "admin/category-management/technologies",
   
   // Pending view counts endpoint
   GET_PENDING_VIEW_COUNTS: "admin/pending-view-counts",

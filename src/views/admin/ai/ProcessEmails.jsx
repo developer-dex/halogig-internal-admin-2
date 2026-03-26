@@ -50,6 +50,7 @@ import {
 } from "react-icons/md";
 import { fetchEmailDomainAnalysis } from "../../../features/admin/emailDomainAnalysisSlice";
 import { showError, showSuccess } from "../../../helpers/messageHelper";
+import { UserStatus } from "utils/enums";
 
 /** Exact filenames under `public/sampleFiles` (used for download URLs). */
 const SAMPLE_CSV_FILES = [
@@ -139,7 +140,7 @@ const ProcessEmails = () => {
     switch (statusLower) {
       case 'pending':
         return { bg: 'transparent', color: 'black', border: 'black.600' };
-      case 'approved':
+      case UserStatus.APPROVED:
       case 'otpverified':
         return { bg: 'transparent', color: 'black', border: 'black.600' };
       case 'rejected':

@@ -65,6 +65,9 @@ import WebRotData from 'views/admin/webRotData';
 import LinkedInAccessToken from 'views/admin/linkedinAccessToken';
 import Google from 'views/admin/google';
 import TwitterAccessToken from 'views/admin/twitterAccessToken';
+import CategoryManagement from 'views/admin/taxonomy/CategoryManagement';
+import SubCategoryManagement from 'views/admin/taxonomy/SubCategoryManagement';
+import TechnologyManagement from 'views/admin/taxonomy/TechnologyManagement';
 const ProjectBidsPage = () => <ProjectBids />;
 const HalogigBidsPage = () => <HalogigBids />;
 const NewOrderPage = () => <NewOrder />;
@@ -120,6 +123,33 @@ const routes = [
         path: '/referral-partners',
         icon: <Icon as={MdWork} width="20px" height="20px" color="inherit" />,
         component: <FreelancerList />,
+      },
+    ],
+  },
+  {
+    category: 'Cat & Tech Management',
+    layout: '/admin',
+    items: [
+      {
+        name: 'Category',
+        layout: '/admin',
+        path: '/cat-tech-management/categories',
+        icon: <Icon as={MdFolder} width="20px" height="20px" color="inherit" />,
+        component: <CategoryManagement />,
+      },
+      {
+        name: 'Sub Category',
+        layout: '/admin',
+        path: '/cat-tech-management/sub-categories',
+        icon: <Icon as={MdContacts} width="20px" height="20px" color="inherit" />,
+        component: <SubCategoryManagement />,
+      },
+      {
+        name: 'Technology',
+        layout: '/admin',
+        path: '/cat-tech-management/technologies',
+        icon: <Icon as={MdScience} width="20px" height="20px" color="inherit" />,
+        component: <TechnologyManagement />,
       },
     ],
   },
