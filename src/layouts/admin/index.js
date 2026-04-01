@@ -18,6 +18,7 @@ import ProjectDeliveryDetail from 'views/admin/projectBids/ProjectDeliveryDetail
 import SalesOrder from 'views/admin/salesOrder';
 import Invoice from 'views/admin/invoice';
 import CreateClientProject from 'views/admin/projects/CreateClientProject';
+import FreelancerDetailPage from 'views/admin/freelancers/FreelancerDetailPage';
 
 // Custom Chakra theme
 export default function Dashboard(props) {
@@ -38,7 +39,11 @@ export default function Dashboard(props) {
   };
   const getActiveRoute = (routes, currentPath) => {
     let activeRoute = 'Default Brand Text';
-    
+
+    if (/^\/admin\/freelancer\/[^/]+$/.test(currentPath)) {
+      return 'Freelancer Details';
+    }
+
     for (let i = 0; i < routes.length; i++) {
       if (routes[i].collapse) {
         let collapseActiveRoute = getActiveRoute(routes[i].items, currentPath);
@@ -201,6 +206,10 @@ export default function Dashboard(props) {
                   <Route
                     path="/create-client-project"
                     element={<CreateClientProject />}
+                  />
+                  <Route
+                    path="/freelancer/:userId"
+                    element={<FreelancerDetailPage />}
                   />
                   <Route
                     path="/"

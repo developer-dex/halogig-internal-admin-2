@@ -26,6 +26,7 @@ import {
   Tooltip,
   HStack,
   Card,
+  CardBody,
   Select,
   Tabs,
   TabList,
@@ -107,9 +108,6 @@ function FreelancerList() {
   const [pageLimit, setPageLimit] = useState(50);
   const [selectedFreelancer, setSelectedFreelancer] = useState(null);
   const [totalCount, setTotalCount] = useState(0);
-  const [detailTabIndex, setDetailTabIndex] = useState(0);
-  const [isEditMode, setIsEditMode] = useState(false);
-  const detailsModal = useDisclosure();
   const statusModal = useDisclosure();
   const reminderModal = useDisclosure();
   const reminderViewModal = useDisclosure();
@@ -153,9 +151,6 @@ function FreelancerList() {
   const {
     isLoading,
     responseData,
-    completeData,
-    completeDataLoading,
-    completeDataError,
   } = useSelector((s) => s.freelancerDataReducer || {});
 
   const rows = useMemo(() => {
@@ -204,26 +199,11 @@ function FreelancerList() {
   }, [isManagementPage]);
 
   const openDetails = (userId) => {
-    setSelectedFreelancer(userId);
-    setDetailTabIndex(0);
-    setIsEditMode(false);
-    detailsModal.onOpen();
-    dispatch(freelancerCompleteData({ userId }));
+    navigate(`/admin/freelancer/${userId}`, { state: { from: location.pathname } });
   };
 
   const openEditDetails = (userId) => {
-    setSelectedFreelancer(userId);
-    setDetailTabIndex(0);
-    setIsEditMode(true);
-    detailsModal.onOpen();
-    dispatch(freelancerCompleteData({ userId }));
-  };
-
-  const closeDetails = () => {
-    detailsModal.onClose();
-    setSelectedFreelancer(null);
-    setDetailTabIndex(0);
-    setIsEditMode(false);
+    navigate(`/admin/freelancer/${userId}?edit=1`, { state: { from: location.pathname } });
   };
 
   const openStatus = (freelancer) => {
@@ -1057,48 +1037,6 @@ function FreelancerList() {
         </ModalContent>
       </Modal>
 
-      {/* Freelancer Detail Modal */}
-      <Modal 
-        isOpen={detailsModal.isOpen} 
-        onClose={closeDetails} 
-        size="6xl"
-        scrollBehavior="inside"
-      >
-        <ModalOverlay />
-        <ModalContent maxH="90vh">
-          <ModalHeader>
-            <Text fontSize="xl" fontWeight="bold">
-              {isEditMode ? 'Edit Freelancer Details' : 'Freelancer Details'}
-            </Text>
-          </ModalHeader>
-          <ModalCloseButton />
-          <ModalBody pb={6}>
-            {completeDataLoading ? (
-              <Flex py={10} align="center" justify="center" gap={3}>
-                <Spinner size="xl" color="brand.500" />
-                <Text>Loading details...</Text>
-              </Flex>
-            ) : completeDataError ? (
-              <Flex py={10} align="center" justify="center" direction="column" gap={3}>
-                <Text color="red.500" fontWeight="bold">Failed to load freelancer details</Text>
-                <Text color="gray.500">Please try again later</Text>
-              </Flex>
-            ) : !completeData || Object.keys(completeData).length === 0 ? (
-              <Flex py={10} align="center" justify="center">
-                <Text color="gray.500">No details available</Text>
-              </Flex>
-            ) : (
-              <FreelancerDetailContent 
-                completeData={completeData}
-                tabIndex={detailTabIndex}
-                onTabChange={setDetailTabIndex}
-                isEditMode={isEditMode}
-                userId={selectedFreelancer}
-              />
-            )}
-          </ModalBody>
-        </ModalContent>
-      </Modal>
       <SendFreelancerEmailModal
         isOpen={emailModal.isOpen}
         onClose={() => {
@@ -1229,12 +1167,20 @@ const SendFreelancerEmailModal = ({ isOpen, onClose, freelancer }) => {
 };
 
 // Freelancer Detail Content Component
-const FreelancerDetailContent = ({ completeData, tabIndex, onTabChange, isEditMode = false, userId }) => {
+export const FreelancerDetailContent = ({
+  completeData,
+  tabIndex,
+  onTabChange,
+  isEditMode = false,
+  userId,
+  detailVariant = 'default',
+}) => {
   const dispatch = useDispatch();
   const textColor = useColorModeValue('rgb(32, 33, 36)', 'white');
   const borderColor = useColorModeValue('gray.200', 'whiteAlpha.100');
   const cardBg = useColorModeValue('white', 'navy.800');
   const hoverBg = useColorModeValue('gray.50', 'whiteAlpha.50');
+  const pageHeadlineBg = useColorModeValue('gray.50', 'whiteAlpha.50');
   
   // State for editable fields
   const [formData, setFormData] = useState({
@@ -2351,9 +2297,48 @@ const FreelancerDetailContent = ({ completeData, tabIndex, onTabChange, isEditMo
     return `${currency || '$'} ${amount}`;
   };
 
+  const getStatusBadgeScheme = (status) => {
+    const s = (status || '').toString().toLowerCase();
+    if (s.includes('approved')) return 'green';
+    if (s.includes('pending') || s.includes('incomplete')) return 'yellow';
+    if (s.includes('reject')) return 'red';
+    if (s.includes('suspend')) return 'orange';
+    if (s.includes('review')) return 'blue';
+    return 'purple';
+  };
+
+  const PageFieldRow = ({ label, value }) => {
+    if (value === null || value === undefined || value === '' || value === '--') return null;
+    return (
+      <Box textAlign="left">
+        <Text
+          fontSize="10px"
+          fontWeight="bold"
+          color="gray.500"
+          textTransform="uppercase"
+          letterSpacing="0.1em"
+          mb={1}
+        >
+          {label}
+        </Text>
+        <Text fontSize="sm" fontWeight="medium" color={textColor} lineHeight="snug" wordBreak="break-word">
+          {value}
+        </Text>
+      </Box>
+    );
+  };
+
   const renderInfoItem = (icon, label, value, fullWidth = false) => {
     if (!value && value !== 0 && value !== false) return null;
-    
+
+    if (detailVariant === 'page') {
+      return (
+        <GridItem colSpan={{ base: 12, sm: fullWidth ? 12 : 6, lg: fullWidth ? 12 : 4 }}>
+          <PageFieldRow label={label} value={value} />
+        </GridItem>
+      );
+    }
+
     return (
       <GridItem colSpan={{ base: 12, md: fullWidth ? 12 : 6, lg: fullWidth ? 12 : 4 }}>
         <VStack align="start" spacing={1} mb={4}>
@@ -2417,17 +2402,17 @@ const FreelancerDetailContent = ({ completeData, tabIndex, onTabChange, isEditMo
 
     return (
       <VStack align="stretch" spacing={6}>
-        <Card bg={cardBg} p={6}>
-          <VStack align="stretch" spacing={4}>
-            <HStack spacing={4} align="start">
-              <Avatar
-                size="xl"
-                src={displayData.profile_image}
-                name={`${displayData.first_name || ''} ${displayData.last_name || ''}`}
-                bg="brand.500"
-              />
-              <VStack align="start" spacing={2} flex={1}>
-                {isEditMode ? (
+        {isEditMode ? (
+          <Card bg={cardBg} p={6}>
+            <VStack align="stretch" spacing={4}>
+              <HStack spacing={4} align="start">
+                <Avatar
+                  size="xl"
+                  src={displayData.profile_image}
+                  name={`${displayData.first_name || ''} ${displayData.last_name || ''}`}
+                  bg="brand.500"
+                />
+                <VStack align="start" spacing={2} flex={1}>
                   <HStack spacing={2} w="100%">
                     <FormControl>
                       <FormLabel fontSize="xs">First Name</FormLabel>
@@ -2448,26 +2433,11 @@ const FreelancerDetailContent = ({ completeData, tabIndex, onTabChange, isEditMo
                       />
                     </FormControl>
                   </HStack>
-                ) : (
-                  <>
-                    <Text fontSize="xl" fontWeight="bold" color={textColor}>
-                      {`${displayData.first_name || ''} ${displayData.last_name || ''}`}
-                    </Text>
-                    <Badge 
-                      colorScheme={displayData.status === UserStatus.PENDING ? 'green' : 'yellow'}
-                      variant="solid"
-                      fontSize="xs"
-                    >
-                      {displayData.status || 'Unknown'}
-                    </Badge>
-                  </>
-                )}
-              </VStack>
-            </HStack>
+                </VStack>
+              </HStack>
 
-            <Divider />
+              <Divider />
 
-            {isEditMode ? (
               <VStack align="stretch" spacing={4}>
                 <Grid templateColumns={{ base: '1fr', md: 'repeat(2, 1fr)', lg: 'repeat(3, 1fr)' }} gap={4}>
                   {renderEditableField(
@@ -2495,8 +2465,7 @@ const FreelancerDetailContent = ({ completeData, tabIndex, onTabChange, isEditMo
                     (value) => updateFormData('primaryIntroduction', 'user', { ...displayData, company_name: value })
                   )}
                 </Grid>
-                
-                {/* City, State, Country on same line */}
+
                 <Grid templateColumns={{ base: '1fr', md: 'repeat(3, 1fr)' }} gap={4}>
                   <GridItem colSpan={{ base: 12, md: 4 }}>
                     <FormControl mb={4}>
@@ -2523,7 +2492,7 @@ const FreelancerDetailContent = ({ completeData, tabIndex, onTabChange, isEditMo
                       </Select>
                     </FormControl>
                   </GridItem>
-                  
+
                   <GridItem colSpan={{ base: 12, md: 4 }}>
                     <FormControl mb={4}>
                       <FormLabel fontSize="xs" fontWeight="600" color="gray.500" textTransform="uppercase">
@@ -2533,7 +2502,7 @@ const FreelancerDetailContent = ({ completeData, tabIndex, onTabChange, isEditMo
                         </HStack>
                       </FormLabel>
                       <Select
-                        placeholder={states.length > 0 ? "Select a state" : "No states found"}
+                        placeholder={states.length > 0 ? 'Select a state' : 'No states found'}
                         value={stateValue || ''}
                         onChange={(e) => handleStateChange(e.target.value)}
                         isDisabled={!countryValue || states.length === 0}
@@ -2554,7 +2523,7 @@ const FreelancerDetailContent = ({ completeData, tabIndex, onTabChange, isEditMo
                       </Select>
                     </FormControl>
                   </GridItem>
-                  
+
                   <GridItem colSpan={{ base: 12, md: 4 }}>
                     <FormControl mb={4}>
                       <FormLabel fontSize="xs" fontWeight="600" color="gray.500" textTransform="uppercase">
@@ -2564,7 +2533,7 @@ const FreelancerDetailContent = ({ completeData, tabIndex, onTabChange, isEditMo
                         </HStack>
                       </FormLabel>
                       <Select
-                        placeholder={cities.length > 0 ? "Select a city" : "No cities found"}
+                        placeholder={cities.length > 0 ? 'Select a city' : 'No cities found'}
                         value={cityValue || ''}
                         onChange={(e) => handleCityChange(e.target.value)}
                         isDisabled={!stateValue || cities.length === 0}
@@ -2587,22 +2556,122 @@ const FreelancerDetailContent = ({ completeData, tabIndex, onTabChange, isEditMo
                   </GridItem>
                 </Grid>
               </VStack>
-            ) : (
+            </VStack>
+          </Card>
+        ) : detailVariant === 'page' ? (
+          <Card
+            bg={cardBg}
+            overflow="hidden"
+            shadow="md"
+            borderWidth="1px"
+            borderColor={borderColor}
+          >
+            <Box h="3px" bgGradient="linear(to-r, brand.400, purple.500)" />
+            <CardBody px={{ base: 5, md: 8 }} py={{ base: 6, md: 8 }}>
+              <Flex
+                direction={{ base: 'column', lg: 'row' }}
+                gap={{ base: 6, lg: 10 }}
+                align={{ base: 'center', lg: 'flex-start' }}
+                mb={8}
+              >
+                <Avatar
+                  size="2xl"
+                  src={displayData.profile_image}
+                  name={`${displayData.first_name || ''} ${displayData.last_name || ''}`}
+                  bg="brand.500"
+                  boxShadow="lg"
+                />
+                <VStack align={{ base: 'center', lg: 'flex-start' }} spacing={3} flex={1}>
+                  <Heading
+                    as="h1"
+                    size="lg"
+                    color={textColor}
+                    textAlign={{ base: 'center', lg: 'left' }}
+                  >
+                    {`${displayData.first_name || ''} ${displayData.last_name || ''}`.trim() || '—'}
+                  </Heading>
+                  <Badge
+                    colorScheme={getStatusBadgeScheme(displayData.status)}
+                    variant="solid"
+                    fontSize="xs"
+                    px={3}
+                    py={1}
+                    borderRadius="full"
+                    textTransform="uppercase"
+                    letterSpacing="wider"
+                  >
+                    {displayData.status || 'Unknown'}
+                  </Badge>
+                </VStack>
+              </Flex>
+              <Divider mb={8} />
+              <Text
+                fontSize="sm"
+                fontWeight="semibold"
+                color="gray.500"
+                textTransform="uppercase"
+                letterSpacing="wider"
+                mb={4}
+              >
+                Contact and profile
+              </Text>
+              <Grid templateColumns="repeat(12, 1fr)" gap={4}>
+                {renderInfoItem(<MdEmail />, 'Email', displayData.email)}
+                {renderInfoItem(<MdPhone />, 'Mobile', displayData.mobile)}
+                {renderInfoItem(<MdPerson />, 'Gender', displayData.gender)}
+                {renderInfoItem(<MdBusiness />, 'Legal Entity Type', designation?.name)}
+                {renderInfoItem(<MdBusiness />, 'Company', displayData.company_name)}
+                {renderInfoItem(
+                  <MdLocationOn />,
+                  'Location',
+                  [displayData.city, displayData.state, displayData.country].filter(Boolean).join(', '),
+                )}
+                {displayData.address && renderInfoItem(<MdLocationOn />, 'Address', displayData.address, true)}
+                {displayData.aboutme && renderInfoItem(<MdPerson />, 'About', displayData.aboutme, true)}
+              </Grid>
+            </CardBody>
+          </Card>
+        ) : (
+          <Card bg={cardBg} p={6}>
+            <VStack align="stretch" spacing={4}>
+              <HStack spacing={4} align="start">
+                <Avatar
+                  size="xl"
+                  src={displayData.profile_image}
+                  name={`${displayData.first_name || ''} ${displayData.last_name || ''}`}
+                  bg="brand.500"
+                />
+                <VStack align="start" spacing={2} flex={1}>
+                  <Text fontSize="xl" fontWeight="bold" color={textColor}>
+                    {`${displayData.first_name || ''} ${displayData.last_name || ''}`}
+                  </Text>
+                  <Badge
+                    colorScheme={getStatusBadgeScheme(displayData.status)}
+                    variant="solid"
+                    fontSize="xs"
+                  >
+                    {displayData.status || 'Unknown'}
+                  </Badge>
+                </VStack>
+              </HStack>
+
+              <Divider />
+
               <Grid templateColumns={{ base: '1fr', md: 'repeat(2, 1fr)', lg: 'repeat(3, 1fr)' }} gap={4}>
                 {renderInfoItem(<MdEmail />, 'Email', displayData.email)}
                 {renderInfoItem(<MdPhone />, 'Mobile', displayData.mobile)}
                 {renderInfoItem(<MdPerson />, 'Gender', displayData.gender)}
                 {renderInfoItem(<MdBusiness />, 'Legal Entity Type', designation?.name)}
                 {renderInfoItem(<MdBusiness />, 'Company', displayData.company_name)}
-                {renderInfoItem(<MdLocationOn />, 'Location', 
-                  [displayData.city, displayData.state, displayData.country].filter(Boolean).join(', ')
+                {renderInfoItem(<MdLocationOn />, 'Location',
+                  [displayData.city, displayData.state, displayData.country].filter(Boolean).join(', '),
                 )}
                 {displayData.address && renderInfoItem(<MdLocationOn />, 'Address', displayData.address, true)}
                 {displayData.aboutme && renderInfoItem(<MdPerson />, 'About', displayData.aboutme, true)}
               </Grid>
-            )}
-          </VStack>
-        </Card>
+            </VStack>
+          </Card>
+        )}
         {isEditMode && (
           <Flex justify="flex-end" pt={4}>
             <Button
@@ -2632,6 +2701,127 @@ const FreelancerDetailContent = ({ completeData, tabIndex, onTabChange, isEditMo
     const subCategoryDisplay = Array.isArray(subCategory)
       ? subCategory.map((sub) => sub?.name).filter(Boolean).join(', ')
       : subCategory?.name;
+
+    if (!isEditMode && detailVariant === 'page') {
+      const rateStr = data.rateperhour_2
+        ? formatCurrency(data.rateperhour_2, data.currency?.split('-')[1])
+        : null;
+      const platformRows = [
+        { name: 'Upwork', active: data.upwork_platform, link: data.upwork_platform_profile_link },
+        { name: 'Fiverr', active: data.fiver_platform, link: data.fiver_platform_profile_link },
+        { name: 'Freelancer', active: data.freelancer_platform, link: data.freelancer_platform_profile_link },
+        { name: 'PeoplePerHour', active: data.pph_platform, link: data.pph_platform_profile_link },
+        { name: 'Truelancer', active: data.truelancer_platform, link: data.truelancer_platform_profile_link },
+        { name: data.other_platform || 'Other', active: !!data.other_platform, link: data.other_platform_profile_link },
+      ].filter((p) => p.active);
+
+      return (
+        <VStack align="stretch" spacing={6} w="100%">
+          <Card bg={cardBg} borderWidth="1px" borderColor={borderColor} shadow="none" borderRadius="lg" overflow="hidden">
+            <Box p={{ base: 5, md: 6 }}>
+              <Text
+                fontSize="10px"
+                fontWeight="bold"
+                color="gray.500"
+                textTransform="uppercase"
+                letterSpacing="0.12em"
+                mb={4}
+              >
+                Professional overview
+              </Text>
+              {data.profile_headline ? (
+                <Box
+                  borderLeftWidth="3px"
+                  borderLeftColor="brand.400"
+                  pl={4}
+                  py={3}
+                  mb={5}
+                  bg={pageHeadlineBg}
+                  borderRadius="md"
+                >
+                  <Text fontSize="sm" color={textColor} lineHeight="tall">
+                    {data.profile_headline}
+                  </Text>
+                </Box>
+              ) : null}
+              <SimpleGrid columns={{ base: 1, sm: 2, lg: 4 }} spacingX={{ base: 4, md: 8 }} spacingY={5}>
+                <PageFieldRow label="Category" value={category?.name} />
+                <PageFieldRow label="Sub category" value={subCategoryDisplay || null} />
+                <PageFieldRow label="Rate per hour" value={rateStr && rateStr !== '--' ? rateStr : null} />
+                <PageFieldRow label="Languages" value={data.languages} />
+              </SimpleGrid>
+              {data.technologty_pre ? (
+                <Box mt={5} textAlign="left">
+                  <Text
+                    fontSize="10px"
+                    fontWeight="bold"
+                    color="gray.500"
+                    textTransform="uppercase"
+                    letterSpacing="0.1em"
+                    mb={2}
+                  >
+                    Technologies
+                  </Text>
+                  <HStack spacing={2} flexWrap="wrap">
+                    {data.technologty_pre.split(',').map((tech, idx) => (
+                      <Tag key={idx} size="sm" variant="subtle" colorScheme="gray">
+                        {tech.trim()}
+                      </Tag>
+                    ))}
+                  </HStack>
+                </Box>
+              ) : null}
+            </Box>
+          </Card>
+
+          <Card bg={cardBg} borderWidth="1px" borderColor={borderColor} shadow="none" borderRadius="lg">
+            <Box p={{ base: 5, md: 6 }}>
+              <Text
+                fontSize="10px"
+                fontWeight="bold"
+                color="gray.500"
+                textTransform="uppercase"
+                letterSpacing="0.12em"
+                mb={4}
+              >
+                Platform links
+              </Text>
+              {platformRows.length === 0 ? (
+                <Text fontSize="sm" color="gray.500">
+                  No platform links on file.
+                </Text>
+              ) : (
+                <VStack align="stretch" spacing={4}>
+                  {platformRows.map((platform, idx) => (
+                    <Box key={`${platform.name}-${idx}`} borderBottomWidth={idx < platformRows.length - 1 ? '1px' : 0} borderColor={borderColor} pb={idx < platformRows.length - 1 ? 4 : 0}>
+                      <Text
+                        fontSize="10px"
+                        fontWeight="bold"
+                        color="gray.500"
+                        textTransform="uppercase"
+                        letterSpacing="0.08em"
+                        mb={1}
+                      >
+                        {platform.name}
+                      </Text>
+                      {platform.link ? (
+                        <Link href={platform.link} target="_blank" rel="noopener noreferrer" color="brand.600" fontSize="sm" isExternal wordBreak="break-all">
+                          {platform.link}
+                        </Link>
+                      ) : (
+                        <Text fontSize="sm" color={textColor}>
+                          Active (no URL provided)
+                        </Text>
+                      )}
+                    </Box>
+                  ))}
+                </VStack>
+              )}
+            </Box>
+          </Card>
+        </VStack>
+      );
+    }
 
     return (
       <VStack align="stretch" spacing={6}>
@@ -3053,6 +3243,130 @@ const FreelancerDetailContent = ({ completeData, tabIndex, onTabChange, isEditMo
       return '--';
     };
 
+    if (!isEditMode && detailVariant === 'page') {
+      return (
+        <VStack align="stretch" spacing={5} w="100%">
+          <Text fontSize="sm" fontWeight="bold" color={textColor} letterSpacing="-0.01em">
+            Projects
+            <Text as="span" fontWeight="normal" color="gray.500" ml={2}>
+              ({count || projectsData.length})
+            </Text>
+          </Text>
+          <VStack align="stretch" spacing={4}>
+            {projectsData.map((project, index) => {
+              const platforms = [
+                { name: 'Web', active: project.is_web_platform },
+                { name: 'Mobile', active: project.is_mobile_platform },
+                { name: 'Desktop', active: project.is_desktop_platform },
+                { name: 'Embedding', active: project.is_embedding_platform },
+              ].filter((platform) => platform.active);
+              const hasPlatforms = platforms.length > 0;
+              const projectTechs = project.technologty_pre
+                ? project.technologty_pre.split(',').map((t) => t.trim()).filter(Boolean)
+                : [];
+
+              return (
+                <Card
+                  key={project.id || index}
+                  bg={cardBg}
+                  borderWidth="1px"
+                  borderColor={borderColor}
+                  shadow="none"
+                  borderRadius="lg"
+                >
+                  <Box p={{ base: 5, md: 6 }}>
+                    <Text fontSize="md" fontWeight="bold" color={textColor} mb={4} textAlign="left">
+                      {project.project_name || `Project ${index + 1}`}
+                    </Text>
+                    <SimpleGrid columns={{ base: 1, sm: 3 }} spacing={{ base: 4, md: 6 }} mb={4}>
+                      <PageFieldRow
+                        label="Duration"
+                        value={project.duration ? `${project.duration} months` : null}
+                      />
+                      <PageFieldRow label="Location" value={project.project_location} />
+                      <PageFieldRow label="Type" value={getProjectTypeLabel(project.project_type)} />
+                    </SimpleGrid>
+                    {projectTechs.length > 0 ? (
+                      <Box mb={4} textAlign="left">
+                        <Text
+                          fontSize="10px"
+                          fontWeight="bold"
+                          color="gray.500"
+                          textTransform="uppercase"
+                          letterSpacing="0.1em"
+                          mb={2}
+                        >
+                          Technologies
+                        </Text>
+                        <HStack spacing={2} flexWrap="wrap">
+                          {projectTechs.map((tech, techIndex) => (
+                            <Tag key={techIndex} size="sm" variant="subtle" colorScheme="gray">
+                              {tech}
+                            </Tag>
+                          ))}
+                        </HStack>
+                      </Box>
+                    ) : null}
+                    {hasPlatforms ? (
+                      <Box mb={4} textAlign="left">
+                        <Text
+                          fontSize="10px"
+                          fontWeight="bold"
+                          color="gray.500"
+                          textTransform="uppercase"
+                          letterSpacing="0.1em"
+                          mb={2}
+                        >
+                          Platforms
+                        </Text>
+                        <HStack spacing={2} flexWrap="wrap">
+                          {platforms.map((platform, platformIndex) => (
+                            <Tag key={platformIndex} size="sm" variant="outline" colorScheme="gray">
+                              {platform.name}
+                            </Tag>
+                          ))}
+                        </HStack>
+                      </Box>
+                    ) : null}
+                    {project.project_details ? (
+                      <Box mb={4} textAlign="left">
+                        <Text
+                          fontSize="10px"
+                          fontWeight="bold"
+                          color="gray.500"
+                          textTransform="uppercase"
+                          letterSpacing="0.1em"
+                          mb={2}
+                        >
+                          Description
+                        </Text>
+                        <Text fontSize="sm" color={textColor} lineHeight="tall">
+                          {project.project_details}
+                        </Text>
+                      </Box>
+                    ) : null}
+                    {project.project_link ? (
+                      <Link
+                        href={project.project_link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        color="brand.600"
+                        fontSize="sm"
+                        fontWeight="medium"
+                        isExternal
+                      >
+                        View project
+                      </Link>
+                    ) : null}
+                  </Box>
+                </Card>
+              );
+            })}
+          </VStack>
+        </VStack>
+      );
+    }
+
     return (
       <VStack align="stretch" spacing={4}>
         <Card bg={cardBg} p={6}>
@@ -3427,25 +3741,44 @@ const FreelancerDetailContent = ({ completeData, tabIndex, onTabChange, isEditMo
       return <Text color="gray.500">No certifications data available.</Text>;
     }
 
+    const isPageViewCert = !isEditMode && detailVariant === 'page';
+    const certCellAlign = isPageViewCert ? 'left' : undefined;
+
     return (
-      <VStack align="stretch" spacing={4}>
-        <Card bg={cardBg} p={6}>
-          <HStack spacing={2} mb={4}>
-            <MdCardMembership size={24} color="brand.500" />
-            <Text fontSize="lg" fontWeight="bold" color={textColor}>
-              Certifications ({count || certsData.length})
+      <VStack align="stretch" spacing={4} w="100%">
+        <Card
+          bg={cardBg}
+          p={isPageViewCert ? 5 : 6}
+          borderWidth={isPageViewCert ? '1px' : undefined}
+          borderColor={isPageViewCert ? borderColor : undefined}
+          boxShadow={isPageViewCert ? 'none' : undefined}
+          borderRadius={isPageViewCert ? 'lg' : undefined}
+        >
+          {isPageViewCert ? (
+            <Text fontSize="sm" fontWeight="bold" color={textColor} mb={4} textAlign="left">
+              Certifications
+              <Text as="span" fontWeight="normal" color="gray.500" ml={2}>
+                ({count || certsData.length})
+              </Text>
             </Text>
-          </HStack>
+          ) : (
+            <HStack spacing={2} mb={4}>
+              <MdCardMembership size={24} color="brand.500" />
+              <Text fontSize="lg" fontWeight="bold" color={textColor}>
+                Certifications ({count || certsData.length})
+              </Text>
+            </HStack>
+          )}
 
           <Box overflowX="auto">
             <Table variant="simple" size="sm">
               <Thead>
                 <Tr>
-                  <Th borderColor={borderColor} color={textColor}>Certificate Name</Th>
-                  <Th borderColor={borderColor} color={textColor}>Institution</Th>
-                  <Th borderColor={borderColor} color={textColor}>Certificate No.</Th>
-                  <Th borderColor={borderColor} color={textColor}>From</Th>
-                  <Th borderColor={borderColor} color={textColor}>Till</Th>
+                  <Th borderColor={borderColor} color={textColor} textAlign={certCellAlign}>Certificate Name</Th>
+                  <Th borderColor={borderColor} color={textColor} textAlign={certCellAlign}>Institution</Th>
+                  <Th borderColor={borderColor} color={textColor} textAlign={certCellAlign}>Certificate No.</Th>
+                  <Th borderColor={borderColor} color={textColor} textAlign={certCellAlign}>From</Th>
+                  <Th borderColor={borderColor} color={textColor} textAlign={certCellAlign}>Till</Th>
                 </Tr>
               </Thead>
               <Tbody>
@@ -3502,11 +3835,11 @@ const FreelancerDetailContent = ({ completeData, tabIndex, onTabChange, isEditMo
                       </>
                     ) : (
                       <>
-                        <Td borderColor={borderColor} color={textColor}>{cert.name || '--'}</Td>
-                        <Td borderColor={borderColor} color={textColor}>{cert.institutename || '--'}</Td>
-                        <Td borderColor={borderColor} color={textColor}>{cert.certificate_no || '--'}</Td>
-                        <Td borderColor={borderColor} color={textColor}>{cert.from_date || '--'}</Td>
-                        <Td borderColor={borderColor} color={textColor}>{cert.till_date === '0' ? 'Present' : cert.till_date || '--'}</Td>
+                        <Td borderColor={borderColor} color={textColor} textAlign={certCellAlign}>{cert.name || '--'}</Td>
+                        <Td borderColor={borderColor} color={textColor} textAlign={certCellAlign}>{cert.institutename || '--'}</Td>
+                        <Td borderColor={borderColor} color={textColor} textAlign={certCellAlign}>{cert.certificate_no || '--'}</Td>
+                        <Td borderColor={borderColor} color={textColor} textAlign={certCellAlign}>{cert.from_date || '--'}</Td>
+                        <Td borderColor={borderColor} color={textColor} textAlign={certCellAlign}>{cert.till_date === '0' ? 'Present' : cert.till_date || '--'}</Td>
                       </>
                     )}
                   </Tr>
@@ -3537,6 +3870,88 @@ const FreelancerDetailContent = ({ completeData, tabIndex, onTabChange, isEditMo
     
     if (!isEditMode && graduation.length === 0 && postGraduation.length === 0) {
       return <Text color="gray.500">No education data available.</Text>;
+    }
+
+    if (!isEditMode && detailVariant === 'page') {
+      const formatEduDegree = (edu, isPost) => {
+        const opts = isPost ? postGraduationDegreeOptions : graduationDegreeOptions;
+        return opts.find((opt) => opt.value === edu.degree)?.label || edu.degree || null;
+      };
+      const formatEduType = (edu) =>
+        educationTypeOptions.find((opt) => opt.value === edu.education_type)?.label || edu.education_type || null;
+      const formatEduYear = (edu) =>
+        edu.year === '0' ? 'Pursuing' : edu.month && edu.year ? `${edu.month} - ${edu.year}` : null;
+
+      return (
+        <VStack align="stretch" spacing={10} w="100%">
+          {graduation.length > 0 ? (
+            <Box w="100%">
+              <Text
+                fontSize="10px"
+                fontWeight="bold"
+                color="gray.500"
+                textTransform="uppercase"
+                letterSpacing="0.12em"
+                mb={4}
+                textAlign="left"
+              >
+                Graduation
+              </Text>
+              <VStack spacing={4} align="stretch">
+                {graduation.map((edu, index) => (
+                  <Box
+                    key={edu.id || index}
+                    borderWidth="1px"
+                    borderColor={borderColor}
+                    borderRadius="md"
+                    p={{ base: 4, md: 5 }}
+                  >
+                    <SimpleGrid columns={{ base: 1, sm: 2 }} spacingX={8} spacingY={4}>
+                      <PageFieldRow label="Degree" value={formatEduDegree(edu, false)} />
+                      <PageFieldRow label="University" value={edu.university_name} />
+                      <PageFieldRow label="Education type" value={formatEduType(edu)} />
+                      <PageFieldRow label="Year" value={formatEduYear(edu)} />
+                    </SimpleGrid>
+                  </Box>
+                ))}
+              </VStack>
+            </Box>
+          ) : null}
+          {postGraduation.length > 0 ? (
+            <Box w="100%">
+              <Text
+                fontSize="10px"
+                fontWeight="bold"
+                color="gray.500"
+                textTransform="uppercase"
+                letterSpacing="0.12em"
+                mb={4}
+                textAlign="left"
+              >
+                Post graduate (optional)
+              </Text>
+              <VStack spacing={4} align="stretch">
+                {postGraduation.map((edu, index) => (
+                  <Box
+                    key={edu.id || index}
+                    borderWidth="1px"
+                    borderColor={borderColor}
+                    borderRadius="md"
+                    p={{ base: 4, md: 5 }}
+                  >
+                    <SimpleGrid columns={{ base: 1, sm: 2 }} spacingX={8} spacingY={4}>
+                      <PageFieldRow label="Degree" value={formatEduDegree(edu, true)} />
+                      <PageFieldRow label="University" value={edu.university_name} />
+                      <PageFieldRow label="Education type" value={formatEduType(edu)} />
+                      <PageFieldRow label="Year" value={formatEduYear(edu)} />
+                    </SimpleGrid>
+                  </Box>
+                ))}
+              </VStack>
+            </Box>
+          ) : null}
+        </VStack>
+      );
     }
 
     const renderGraduationEntry = (element, i) => {
@@ -3968,54 +4383,93 @@ const FreelancerDetailContent = ({ completeData, tabIndex, onTabChange, isEditMo
   };
 
   return (
-    <Tabs index={tabIndex} onChange={onTabChange} colorScheme="brand" variant="enclosed">
-      <TabList>
-        <Tab>
-          <HStack spacing={2}>
-            <MdPerson />
-            <Text>Primary Introduction</Text>
-          </HStack>
-        </Tab>
-        <Tab>
-          <HStack spacing={2}>
-            <MdWork />
-            <Text>Professional Experience</Text>
-          </HStack>
-        </Tab>
-        <Tab>
-          <HStack spacing={2}>
-            <MdFolder />
-            <Text>Projects</Text>
-          </HStack>
-        </Tab>
-        <Tab>
-          <HStack spacing={2}>
-            <MdCardMembership />
-            <Text>Certifications</Text>
-          </HStack>
-        </Tab>
-        <Tab>
-          <HStack spacing={2}>
-            <MdSchool />
-            <Text>Education</Text>
-          </HStack>
-        </Tab>
+    <Tabs
+      index={tabIndex}
+      onChange={onTabChange}
+      colorScheme="brand"
+      variant={detailVariant === 'page' ? 'line' : 'enclosed'}
+      isLazy
+      lazyBehavior="keepMounted"
+    >
+      <TabList
+        overflowX="auto"
+        borderBottomWidth={detailVariant === 'page' ? '1px' : undefined}
+        borderColor={detailVariant === 'page' ? borderColor : undefined}
+        pb={detailVariant === 'page' ? 0 : undefined}
+        gap={detailVariant === 'page' ? 1 : 0}
+        justifyContent={detailVariant === 'page' ? 'flex-start' : undefined}
+        flexWrap="wrap"
+        w="100%"
+        sx={detailVariant === 'page' ? undefined : { overflow: 'hidden' }}
+      >
+        {detailVariant === 'page' ? (
+          <>
+            <Tab whiteSpace="nowrap" px={4} py={3} fontWeight="semibold" fontSize="sm">
+              Overview
+            </Tab>
+            <Tab whiteSpace="nowrap" px={4} py={3} fontWeight="semibold" fontSize="sm">
+              Experience
+            </Tab>
+            <Tab whiteSpace="nowrap" px={4} py={3} fontWeight="semibold" fontSize="sm">
+              Projects
+            </Tab>
+            <Tab whiteSpace="nowrap" px={4} py={3} fontWeight="semibold" fontSize="sm">
+              Certifications
+            </Tab>
+            <Tab whiteSpace="nowrap" px={4} py={3} fontWeight="semibold" fontSize="sm">
+              Education
+            </Tab>
+          </>
+        ) : (
+          <>
+            <Tab whiteSpace="nowrap">
+              <HStack spacing={2}>
+                <MdPerson />
+                <Text>Primary Introduction</Text>
+              </HStack>
+            </Tab>
+            <Tab>
+              <HStack spacing={2}>
+                <MdWork />
+                <Text>Professional Experience</Text>
+              </HStack>
+            </Tab>
+            <Tab>
+              <HStack spacing={2}>
+                <MdFolder />
+                <Text>Projects</Text>
+              </HStack>
+            </Tab>
+            <Tab>
+              <HStack spacing={2}>
+                <MdCardMembership />
+                <Text>Certifications</Text>
+              </HStack>
+            </Tab>
+            <Tab>
+              <HStack spacing={2}>
+                <MdSchool />
+                <Text>Education</Text>
+              </HStack>
+            </Tab>
+          </>
+        )}
       </TabList>
 
       <TabPanels>
-        <TabPanel px={0} pt={4}>
+        <TabPanel px={0} pt={detailVariant === 'page' ? 6 : 4}>
           {renderPrimaryIntroduction()}
         </TabPanel>
-        <TabPanel px={0} pt={4}>
+        <TabPanel px={0} pt={detailVariant === 'page' ? 6 : 4}>
           {renderProfessionalExperience()}
         </TabPanel>
-        <TabPanel px={0} pt={4}>
+        <TabPanel px={0} pt={detailVariant === 'page' ? 6 : 4}>
           {renderProjects()}
         </TabPanel>
-        <TabPanel px={0} pt={4}>
+        <TabPanel px={0} pt={detailVariant === 'page' ? 6 : 4}>
           {renderCertifications()}
         </TabPanel>
-        <TabPanel px={0} pt={4}>
+        <TabPanel px={0} pt={detailVariant === 'page' ? 6 : 4}>
           {renderEducation()}
         </TabPanel>
       </TabPanels>
