@@ -68,6 +68,7 @@ import TwitterAccessToken from 'views/admin/twitterAccessToken';
 import CategoryManagement from 'views/admin/taxonomy/CategoryManagement';
 import SubCategoryManagement from 'views/admin/taxonomy/SubCategoryManagement';
 import TechnologyManagement from 'views/admin/taxonomy/TechnologyManagement';
+import Admins from 'views/admin/admins/Admins';
 const ProjectBidsPage = () => <ProjectBids />;
 const HalogigBidsPage = () => <HalogigBids />;
 const NewOrderPage = () => <NewOrder />;
@@ -84,6 +85,19 @@ const LogManagerPage = () => <div>Log Manager Page - Coming Soon</div>;
 
 const routes = [
   // Auth Routes (hidden from sidebar)
+  {
+    category: 'Security',
+    layout: '/admin',
+    items: [
+      {
+        name: 'Admins',
+        layout: '/admin',
+        path: '/admins',
+        icon: <Icon as={MdLock} width="20px" height="20px" color="inherit" />,
+        component: <Admins />,
+      },
+    ],
+  },
   {
     name: 'Sign In',
     layout: '/auth',

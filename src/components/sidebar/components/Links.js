@@ -21,6 +21,17 @@ export function SidebarLinks(props) {
 
   const { routes } = props;
 
+  const { permissions, admin } = useSelector((state) => state.rbac || { permissions: {}, admin: null });
+
+  const hasPermission = (moduleKey, action = 'view') => {
+    if (!admin) return false;
+    if (admin.role === 'super_admin') return true;
+    const modulePerms = permissions && permissions[moduleKey];
+    if (modulePerms === true) return true;
+    if (!modulePerms || typeof modulePerms !== 'object') return false;
+    return !!(modulePerms[action] || modulePerms.view || modulePerms.create || modulePerms.edit || modulePerms.delete);
+  };
+
   // Get pending view counts from Redux store
   const { freelancer: freelancerCount, client: clientCount } = useSelector((state) => state.pendingViewCounts || { freelancer: 0, client: 0 });
 
@@ -69,18 +80,31 @@ export function SidebarLinks(props) {
     }));
   };
 
-  // Check if any route in category is active
+  const getVisibleCategoryItems = (items, layout) => {
+    const safeItems = Array.isArray(items) ? items : [];
+    return safeItems.filter((item) => {
+      const itemFullPath = (layout || item.layout || '') + item.path;
+      return hasPermission(itemFullPath, 'view');
+    });
+  };
+
+  // Check if any *visible* route in category is active
   const isCategoryActive = (items, layout) => {
-    return items?.some(item => {
-      const itemFullPath = layout + item.path;
+    const visibleItems = getVisibleCategoryItems(items, layout);
+    return visibleItems.some((item) => {
+      const itemFullPath = (layout || item.layout || '') + item.path;
       return activeRoute(item.path?.toLowerCase(), itemFullPath);
     });
   };
 
   // this function creates the links from the secondary accordions (for example auth -> sign-in -> default)
-  const createLinks = (routes) => {
-    return routes.map((route, index) => {
+  const createLinks = (routesConfig) => {
+    return routesConfig.map((route, index) => {
       if (route.category) {
+        const visibleItems = getVisibleCategoryItems(route.items, route.layout);
+        if (!visibleItems.length) {
+          return null;
+        }
         const isExpanded = expandedCategories[route.category] === true;
         const categoryActive = isCategoryActive(route.items, route.layout);
         // Get icon from first item in category that has an icon
@@ -132,7 +156,7 @@ export function SidebarLinks(props) {
             {/* Category Items with Collapse Animation */}
             <Collapse in={isExpanded} animateOpacity>
               <Box>
-                {route.items?.map((item, itemIndex) => {
+                {visibleItems.map((item, itemIndex) => {
                   const isFreelancers = item.name === 'Freelancers' && (item.path === '/freelancers' || item.path === '/freelancers-management');
                   const isClients = item.name === 'Clients' && (item.path === '/offline-clients' || item.path === '/clients');
                   const showRedDot = (isFreelancers && freelancerCount > 0) || (isClients && clientCount > 0);
@@ -237,6 +261,10 @@ export function SidebarLinks(props) {
         const showRedDot = (isFreelancers && freelancerCount > 0) || (isClients && clientCount > 0);
         
         const routeFullPath = route.layout + route.path;
+        const moduleKey = routeFullPath;
+        if (!hasPermission(moduleKey, 'view')) {
+          return null;
+        }
         const isRouteActive = activeRoute(route.path.toLowerCase(), routeFullPath);
         
         return (

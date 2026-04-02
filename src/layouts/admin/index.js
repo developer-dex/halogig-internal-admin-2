@@ -7,8 +7,9 @@ import Sidebar from 'components/sidebar/Sidebar.js';
 import { SidebarContext } from 'contexts/SidebarContext';
 import React, { useState, useEffect } from 'react';
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import routes from 'routes.js';
+import { fetchAdminProfile } from '../../features/admin/rbacSlice';
 import { getPendingViewCounts } from '../../features/admin/pendingViewCountsSlice';
 import WebsiteDataDetails from 'views/admin/websiteData/WebsiteDataDetails';
 import ProjectBidDetail from 'views/admin/projectBids/ProjectBidDetail';
@@ -25,13 +26,15 @@ export default function Dashboard(props) {
   const { ...rest } = props;
   const location = useLocation();
   const dispatch = useDispatch();
+  const { permissions, admin } = useSelector((state) => state.rbac || { permissions: {}, admin: null });
   // states and functions
   const [fixed] = useState(false);
   const [toggleSidebar, setToggleSidebar] = useState(false);
 
-  // Fetch pending view counts when admin layout loads
+  // Fetch pending view counts + admin profile (permissions) when admin layout loads
   useEffect(() => {
     dispatch(getPendingViewCounts());
+    dispatch(fetchAdminProfile());
   }, [dispatch]);
   // functions for changing the states from components
   const getRoute = () => {
@@ -113,18 +116,30 @@ export default function Dashboard(props) {
     }
     return activeNavbar;
   };
-  const getRoutes = (routes) => {
-    return routes.map((route, key) => {
-      if (route.layout === '/admin' && route.path) {
+  const hasPermission = (moduleKey, action = 'view') => {
+    if (!admin) return false;
+    if (admin.role === 'super_admin') return true;
+    const modulePerms = permissions && permissions[moduleKey];
+    if (modulePerms === true) return true;
+    if (!modulePerms || typeof modulePerms !== 'object') return false;
+    return !!(modulePerms[action] || modulePerms.view || modulePerms.create || modulePerms.edit || modulePerms.delete);
+  };
+
+  const getRoutes = (routesConfig) => {
+    return routesConfig.map((route, key) => {
+      if (route.layout === '/admin' && route.path && !route.hidden) {
+        const moduleKey = `${route.layout}${route.path}`;
+        if (!hasPermission(moduleKey, 'view')) {
+          return null;
+        }
         return (
           <Route path={`${route.path}`} element={route.component} key={key} />
         );
       }
       if (route.collapse || route.category) {
         return getRoutes(route.items);
-      } else {
-        return null;
       }
+      return null;
     });
   };
   document.documentElement.dir = 'ltr';

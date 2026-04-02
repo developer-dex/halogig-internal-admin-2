@@ -17,6 +17,8 @@ import { freelancerPaymentsReducer } from "../features/admin/freelancerPaymentsS
 import { disputeManagementReducer } from "../features/admin/disputeManagementSlice";
 import { testimonialReducer } from "../features/admin/testimonialSlice";
 import { webRotDataReducer } from "../features/admin/webRotDataSlice";
+import { rbacReducer } from "../features/admin/rbacSlice";
+import { adminsReducer } from "../features/admin/adminsSlice";
 
 const store = configureStore({
   reducer: {
@@ -38,6 +40,8 @@ const store = configureStore({
     disputeManagement: disputeManagementReducer,
     testimonial: testimonialReducer,
     webRotData: webRotDataReducer,
+    rbac: rbacReducer,
+    admins: adminsReducer,
   },
   middleware: getDefaultMiddleware =>
     getDefaultMiddleware({
