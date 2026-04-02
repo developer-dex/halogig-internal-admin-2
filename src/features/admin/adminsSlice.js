@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { getApi, postApi, putApi } from '../../services/api';
+import { getApi, postApi, putApi, deleteApi } from '../../services/api';
 import { apiEndPoints } from '../../config/path';
 import { showError, showSuccess } from '../../helpers/messageHelper';
 
@@ -50,6 +50,20 @@ export const updateAdmin = createAsyncThunk(
   },
 );
 
+export const deleteAdmin = createAsyncThunk(
+  'admins/deleteAdmin',
+  async (adminId) => {
+    try {
+      await deleteApi(`${apiEndPoints.ADMINS}/${adminId}`);
+      showSuccess('Admin deleted successfully');
+      return adminId;
+    } catch (e) {
+      showError(e.response?.data?.message || 'Failed to delete admin');
+      throw e;
+    }
+  },
+);
+
 const adminsSlice = createSlice({
   name: 'admins',
   initialState,
@@ -77,6 +91,9 @@ const adminsSlice = createSlice({
       .addCase(updateAdmin.fulfilled, (state, { payload }) => {
         if (!payload) return;
         state.admins = state.admins.map((a) => (a.id === payload.id ? payload : a));
+      })
+      .addCase(deleteAdmin.fulfilled, (state, { payload: adminId }) => {
+        state.admins = state.admins.filter((a) => String(a.id) !== String(adminId));
       });
   },
 });

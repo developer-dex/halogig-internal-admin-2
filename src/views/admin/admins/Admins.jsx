@@ -33,9 +33,9 @@ import {
   Tooltip,
   Spinner,
 } from '@chakra-ui/react';
-import { AddIcon, EditIcon } from '@chakra-ui/icons';
+import { EditIcon, DeleteIcon } from '@chakra-ui/icons';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchAdmins, createAdmin, updateAdmin } from '../../../features/admin/adminsSlice';
+import { fetchAdmins, createAdmin, updateAdmin, deleteAdmin } from '../../../features/admin/adminsSlice';
 import routes from '../../../routes';
 import Card from '../../../components/card/Card';
 
@@ -117,12 +117,23 @@ const Admins = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [editingAdmin, setEditingAdmin] = useState(null);
   const [email, setEmail] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
   const [emailError, setEmailError] = useState('');
+  const [nameError, setNameError] = useState('');
   const [permissions, setPermissions] = useState({});
   const [permissionsError, setPermissionsError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const cardBg = useColorModeValue('white', 'navy.800');
+  const {
+    isOpen: isDeleteOpen,
+    onOpen: onDeleteOpen,
+    onClose: onDeleteClose,
+  } = useDisclosure();
+  const [adminToDelete, setAdminToDelete] = useState(null);
+  const [deleteConfirmText, setDeleteConfirmText] = useState('');
+  const [isDeleting, setIsDeleting] = useState(false);
+
   const tableHeaderBg = useColorModeValue('gray.50', 'whiteAlpha.50');
   const textColor = useColorModeValue('rgb(32, 33, 36)', 'white');
   const borderColor = useColorModeValue('gray.200', 'whiteAlpha.100');
@@ -136,7 +147,10 @@ const Admins = () => {
   const openCreateModal = () => {
     setEditingAdmin(null);
     setEmail('');
+    setFirstName('');
+    setLastName('');
     setEmailError('');
+    setNameError('');
     setPermissions({});
     setPermissionsError('');
     onOpen();
@@ -145,10 +159,37 @@ const Admins = () => {
   const openEditModal = (admin) => {
     setEditingAdmin(admin);
     setEmail(admin.email || '');
+    setFirstName(admin.first_name || '');
+    setLastName(admin.last_name || '');
     setEmailError('');
+    setNameError('');
     setPermissions(normalizeToModuleAccessMap(admin.permissions || {}));
     setPermissionsError('');
     onOpen();
+  };
+
+  const openDeleteModal = (admin) => {
+    setAdminToDelete(admin);
+    setDeleteConfirmText('');
+    onDeleteOpen();
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!adminToDelete) return;
+    if (deleteConfirmText !== 'DELETE') return;
+
+    setIsDeleting(true);
+    try {
+      await dispatch(deleteAdmin(adminToDelete.id)).unwrap();
+      setIsDeleting(false);
+      onDeleteClose();
+      setAdminToDelete(null);
+      setDeleteConfirmText('');
+      // Fetch to be safe with backend filtering
+      dispatch(fetchAdmins());
+    } catch (e) {
+      setIsDeleting(false);
+    }
   };
 
   const handleToggleModuleAccess = (moduleKey) => {
@@ -180,6 +221,13 @@ const Admins = () => {
       setEmailError('');
     }
 
+    if (!firstName || firstName.trim().length < 2 || !lastName || lastName.trim().length < 2) {
+      setNameError('First name and last name are required');
+      valid = false;
+    } else {
+      setNameError('');
+    }
+
     const hasAnyPermission = Object.values(permissions).some((v) => v === true);
     if (!hasAnyPermission) {
       setPermissionsError('At least one permission must be selected');
@@ -196,10 +244,21 @@ const Admins = () => {
 
     setIsSubmitting(true);
     try {
-      const payload = {
-        email,
-        permissions,
-      };
+      const payload = editingAdmin
+        ? {
+          email,
+          permissions,
+          // Sequelize columns are snake_case for admin updates
+          first_name: firstName,
+          last_name: lastName,
+        }
+        : {
+          email,
+          permissions,
+          // create controller expects camelCase
+          firstName,
+          lastName,
+        };
       if (editingAdmin) {
         await dispatch(updateAdmin({ adminId: editingAdmin.id, data: payload })).unwrap();
       } else {
@@ -329,6 +388,18 @@ const Admins = () => {
                                 <Icon as={EditIcon} />
                               </Button>
                             </Tooltip>
+
+                            <Tooltip label="Delete admin">
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                color="red.500"
+                                onClick={() => openDeleteModal(admin)}
+                                ml={2}
+                              >
+                                <Icon as={DeleteIcon} />
+                              </Button>
+                            </Tooltip>
                           </Td>
                         </Tr>
                       );
@@ -351,16 +422,43 @@ const Admins = () => {
           <ModalCloseButton />
           <ModalBody>
             <Stack spacing={4}>
-              <FormControl isRequired isInvalid={!!emailError}>
-                <FormLabel>Email Address</FormLabel>
-                <Input
-                  type="email"
-                  placeholder="Enter admin email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                />
-                {emailError && <FormErrorMessage>{emailError}</FormErrorMessage>}
-              </FormControl>
+              <Stack spacing={4}>
+                <FormControl isRequired isInvalid={!!emailError}>
+                  <FormLabel>Email Address</FormLabel>
+                  <Input
+                    type="email"
+                    placeholder="Enter admin email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                  />
+                  {emailError && <FormErrorMessage>{emailError}</FormErrorMessage>}
+                </FormControl>
+
+                <SimpleGrid columns={2} spacing={3}>
+                  <FormControl isRequired isInvalid={!!nameError}>
+                    <FormLabel>First Name</FormLabel>
+                    <Input
+                      placeholder="Enter first name"
+                      value={firstName}
+                      onChange={(e) => setFirstName(e.target.value)}
+                    />
+                  </FormControl>
+                  <FormControl isRequired isInvalid={!!nameError}>
+                    <FormLabel>Last Name</FormLabel>
+                    <Input
+                      placeholder="Enter last name"
+                      value={lastName}
+                      onChange={(e) => setLastName(e.target.value)}
+                    />
+                  </FormControl>
+                </SimpleGrid>
+
+                {nameError && (
+                  <Text fontSize="xs" color="red.500" mt={-2}>
+                    {nameError}
+                  </Text>
+                )}
+              </Stack>
 
               <Box>
                 <Flex justify="space-between" align="center" mb={2}>
@@ -442,6 +540,50 @@ const Admins = () => {
               loadingText={editingAdmin ? 'Saving...' : 'Creating...'}
             >
               {editingAdmin ? 'Save Changes' : 'Create Admin'}
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+
+      <Modal
+        isOpen={isDeleteOpen}
+        onClose={onDeleteClose}
+        isCentered
+        size="md"
+      >
+        <ModalOverlay />
+        <ModalContent maxW="420px">
+          <ModalHeader>Delete Admin</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <Text fontSize="sm" color="gray.600" mb={3}>
+              This action will mark the admin as inactive. To confirm, type{' '}
+              <Text as="span" fontWeight="700" color="red.500">
+                DELETE
+              </Text>
+              .
+            </Text>
+
+            <FormControl isRequired>
+              <FormLabel mb={1}>Confirmation</FormLabel>
+              <Input
+                value={deleteConfirmText}
+                onChange={(e) => setDeleteConfirmText(e.target.value)}
+                placeholder="Type DELETE"
+              />
+            </FormControl>
+          </ModalBody>
+          <ModalFooter>
+            <Button variant="ghost" mr={3} onClick={onDeleteClose}>
+              Cancel
+            </Button>
+            <Button
+              colorScheme="red"
+              onClick={handleConfirmDelete}
+              isLoading={isDeleting}
+              isDisabled={deleteConfirmText !== 'DELETE' || !adminToDelete}
+            >
+              Delete
             </Button>
           </ModalFooter>
         </ModalContent>

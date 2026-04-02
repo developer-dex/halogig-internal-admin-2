@@ -3,7 +3,7 @@ export const apiEndPoints = {
   ADMIN_LOGIN: "admin/login",
   ADMIN_VERIFY_OTP: "admin/verify-otp",
   ADMIN_PROFILE: "admin/auth/profile",
-  ADMINS: "admins",
+  ADMINS: "admin/auth/admins",
   
   GET_CLIENT_DATA: "admin/clients",
   GET_CLIENT_DETAILS: "admin/user",
