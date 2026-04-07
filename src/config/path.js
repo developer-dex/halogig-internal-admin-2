@@ -83,6 +83,9 @@ export const apiEndPoints = {
   GET_ALL_CATEGORIES: "admin/categories",
   GET_SUB_CATEGORIES_BY_CATEGORY: "admin/sub-categories",
   GET_BATCH_NAME: "admin/batch-name",
+  /** Proxied via halogig-internal-backend → AI service (admin Bearer required) */
+  DRAFT_CAMPAIGN_NAMES: "draft/campaign-names",
+  FOLLOWUP_START: "followup/start",
   GET_HTML_TEMPLATE: "admin/html-template",
   GET_WEBSITE_DATA_SLUG: "admin/website-data-slug",
   GET_WEBSITE_DATA_SLUGS: "admin/website-data-slugs",

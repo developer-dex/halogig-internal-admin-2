@@ -26,8 +26,10 @@ import {
   useDisclosure,
   VStack,
 } from "@chakra-ui/react";
-import { MdAdd, MdRefresh } from "react-icons/md";
+import { MdAdd, MdEmail, MdPeople, MdRefresh } from "react-icons/md";
 import { showError, showSuccess } from "../../../helpers/messageHelper";
+import FollowupEmailModal from "./FollowupEmailModal";
+import LeadStatusSyncModal from "./LeadStatusSyncModal";
 
 const getAiBaseUrl = () => {
   const base = process.env.REACT_APP_AI_API_ENDPOINT;
@@ -43,6 +45,8 @@ const Instantly = () => {
   const theadBg = useColorModeValue("gray.50", "whiteAlpha.50");
 
   const createModal = useDisclosure();
+  const followupModal = useDisclosure();
+  const leadStatusModal = useDisclosure();
 
   const [batchNames, setBatchNames] = useState([]);
   const [campaigns, setCampaigns] = useState([]);
@@ -180,6 +184,24 @@ const Instantly = () => {
           Create
         </Button>
         <Button
+          leftIcon={<MdEmail />}
+          variant="outline"
+          size="sm"
+          borderColor={borderColor}
+          onClick={followupModal.onOpen}
+        >
+          Followup Email
+        </Button>
+        <Button
+          leftIcon={<MdPeople />}
+          variant="outline"
+          size="sm"
+          borderColor={borderColor}
+          onClick={leadStatusModal.onOpen}
+        >
+          Lead Status
+        </Button>
+        <Button
           leftIcon={<MdRefresh />}
           variant="outline"
           size="sm"
@@ -312,6 +334,20 @@ const Instantly = () => {
           </ModalFooter>
         </ModalContent>
       </Modal>
+
+      <FollowupEmailModal
+        isOpen={followupModal.isOpen}
+        onClose={followupModal.onClose}
+        textColor={textColor}
+        borderColor={borderColor}
+      />
+
+      <LeadStatusSyncModal
+        isOpen={leadStatusModal.isOpen}
+        onClose={leadStatusModal.onClose}
+        textColor={textColor}
+        borderColor={borderColor}
+      />
     </Box>
   );
 };
