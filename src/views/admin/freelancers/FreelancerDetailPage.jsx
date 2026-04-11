@@ -14,7 +14,7 @@ import {
   Text,
   useColorModeValue,
 } from '@chakra-ui/react';
-import { MdArrowBack } from 'react-icons/md';
+import { IoMdArrowRoundBack } from "react-icons/io";
 import { freelancerCompleteData } from 'features/admin/freelancerManagementSlice';
 import { FreelancerDetailContent } from './FreelancerList';
 
@@ -85,13 +85,12 @@ export default function FreelancerDetailPage() {
           </BreadcrumbItem>
         </Breadcrumb> */}
           <Button
-            leftIcon={<MdArrowBack />}
+            leftIcon={<IoMdArrowRoundBack />}
             variant="ghost"
             // alignSelf={{ base: 'flex-start', sm: 'center' }}
             onClick={handleBack}
             // size="lg"
           >
-            {/* Back to list */}
           </Button>
 
         <Box

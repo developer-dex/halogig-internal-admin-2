@@ -1,0 +1,55 @@
+/**
+ * Freelancer profile detail page (standalone / detailVariant="page").
+ * All tab field labels use .freelancer-detail-field-label — edit here to restyle globally.
+ */
+
+.freelancer-detail-field-label {
+  font-size: 14px;
+  font-weight: 800;
+  text-transform: capitalize;
+  /* letter-spacing: 0.1em; */
+  /* line-height: 1.35; */
+  /* color: #718096; */
+}
+
+html.chakra-ui-dark .freelancer-detail-field-label,
+body.chakra-ui-dark .freelancer-detail-field-label {
+  color: #a0aec0;
+}
+
+/* Certifications table headers: same typography, sentence case */
+th.freelancer-detail-field-label {
+  text-transform: none;
+  letter-spacing: normal;
+}
+
+/* Field / body values on the same detail page — use on any <Text>, <Link>, <Td>, headings, etc. */
+.freelancer-detail-field-value {
+  font-size: 14px;
+  font-weight: 400;
+  /* line-height: 1.5; */
+  word-break: break-word;
+}
+
+/**
+ * Outlined pill chips (Technologies & Platforms on the detail page).
+ * Style once here; both sections use the same classes.
+ */
+.freelancer-detail-outline-chip {
+  display: inline-block;
+  box-sizing: border-box;
+  border: 1px solid #a0aec0;
+  background-color: transparent;
+  border-radius: 20px;
+  padding: 6px 12px;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.25;
+  color: #2d3748;
+}
+
+html.chakra-ui-dark .freelancer-detail-outline-chip,
+body.chakra-ui-dark .freelancer-detail-outline-chip {
+  border-color: rgba(255, 255, 255, 0.36);
+  color: rgba(255, 255, 255, 0.92);
+}

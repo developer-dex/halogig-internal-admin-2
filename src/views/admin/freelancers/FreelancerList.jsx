@@ -52,6 +52,8 @@ import {
   Textarea,
   Checkbox,
 } from '@chakra-ui/react';
+import './freelancerDetailPage.css';
+
 import { 
   MdVisibility, 
   MdChevronLeft, 
@@ -93,6 +95,23 @@ import { config } from '../../../config/config';
 import { Country, State, City } from 'country-state-city';
 import { apiEndPoints } from '../../../config/path';
 import { UserStatus } from 'utils/enums';
+
+/** Title-case each word in first/last for display (e.g. "kunj VIRANI" → "Kunj Virani"). */
+function formatFreelancerDisplayName(firstName, lastName) {
+  const titleCaseWord = (word) => {
+    const w = String(word ?? '').trim();
+    if (!w) return '';
+    return w.charAt(0).toUpperCase() + w.slice(1).toLowerCase();
+  };
+  const titleCaseSegment = (segment) =>
+    String(segment ?? '')
+      .trim()
+      .split(/\s+/)
+      .map(titleCaseWord)
+      .filter(Boolean)
+      .join(' ');
+  return [titleCaseSegment(firstName), titleCaseSegment(lastName)].filter(Boolean).join(' ');
+}
 
 const FREELANCER_STATUS_FILTER_OPTIONS = [
   { label: 'Pending For Registration', value: 'incomplete' },
@@ -1181,7 +1200,7 @@ export const FreelancerDetailContent = ({
   const cardBg = useColorModeValue('white', 'navy.800');
   const hoverBg = useColorModeValue('gray.50', 'whiteAlpha.50');
   const pageHeadlineBg = useColorModeValue('gray.50', 'whiteAlpha.50');
-  
+
   // State for editable fields
   const [formData, setFormData] = useState({
     primaryIntroduction: {},
@@ -2311,22 +2330,25 @@ export const FreelancerDetailContent = ({
     if (value === null || value === undefined || value === '' || value === '--') return null;
     return (
       <Box textAlign="left">
-        <Text
-          fontSize="10px"
-          fontWeight="bold"
-          color="gray.500"
-          textTransform="uppercase"
-          letterSpacing="0.1em"
-          mb={1}
-        >
+        <Text className="freelancer-detail-field-label" mb={1}>
           {label}
         </Text>
-        <Text fontSize="sm" fontWeight="medium" color={textColor} lineHeight="snug" wordBreak="break-word">
+        <Text className="freelancer-detail-field-value" color={textColor} lineHeight="snug">
           {value}
         </Text>
       </Box>
     );
   };
+
+  /** Technologies & Platforms chips — border/radius/padding live in freelancerDetailPage.css */
+  const DetailOutlineChip = ({ children }) => (
+    <Box
+      as="span"
+      className="freelancer-detail-outline-chip freelancer-detail-field-value"
+    >
+      {children}
+    </Box>
+  );
 
   const renderInfoItem = (icon, label, value, fullWidth = false) => {
     if (!value && value !== 0 && value !== false) return null;
@@ -2409,7 +2431,7 @@ export const FreelancerDetailContent = ({
                 <Avatar
                   size="xl"
                   src={displayData.profile_image}
-                  name={`${displayData.first_name || ''} ${displayData.last_name || ''}`}
+                  name={formatFreelancerDisplayName(displayData.first_name, displayData.last_name)}
                   bg="brand.500"
                 />
                 <VStack align="start" spacing={2} flex={1}>
@@ -2575,11 +2597,11 @@ export const FreelancerDetailContent = ({
                 mb={8}
               >
                 <Avatar
-                  size="2xl"
+                  size="xl"
                   src={displayData.profile_image}
-                  name={`${displayData.first_name || ''} ${displayData.last_name || ''}`}
-                  bg="brand.500"
-                  boxShadow="lg"
+                  name={formatFreelancerDisplayName(displayData.first_name, displayData.last_name)}
+                  // bg="brand.500"
+                  // boxShadow="lg"
                 />
                 <VStack align={{ base: 'center', lg: 'flex-start' }} spacing={3} flex={1}>
                   <Heading
@@ -2588,7 +2610,7 @@ export const FreelancerDetailContent = ({
                     color={textColor}
                     textAlign={{ base: 'center', lg: 'left' }}
                   >
-                    {`${displayData.first_name || ''} ${displayData.last_name || ''}`.trim() || '—'}
+                    {formatFreelancerDisplayName(displayData.first_name, displayData.last_name) || '—'}
                   </Heading>
                   <Badge
                     colorScheme={getStatusBadgeScheme(displayData.status)}
@@ -2605,14 +2627,7 @@ export const FreelancerDetailContent = ({
                 </VStack>
               </Flex>
               <Divider mb={8} />
-              <Text
-                fontSize="sm"
-                fontWeight="semibold"
-                color="gray.500"
-                textTransform="uppercase"
-                letterSpacing="wider"
-                mb={4}
-              >
+              <Text className="freelancer-detail-field-label" mb={4}>
                 Contact and profile
               </Text>
               <Grid templateColumns="repeat(12, 1fr)" gap={4}>
@@ -2638,12 +2653,12 @@ export const FreelancerDetailContent = ({
                 <Avatar
                   size="xl"
                   src={displayData.profile_image}
-                  name={`${displayData.first_name || ''} ${displayData.last_name || ''}`}
+                  name={formatFreelancerDisplayName(displayData.first_name, displayData.last_name)}
                   bg="brand.500"
                 />
                 <VStack align="start" spacing={2} flex={1}>
                   <Text fontSize="xl" fontWeight="bold" color={textColor}>
-                    {`${displayData.first_name || ''} ${displayData.last_name || ''}`}
+                    {formatFreelancerDisplayName(displayData.first_name, displayData.last_name) || '—'}
                   </Text>
                   <Badge
                     colorScheme={getStatusBadgeScheme(displayData.status)}
@@ -2719,30 +2734,13 @@ export const FreelancerDetailContent = ({
         <VStack align="stretch" spacing={6} w="100%">
           <Card bg={cardBg} borderWidth="1px" borderColor={borderColor} shadow="none" borderRadius="lg" overflow="hidden">
             <Box p={{ base: 5, md: 6 }}>
-              <Text
-                fontSize="10px"
-                fontWeight="bold"
-                color="gray.500"
-                textTransform="uppercase"
-                letterSpacing="0.12em"
-                mb={4}
-              >
+              <Text className="freelancer-detail-field-label" mb={2}>
                 Professional overview
               </Text>
               {data.profile_headline ? (
-                <Box
-                  borderLeftWidth="3px"
-                  borderLeftColor="brand.400"
-                  pl={4}
-                  py={3}
-                  mb={5}
-                  bg={pageHeadlineBg}
-                  borderRadius="md"
-                >
-                  <Text fontSize="sm" color={textColor} lineHeight="tall">
+                  <Text className="freelancer-detail-field-value" color={textColor}  mb={6}>
                     {data.profile_headline}
                   </Text>
-                </Box>
               ) : null}
               <SimpleGrid columns={{ base: 1, sm: 2, lg: 4 }} spacingX={{ base: 4, md: 8 }} spacingY={5}>
                 <PageFieldRow label="Category" value={category?.name} />
@@ -2752,21 +2750,12 @@ export const FreelancerDetailContent = ({
               </SimpleGrid>
               {data.technologty_pre ? (
                 <Box mt={5} textAlign="left">
-                  <Text
-                    fontSize="10px"
-                    fontWeight="bold"
-                    color="gray.500"
-                    textTransform="uppercase"
-                    letterSpacing="0.1em"
-                    mb={2}
-                  >
+                  <Text className="freelancer-detail-field-label" mb={2}>
                     Technologies
                   </Text>
                   <HStack spacing={2} flexWrap="wrap">
                     {data.technologty_pre.split(',').map((tech, idx) => (
-                      <Tag key={idx} size="sm" variant="subtle" colorScheme="gray">
-                        {tech.trim()}
-                      </Tag>
+                      <DetailOutlineChip key={idx}>{tech.trim()}</DetailOutlineChip>
                     ))}
                   </HStack>
                 </Box>
@@ -2776,40 +2765,34 @@ export const FreelancerDetailContent = ({
 
           <Card bg={cardBg} borderWidth="1px" borderColor={borderColor} shadow="none" borderRadius="lg">
             <Box p={{ base: 5, md: 6 }}>
-              <Text
-                fontSize="10px"
-                fontWeight="bold"
-                color="gray.500"
-                textTransform="uppercase"
-                letterSpacing="0.12em"
-                mb={4}
-              >
+              <Text className="freelancer-detail-field-label" mb={4}>
                 Platform links
               </Text>
               {platformRows.length === 0 ? (
-                <Text fontSize="sm" color="gray.500">
+                <Text className="freelancer-detail-field-value" color="gray.500">
                   No platform links on file.
                 </Text>
               ) : (
                 <VStack align="stretch" spacing={4}>
                   {platformRows.map((platform, idx) => (
                     <Box key={`${platform.name}-${idx}`} borderBottomWidth={idx < platformRows.length - 1 ? '1px' : 0} borderColor={borderColor} pb={idx < platformRows.length - 1 ? 4 : 0}>
-                      <Text
-                        fontSize="10px"
-                        fontWeight="bold"
-                        color="gray.500"
-                        textTransform="uppercase"
-                        letterSpacing="0.08em"
-                        mb={1}
-                      >
+                      <Text className="freelancer-detail-field-label" mb={1}>
                         {platform.name}
                       </Text>
                       {platform.link ? (
-                        <Link href={platform.link} target="_blank" rel="noopener noreferrer" color="brand.600" fontSize="sm" isExternal wordBreak="break-all">
+                        <Link
+                          href={platform.link}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          color="brand.600"
+                          className="freelancer-detail-field-value"
+                          isExternal
+                          wordBreak="break-all"
+                        >
                           {platform.link}
                         </Link>
                       ) : (
-                        <Text fontSize="sm" color={textColor}>
+                        <Text className="freelancer-detail-field-value" color={textColor}>
                           Active (no URL provided)
                         </Text>
                       )}
@@ -3246,7 +3229,7 @@ export const FreelancerDetailContent = ({
     if (!isEditMode && detailVariant === 'page') {
       return (
         <VStack align="stretch" spacing={5} w="100%">
-          <Text fontSize="sm" fontWeight="bold" color={textColor} letterSpacing="-0.01em">
+          <Text className="freelancer-detail-field-value" fontWeight="bold" color={textColor} letterSpacing="-0.01em">
             Projects
             <Text as="span" fontWeight="normal" color="gray.500" ml={2}>
               ({count || projectsData.length})
@@ -3275,7 +3258,13 @@ export const FreelancerDetailContent = ({
                   borderRadius="lg"
                 >
                   <Box p={{ base: 5, md: 6 }}>
-                    <Text fontSize="md" fontWeight="bold" color={textColor} mb={4} textAlign="left">
+                    <Text className="freelancer-detail-field-label" mb={2}>
+                      Project Name
+                    </Text>
+                    <Text
+                      className="freelancer-detail-field-value"
+                      mb={4}
+                    >
                       {project.project_name || `Project ${index + 1}`}
                     </Text>
                     <SimpleGrid columns={{ base: 1, sm: 3 }} spacing={{ base: 4, md: 6 }} mb={4}>
@@ -3288,59 +3277,34 @@ export const FreelancerDetailContent = ({
                     </SimpleGrid>
                     {projectTechs.length > 0 ? (
                       <Box mb={4} textAlign="left">
-                        <Text
-                          fontSize="10px"
-                          fontWeight="bold"
-                          color="gray.500"
-                          textTransform="uppercase"
-                          letterSpacing="0.1em"
-                          mb={2}
-                        >
+                        <Text className="freelancer-detail-field-label" mb={2}>
                           Technologies
                         </Text>
                         <HStack spacing={2} flexWrap="wrap">
                           {projectTechs.map((tech, techIndex) => (
-                            <Tag key={techIndex} size="sm" variant="subtle" colorScheme="gray">
-                              {tech}
-                            </Tag>
+                            <DetailOutlineChip key={techIndex}>{tech}</DetailOutlineChip>
                           ))}
                         </HStack>
                       </Box>
                     ) : null}
                     {hasPlatforms ? (
                       <Box mb={4} textAlign="left">
-                        <Text
-                          fontSize="10px"
-                          fontWeight="bold"
-                          color="gray.500"
-                          textTransform="uppercase"
-                          letterSpacing="0.1em"
-                          mb={2}
-                        >
+                        <Text className="freelancer-detail-field-label" mb={2}>
                           Platforms
                         </Text>
                         <HStack spacing={2} flexWrap="wrap">
                           {platforms.map((platform, platformIndex) => (
-                            <Tag key={platformIndex} size="sm" variant="outline" colorScheme="gray">
-                              {platform.name}
-                            </Tag>
+                            <DetailOutlineChip key={platformIndex}>{platform.name}</DetailOutlineChip>
                           ))}
                         </HStack>
                       </Box>
                     ) : null}
                     {project.project_details ? (
                       <Box mb={4} textAlign="left">
-                        <Text
-                          fontSize="10px"
-                          fontWeight="bold"
-                          color="gray.500"
-                          textTransform="uppercase"
-                          letterSpacing="0.1em"
-                          mb={2}
-                        >
+                        <Text className="freelancer-detail-field-label" mb={2}>
                           Description
                         </Text>
-                        <Text fontSize="sm" color={textColor} lineHeight="tall">
+                        <Text className="freelancer-detail-field-value" color={textColor} lineHeight="tall">
                           {project.project_details}
                         </Text>
                       </Box>
@@ -3351,7 +3315,7 @@ export const FreelancerDetailContent = ({
                         target="_blank"
                         rel="noopener noreferrer"
                         color="brand.600"
-                        fontSize="sm"
+                        className="freelancer-detail-field-value"
                         fontWeight="medium"
                         isExternal
                       >
@@ -3755,7 +3719,7 @@ export const FreelancerDetailContent = ({
           borderRadius={isPageViewCert ? 'lg' : undefined}
         >
           {isPageViewCert ? (
-            <Text fontSize="sm" fontWeight="bold" color={textColor} mb={4} textAlign="left">
+            <Text className="freelancer-detail-field-value" fontWeight="bold" color={textColor} mb={4} textAlign="left">
               Certifications
               <Text as="span" fontWeight="normal" color="gray.500" ml={2}>
                 ({count || certsData.length})
@@ -3774,11 +3738,46 @@ export const FreelancerDetailContent = ({
             <Table variant="simple" size="sm">
               <Thead>
                 <Tr>
-                  <Th borderColor={borderColor} color={textColor} textAlign={certCellAlign}>Certificate Name</Th>
-                  <Th borderColor={borderColor} color={textColor} textAlign={certCellAlign}>Institution</Th>
-                  <Th borderColor={borderColor} color={textColor} textAlign={certCellAlign}>Certificate No.</Th>
-                  <Th borderColor={borderColor} color={textColor} textAlign={certCellAlign}>From</Th>
-                  <Th borderColor={borderColor} color={textColor} textAlign={certCellAlign}>Till</Th>
+                  <Th
+                    borderColor={borderColor}
+                    textAlign={certCellAlign}
+                    className={isPageViewCert ? 'freelancer-detail-field-label' : undefined}
+                    color={isPageViewCert ? undefined : textColor}
+                  >
+                    Certificate Name
+                  </Th>
+                  <Th
+                    borderColor={borderColor}
+                    textAlign={certCellAlign}
+                    className={isPageViewCert ? 'freelancer-detail-field-label' : undefined}
+                    color={isPageViewCert ? undefined : textColor}
+                  >
+                    Institution
+                  </Th>
+                  <Th
+                    borderColor={borderColor}
+                    textAlign={certCellAlign}
+                    className={isPageViewCert ? 'freelancer-detail-field-label' : undefined}
+                    color={isPageViewCert ? undefined : textColor}
+                  >
+                    Certificate No.
+                  </Th>
+                  <Th
+                    borderColor={borderColor}
+                    textAlign={certCellAlign}
+                    className={isPageViewCert ? 'freelancer-detail-field-label' : undefined}
+                    color={isPageViewCert ? undefined : textColor}
+                  >
+                    From
+                  </Th>
+                  <Th
+                    borderColor={borderColor}
+                    textAlign={certCellAlign}
+                    className={isPageViewCert ? 'freelancer-detail-field-label' : undefined}
+                    color={isPageViewCert ? undefined : textColor}
+                  >
+                    Till
+                  </Th>
                 </Tr>
               </Thead>
               <Tbody>
@@ -3835,11 +3834,11 @@ export const FreelancerDetailContent = ({
                       </>
                     ) : (
                       <>
-                        <Td borderColor={borderColor} color={textColor} textAlign={certCellAlign}>{cert.name || '--'}</Td>
-                        <Td borderColor={borderColor} color={textColor} textAlign={certCellAlign}>{cert.institutename || '--'}</Td>
-                        <Td borderColor={borderColor} color={textColor} textAlign={certCellAlign}>{cert.certificate_no || '--'}</Td>
-                        <Td borderColor={borderColor} color={textColor} textAlign={certCellAlign}>{cert.from_date || '--'}</Td>
-                        <Td borderColor={borderColor} color={textColor} textAlign={certCellAlign}>{cert.till_date === '0' ? 'Present' : cert.till_date || '--'}</Td>
+                        <Td borderColor={borderColor} color={textColor} textAlign={certCellAlign} className={isPageViewCert ? 'freelancer-detail-field-value' : undefined}>{cert.name || '--'}</Td>
+                        <Td borderColor={borderColor} color={textColor} textAlign={certCellAlign} className={isPageViewCert ? 'freelancer-detail-field-value' : undefined}>{cert.institutename || '--'}</Td>
+                        <Td borderColor={borderColor} color={textColor} textAlign={certCellAlign} className={isPageViewCert ? 'freelancer-detail-field-value' : undefined}>{cert.certificate_no || '--'}</Td>
+                        <Td borderColor={borderColor} color={textColor} textAlign={certCellAlign} className={isPageViewCert ? 'freelancer-detail-field-value' : undefined}>{cert.from_date || '--'}</Td>
+                        <Td borderColor={borderColor} color={textColor} textAlign={certCellAlign} className={isPageViewCert ? 'freelancer-detail-field-value' : undefined}>{cert.till_date === '0' ? 'Present' : cert.till_date || '--'}</Td>
                       </>
                     )}
                   </Tr>
@@ -3886,15 +3885,7 @@ export const FreelancerDetailContent = ({
         <VStack align="stretch" spacing={10} w="100%">
           {graduation.length > 0 ? (
             <Box w="100%">
-              <Text
-                fontSize="10px"
-                fontWeight="bold"
-                color="gray.500"
-                textTransform="uppercase"
-                letterSpacing="0.12em"
-                mb={4}
-                textAlign="left"
-              >
+              <Text className="freelancer-detail-field-label" mb={4} textAlign="left">
                 Graduation
               </Text>
               <VStack spacing={4} align="stretch">
@@ -3919,15 +3910,7 @@ export const FreelancerDetailContent = ({
           ) : null}
           {postGraduation.length > 0 ? (
             <Box w="100%">
-              <Text
-                fontSize="10px"
-                fontWeight="bold"
-                color="gray.500"
-                textTransform="uppercase"
-                letterSpacing="0.12em"
-                mb={4}
-                textAlign="left"
-              >
+              <Text className="freelancer-detail-field-label" mb={4} textAlign="left">
                 Post graduate (optional)
               </Text>
               <VStack spacing={4} align="stretch">
