@@ -8,6 +8,7 @@ export const apiEndPoints = {
   GET_CLIENT_DATA: "admin/clients",
   GET_CLIENT_DETAILS: "admin/user",
   GET_FRELANCER_DATA:"admin/freelancers",
+  GET_REFERRAL_PARTNER_DATA: "admin/referral-partners",
   GET_FREELANCER_COMPLETE_DATA: "admin/freelancer",
   UPDATE_FREELANCER_PRIMARY_INTRODUCTION: "admin/freelancer",
   UPDATE_FREELANCER_PROFESSIONAL_EXPERIENCE: "admin/freelancer",

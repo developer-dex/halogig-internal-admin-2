@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import {
   Box,
   Button,
+  Divider,
   Flex,
   FormControl,
   FormLabel,
@@ -13,8 +14,11 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
+  Radio,
+  RadioGroup,
   Select,
   Spinner,
+  Stack,
   Table,
   Tbody,
   Td,
@@ -54,7 +58,18 @@ const Instantly = () => {
   const [isRefreshingTable, setIsRefreshingTable] = useState(false);
   const [selectedBatchName, setSelectedBatchName] = useState("");
   const [selectedCampaignName, setSelectedCampaignName] = useState("");
+  /** "split" = batch + campaign (push-leads). "combine" = one name (push-same). */
+  const [pushMode, setPushMode] = useState("split");
+  const [combinedCampaignName, setCombinedCampaignName] = useState("");
   const [isExecuting, setIsExecuting] = useState(false);
+
+  const combineNameOptions = useMemo(() => {
+    const set = new Set(batchNames.filter(Boolean));
+    (campaigns || []).forEach((c) => {
+      if (c?.name) set.add(String(c.name));
+    });
+    return [...set].sort((a, b) => a.localeCompare(b));
+  }, [batchNames, campaigns]);
 
   const loadLists = async () => {
     const aiBaseUrl = getAiBaseUrl();
@@ -101,6 +116,8 @@ const Instantly = () => {
   const handleOpenCreate = () => {
     setSelectedBatchName("");
     setSelectedCampaignName("");
+    setPushMode("split");
+    setCombinedCampaignName("");
     createModal.onOpen();
   };
 
@@ -125,47 +142,82 @@ const Instantly = () => {
     createModal.onClose();
     setSelectedBatchName("");
     setSelectedCampaignName("");
+    setPushMode("split");
+    setCombinedCampaignName("");
+  };
+
+  const handlePushModeChange = (value) => {
+    setPushMode(value);
+    if (value === "split") {
+      setCombinedCampaignName("");
+    } else {
+      setSelectedBatchName("");
+      setSelectedCampaignName("");
+    }
   };
 
   const handleExecute = async () => {
-    if (!selectedBatchName.trim()) {
-      showError("Please select a batch name");
-      return;
-    }
-    if (!selectedCampaignName.trim()) {
-      showError("Please select a campaign");
-      return;
-    }
-
     const aiBaseUrl = getAiBaseUrl();
     if (!aiBaseUrl) {
       showError("AI API endpoint is not configured (REACT_APP_AI_API_ENDPOINT)");
       return;
     }
 
-    setIsExecuting(true);
-    try {
-      const { data } = await axios.post(`${aiBaseUrl}/api/instantly/push-leads`, {
-        batch_name: selectedBatchName.trim(),
-        campaign_name: selectedCampaignName.trim(),
-      });
-
-      if (data?.success === false) {
-        showError(data?.message || "Push to Instantly failed");
+    if (pushMode === "split") {
+      if (!selectedBatchName.trim()) {
+        showError("Please select a batch name");
         return;
       }
+      if (!selectedCampaignName.trim()) {
+        showError("Please select a campaign");
+        return;
+      }
+    } else {
+      if (!combinedCampaignName.trim()) {
+        showError("Please select a campaign name (combine)");
+        return;
+      }
+    }
 
-      const sent = data?.total_leads_sent ?? data?.leads_uploaded ?? "—";
-      showSuccess(
-        `Push completed. Leads sent: ${sent}. Drafts: ${data?.total_drafts ?? "—"}`
-      );
+    setIsExecuting(true);
+    try {
+      if (pushMode === "split") {
+        const { data } = await axios.post(`${aiBaseUrl}/api/instantly/push-leads`, {
+          batch_name: selectedBatchName.trim(),
+          campaign_name: selectedCampaignName.trim(),
+        });
+
+        if (data?.success === false) {
+          showError(data?.message || "Push to Instantly failed");
+          return;
+        }
+
+        const sent = data?.total_leads_sent ?? data?.leads_uploaded ?? "—";
+        showSuccess(
+          `Push completed. Leads sent: ${sent}. Drafts: ${data?.total_drafts ?? "—"}`
+        );
+      } else {
+        const { data } = await axios.post(`${aiBaseUrl}/api/instantly/push-same`, {
+          campaign_name: combinedCampaignName.trim(),
+        });
+
+        if (data?.success === false) {
+          showError(data?.message || "Push to Instantly failed");
+          return;
+        }
+
+        showSuccess(data?.message || "Same-name push to Instantly completed");
+      }
+
       createModal.onClose();
       setSelectedBatchName("");
       setSelectedCampaignName("");
+      setPushMode("split");
+      setCombinedCampaignName("");
     } catch (err) {
-      console.error("Instantly — push-leads error:", err);
+      console.error("Instantly — execute error:", err);
       const msg =
-        err?.response?.data?.message || err?.message || "Failed to push leads to Instantly";
+        err?.response?.data?.message || err?.message || "Failed to push to Instantly";
       showError(msg);
     } finally {
       setIsExecuting(false);
@@ -278,43 +330,102 @@ const Instantly = () => {
                   <Spinner />
                 </Flex>
               ) : (
-                <>
-                  <FormControl isRequired>
-                    <FormLabel fontSize="sm">Batch name</FormLabel>
-                    <Select
-                      placeholder="Select batch name"
-                      value={selectedBatchName}
-                      onChange={(e) => setSelectedBatchName(e.target.value)}
+                <RadioGroup value={pushMode} onChange={handlePushModeChange}>
+                  <Stack spacing={4} align="stretch">
+                    <Box
+                      borderWidth="1px"
+                      borderColor={pushMode === "split" ? "brand.400" : borderColor}
+                      borderRadius="md"
+                      p={3}
+                      bg={pushMode === "split" ? "brand.50" : "transparent"}
+                      _dark={{ bg: pushMode === "split" ? "whiteAlpha.100" : "transparent" }}
                     >
-                      {batchNames.map((name) => (
-                        <option key={String(name)} value={name}>
-                          {name}
-                        </option>
-                      ))}
-                    </Select>
-                  </FormControl>
+                      <Radio value="split" mb={3} colorScheme="brand">
+                        <Text as="span" fontWeight="600" fontSize="sm">
+                          Batch name + Campaign name
+                        </Text>
+                      </Radio>
+                      <VStack spacing={3} align="stretch" pl={{ base: 0, sm: 6 }} opacity={pushMode === "split" ? 1 : 0.45}>
+                        <FormControl isRequired={pushMode === "split"}>
+                          <FormLabel fontSize="sm">Batch name</FormLabel>
+                          <Select
+                            placeholder="Select batch name"
+                            value={selectedBatchName}
+                            onChange={(e) => setSelectedBatchName(e.target.value)}
+                            isDisabled={pushMode !== "split"}
+                          >
+                            {batchNames.map((name) => (
+                              <option key={String(name)} value={name}>
+                                {name}
+                              </option>
+                            ))}
+                          </Select>
+                        </FormControl>
+                        <FormControl isRequired={pushMode === "split"}>
+                          <FormLabel fontSize="sm">Campaign name</FormLabel>
+                          <Select
+                            placeholder="Select campaign"
+                            value={selectedCampaignName}
+                            onChange={(e) => setSelectedCampaignName(e.target.value)}
+                            isDisabled={pushMode !== "split"}
+                          >
+                            {campaigns
+                              .filter((c) => c?.name)
+                              .map((c) => {
+                                const name = c.name;
+                                return (
+                                  <option key={String(c?.id ?? name)} value={name}>
+                                    {name}
+                                  </option>
+                                );
+                              })}
+                          </Select>
+                        </FormControl>
+                      </VStack>
+                    </Box>
 
-                  <FormControl isRequired>
-                    <FormLabel fontSize="sm">Campaign name</FormLabel>
-                    <Select
-                      placeholder="Select campaign"
-                      value={selectedCampaignName}
-                      onChange={(e) => setSelectedCampaignName(e.target.value)}
+                    <Flex align="center" gap={3} py={1}>
+                      <Divider borderColor={borderColor} />
+                      <Text fontSize="sm" fontWeight="700" color="gray.500" flexShrink={0}>
+                        OR
+                      </Text>
+                      <Divider borderColor={borderColor} />
+                    </Flex>
+
+                    <Box
+                      borderWidth="1px"
+                      borderColor={pushMode === "combine" ? "brand.400" : borderColor}
+                      borderRadius="md"
+                      p={3}
+                      bg={pushMode === "combine" ? "brand.50" : "transparent"}
+                      _dark={{ bg: pushMode === "combine" ? "whiteAlpha.100" : "transparent" }}
                     >
-                      {campaigns
-                        .filter((c) => c?.name)
-                        .map((c) => {
-                          const name = c.name;
-                          return (
-                            <option key={String(c?.id ?? name)} value={name}>
+                      <Radio value="combine" mb={3} colorScheme="brand">
+                        <Text as="span" fontWeight="600" fontSize="sm">
+                          Campaign name (combine)
+                        </Text>
+                      </Radio>
+                      <Text fontSize="xs" color="gray.500" mb={2} pl={{ base: 0, sm: 6 }}>
+                        One name is used as both the draft batch name and the Instantly campaign name when pushing leads.
+                      </Text>
+                      <FormControl isRequired={pushMode === "combine"} pl={{ base: 0, sm: 6 }}>
+                        <FormLabel fontSize="sm">Campaign name</FormLabel>
+                        <Select
+                          placeholder="Select name"
+                          value={combinedCampaignName}
+                          onChange={(e) => setCombinedCampaignName(e.target.value)}
+                          isDisabled={pushMode !== "combine"}
+                        >
+                          {combineNameOptions.map((name) => (
+                            <option key={String(name)} value={name}>
                               {name}
-                              {/* {c?.status ? ` (${c.status})` : ""} */}
                             </option>
-                          );
-                        })}
-                    </Select>
-                  </FormControl>
-                </>
+                          ))}
+                        </Select>
+                      </FormControl>
+                    </Box>
+                  </Stack>
+                </RadioGroup>
               )}
             </VStack>
           </ModalBody>
@@ -327,7 +438,12 @@ const Instantly = () => {
               onClick={handleExecute}
               isLoading={isExecuting}
               loadingText="Executing"
-              isDisabled={isLoadingLists}
+              isDisabled={
+                isLoadingLists
+                || (pushMode === "split"
+                  && (!selectedBatchName.trim() || !selectedCampaignName.trim()))
+                || (pushMode === "combine" && !combinedCampaignName.trim())
+              }
             >
               Execute
             </Button>

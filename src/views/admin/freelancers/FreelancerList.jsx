@@ -159,13 +159,11 @@ function FreelancerList() {
   // Determine which page variant is active based on path
   // Registration -> Freelancers is at /freelancers
   // Management -> Freelancers is at /freelancers-management
-  // Registration -> Referral Partners is at /referral-partners
   const isManagementPage = location.pathname === '/admin/freelancers-management';
-  const isReferralPartnerPage = location.pathname === '/admin/referral-partners';
 
   // Set filters:
   // - Management page shows only approved
-  // - Registration (Freelancers / Referral Partners) shows all others (exclude approved)
+  // - Registration (Freelancers) shows all others (exclude approved)
   const statusFilter = statusFilterValue || (isManagementPage ? UserStatus.APPROVED : null);
   const excludeStatusFilter = statusFilterValue ? null : (!isManagementPage ? UserStatus.APPROVED : null);
 
@@ -198,13 +196,12 @@ function FreelancerList() {
       pageLimit,
       status: statusFilter,
       excludeStatus: excludeStatusFilter,
-      isReferralPartner: isReferralPartnerPage ? true : undefined,
     }));
-  }, [dispatch, page, pageLimit, statusFilter, excludeStatusFilter, isReferralPartnerPage]);
+  }, [dispatch, page, pageLimit, statusFilter, excludeStatusFilter]);
 
   useEffect(() => {
     setSelectedFreelancerIds([]);
-  }, [page, pageLimit, statusFilterValue, isManagementPage, isReferralPartnerPage]);
+  }, [page, pageLimit, statusFilterValue, isManagementPage]);
 
   useEffect(() => {
     if (!isSelectionMode) {
@@ -250,7 +247,6 @@ function FreelancerList() {
         pageLimit,
         status: statusFilter,
         excludeStatus: excludeStatusFilter,
-        isReferralPartner: isReferralPartnerPage ? true : undefined,
       }));
     } catch (e) {
       showError('Failed to update status');
@@ -351,7 +347,6 @@ function FreelancerList() {
         pageLimit,
         status: statusFilter,
         excludeStatus: excludeStatusFilter,
-        isReferralPartner: isReferralPartnerPage ? true : undefined,
       }));
     } catch (error) {
       console.error('Error setting reminder:', error);
@@ -485,7 +480,7 @@ function FreelancerList() {
         <Box p="12px">
           <Flex justify="space-between" align={{ base: 'start', md: 'center' }} gap={3} mb="10px" flexWrap="wrap">
             <Text color={textColor} fontSize="l" fontWeight="700" mb="0">
-              {isReferralPartnerPage ? 'Referral Partners' : 'Freelancers'}
+              Freelancers
             </Text>
 
             {!isManagementPage && (

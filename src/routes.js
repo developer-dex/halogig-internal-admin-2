@@ -23,6 +23,8 @@ import {
   MdScience,
   MdSupport,
   MdAssignment,
+  MdCleaningServices,
+  MdDataset,
 } from 'react-icons/md';
 import { FaGoogle, FaLinkedin, FaTwitter } from 'react-icons/fa';
 
@@ -47,6 +49,7 @@ import VerifyOtp from 'views/auth/verifyOtp';
 // Admin Page Imports
 import ClientList from 'views/admin/clients';
 import FreelancerList from 'views/admin/freelancers';
+import ReferralPartnerList from 'views/admin/referralPartners';
 import SalesReferralLeadList from 'views/admin/salesReferral';
 import ProjectList from 'views/admin/projects';
 import ContactList from 'views/admin/contacts';
@@ -57,6 +60,8 @@ import ChatRoom from 'views/admin/chatRoom';
 import UserChatRoom from 'views/admin/userChatRoom';
 import Blog from 'views/admin/blog';
 import EmailDomainAnalysis from 'views/admin/ai';
+import EmailClearens from 'views/admin/ai/EmailClearens';
+import CentralDataRecords from 'views/admin/ai/CentralDataRecords';
 import InstantlyAnalytics from 'views/admin/instantlyAnalytics';
 import FreelancerTickets from 'views/admin/freelancerTickets';
 import ClientTickets from 'views/admin/clientTickets';
@@ -137,7 +142,7 @@ const routes = [
         layout: '/admin',
         path: '/referral-partners',
         icon: <Icon as={MdWork} width="20px" height="20px" color="inherit" />,
-        component: <FreelancerList />,
+        component: <ReferralPartnerList />,
       },
     ],
   },
@@ -349,6 +354,20 @@ const routes = [
         path: '/ai/instantly-analytics',
         icon: <Icon as={MdAnalytics} width="20px" height="20px" color="inherit" />,
         component: <InstantlyAnalytics />,
+      },
+      {
+        name: 'Email Clearens',
+        layout: '/admin',
+        path: '/ai/email-clearens',
+        icon: <Icon as={MdCleaningServices} width="20px" height="20px" color="inherit" />,
+        component: <EmailClearens />,
+      },
+      {
+        name: 'Central Data Records',
+        layout: '/admin',
+        path: '/ai/central-data-records',
+        icon: <Icon as={MdDataset} width="20px" height="20px" color="inherit" />,
+        component: <CentralDataRecords />,
       },
     ],
   },

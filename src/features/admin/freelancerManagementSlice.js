@@ -41,7 +41,6 @@ export const freelancerData = createAsyncThunk(
     pageLimit,
     status,
     excludeStatus,
-    isReferralPartner,
   }) => {
     try {
       let url = `${apiEndPoints.GET_FRELANCER_DATA}?page=${page}&limit=${pageLimit}`;
@@ -50,9 +49,6 @@ export const freelancerData = createAsyncThunk(
       }
       if (excludeStatus) {
         url += `&excludeStatus=${excludeStatus}`;
-      }
-      if (typeof isReferralPartner === 'boolean') {
-        url += `&is_referral_partner=${isReferralPartner ? 'true' : 'false'}`;
       }
       const payload = await getApi(url);
       return payload;

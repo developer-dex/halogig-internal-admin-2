@@ -172,9 +172,6 @@ const GenerateEmails = () => {
   const [selectedBatchId, setSelectedBatchId] = useState("");
   const [isLoadingBatchNames, setIsLoadingBatchNames] = useState(false);
 
-  const [industries, setIndustries] = useState([]);
-  const [isLoadingIndustries, setIsLoadingIndustries] = useState(false);
-
   // State for execute operation
   const [isExecuting, setIsExecuting] = useState(false);
 
@@ -189,11 +186,10 @@ const GenerateEmails = () => {
     }
   }, [selectedCategoryType, selectedBatchId]);
 
-  // Fetch all categories, batch names, industries, and slugs on mount
+  // Fetch all categories, batch names, and slugs on mount
   useEffect(() => {
     fetchCategories();
     fetchBatchNames();
-    fetchIndustries();
     fetchWebsiteSlugs();
   }, []);
 
@@ -284,21 +280,6 @@ const GenerateEmails = () => {
     }
   };
 
-  const fetchIndustries = async () => {
-    setIsLoadingIndustries(true);
-    try {
-      const response = await getApi(apiEndPoints.GET_INDUSTRY);
-      const data = response?.data?.data || [];
-      setIndustries(Array.isArray(data) ? data : []);
-    } catch (error) {
-      showError("Failed to fetch industries");
-      console.error("fetchIndustries error:", error);
-      setIndustries([]);
-    } finally {
-      setIsLoadingIndustries(false);
-    }
-  };
-
   const handleCategoryTypeChange = (value) => {
     setSelectedCategoryType(value);
     setSelectedItems([]);
@@ -340,12 +321,7 @@ const GenerateEmails = () => {
           slugId: "",
           userPrompt: "",
           subjectPrompt: "",
-          industry: "",
           wordLimit: "",
-          mode: "",
-          include_first_name: false,
-          include_full_name: false,
-          include_designation: false,
         },
       }));
     }
@@ -446,37 +422,6 @@ const GenerateEmails = () => {
     }));
   };
 
-  const handleModeChange = (itemValue, mode) => {
-    setItemSelections((prev) => ({
-      ...prev,
-      [itemValue]: {
-        ...prev[itemValue],
-        mode,
-        // Reset optional flags on mode change to avoid stale values
-        include_first_name: false,
-        include_full_name: false,
-        include_designation: false,
-      },
-    }));
-  };
-
-  const getVisibleIncludeFields = (mode) => {
-    switch (mode) {
-      case "firstname_emails":
-        return ["include_first_name"];
-      case "fullname_emails":
-        return ["include_full_name"];
-      case "firstname_designation_emails":
-        return ["include_first_name", "include_designation"];
-      case "fullname_designation_emails":
-        return ["include_full_name", "include_designation"];
-      case "exa_emails":
-      case "validated_emails":
-      default:
-        return [];
-    }
-  };
-
   const fetchWebsiteSlugs = async () => {
     setIsLoadingSlugs(true);
     try {
@@ -509,8 +454,6 @@ const GenerateEmails = () => {
         !selection?.categoryId ||
         !selection?.subCategoryId ||
         !selection?.slugId ||
-        !selection?.mode ||
-        !selection?.industry ||
         !selection?.wordLimit
       );
     });
@@ -555,8 +498,6 @@ const GenerateEmails = () => {
       const fullSlug = selectedSlug?.full_slug 
         ? `https://halogig.com/${selectedSlug.full_slug}` 
         : "";
-      const visibleIncludeFields = getVisibleIncludeFields(selection?.mode);
-
       return {
         specialCategoryType: selectedCategoryType,
         specialCategoryValue: item,
@@ -569,18 +510,7 @@ const GenerateEmails = () => {
         fullSlugUrl: fullSlug,
         user_prompt: selection?.userPrompt?.trim() || "",
         subject_prompt: selection?.subjectPrompt?.trim() || "",
-        industry: selection?.industry || "",
         word_limit: Number(selection?.wordLimit),
-        mode: selection?.mode || "",
-        ...(visibleIncludeFields.includes("include_first_name")
-          ? { include_first_name: Boolean(selection?.include_first_name) }
-          : {}),
-        ...(visibleIncludeFields.includes("include_full_name")
-          ? { include_full_name: Boolean(selection?.include_full_name) }
-          : {}),
-        ...(visibleIncludeFields.includes("include_designation")
-          ? { include_designation: Boolean(selection?.include_designation) }
-          : {}),
       };
     });
 
@@ -916,69 +846,6 @@ const GenerateEmails = () => {
                         _hover={{ borderColor: "gray.300" }}
                         focusBorderColor="brand.500"
                       />
-                    </Box>
-                    <Box>
-                      <Text color="gray.500" fontSize="xs" mb={1}>
-                        Mode
-                      </Text>
-                      <Select
-                        placeholder="Select mode"
-                        value={selection.mode || ""}
-                        onChange={(e) => handleModeChange(item, e.target.value)}
-                        size="sm"
-                      >
-                        <option value="exa_emails">Exa Emails</option>
-                        <option value="validated_emails">Validated Emails</option>
-                        <option value="firstname_emails">First Name Emails</option>
-                        <option value="fullname_emails">Full Name Emails</option>
-                        <option value="firstname_designation_emails">First Name Designation Emails</option>
-                        <option value="fullname_designation_emails">Full Name Designation Emails</option>
-                      </Select>
-                    </Box>
-                    {getVisibleIncludeFields(selection.mode).includes("include_first_name") && (
-                      <Checkbox
-                        isChecked={Boolean(selection.include_first_name)}
-                        onChange={(e) => handleItemFieldChange(item, "include_first_name", e.target.checked)}
-                      >
-                        Include First Name
-                      </Checkbox>
-                    )}
-                    {getVisibleIncludeFields(selection.mode).includes("include_full_name") && (
-                      <Checkbox
-                        isChecked={Boolean(selection.include_full_name)}
-                        onChange={(e) => handleItemFieldChange(item, "include_full_name", e.target.checked)}
-                      >
-                        Include Full Name
-                      </Checkbox>
-                    )}
-                    {getVisibleIncludeFields(selection.mode).includes("include_designation") && (
-                      <Checkbox
-                        isChecked={Boolean(selection.include_designation)}
-                        onChange={(e) => handleItemFieldChange(item, "include_designation", e.target.checked)}
-                      >
-                        Include Designation
-                      </Checkbox>
-                    )}
-                    <Box>
-                      <Text color="gray.500" fontSize="xs" mb={1}>
-                        Industry
-                      </Text>
-                      <Select
-                        placeholder={isLoadingIndustries ? "Loading industries..." : "Select industry"}
-                        value={selection.industry || ""}
-                        onChange={(e) => handleItemFieldChange(item, "industry", e.target.value)}
-                        isDisabled={isLoadingIndustries || industries.length === 0}
-                        size="sm"
-                      >
-                        {industries.map((industry, indIndex) => {
-                          const value = industry?.name || industry?.industry || industry?.industry_name || "";
-                          return (
-                            <option key={industry?.id || indIndex} value={value}>
-                              {value}
-                            </option>
-                          );
-                        })}
-                      </Select>
                     </Box>
                     <Box>
                       <Text color="gray.500" fontSize="xs" mb={1}>

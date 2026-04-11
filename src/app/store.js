@@ -1,6 +1,7 @@
 import { configureStore } from "@reduxjs/toolkit";
 import { clientDataReducer } from "../features/admin/clientManagementSlice";
 import { freelancerDataReducer } from "../features/admin/freelancerManagementSlice";
+import { referralPartnerDataReducer } from "../features/admin/referralPartnerManagementSlice";
 import { contactDataReducer } from "../features/admin/contactUsManagementSlice";
 import { siteAnalyticsReducer } from "../features/admin/siteAnalyticsSlice";
 import { chatManagementReducer } from "../features/admin/chatManagementSlice";
@@ -24,6 +25,7 @@ const store = configureStore({
   reducer: {
     clientDataReducer: clientDataReducer,
     freelancerDataReducer:freelancerDataReducer,
+    referralPartnerDataReducer,
     contactDataReducer:contactDataReducer,
     siteAnalyticsReducer:siteAnalyticsReducer,
     chatManagementReducer:chatManagementReducer,
