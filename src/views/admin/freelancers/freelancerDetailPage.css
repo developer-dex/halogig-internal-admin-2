@@ -5,7 +5,6 @@
 
 /* ─── Page wrapper ─────────────────────────────────────────────────── */
 .fdp-page-wrapper {
-  min-height: 100vh;
   background: #f7f8fc;
   padding: 20px 16px 40px;
 }
@@ -243,8 +242,20 @@ body.chakra-ui-dark .fdp-section-heading {
 /* ─── Info grid ────────────────────────────────────────────────────── */
 .fdp-info-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  grid-template-columns: repeat(3, 1fr);
   gap: 20px 28px;
+}
+
+@media (max-width: 900px) {
+  .fdp-info-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 500px) {
+  .fdp-info-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .fdp-info-item {
@@ -711,4 +722,880 @@ body.chakra-ui-dark .fdp-platform-name {
 html.chakra-ui-dark .fdp-divider,
 body.chakra-ui-dark .fdp-divider {
   border-top-color: rgba(255,255,255,0.07);
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   EDIT MODE — Professional Admin Panel Form Styles
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* ─── Edit page wrapper ────────────────────────────────────────────── */
+.fdp-edit-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* ─── Edit section card ────────────────────────────────────────────── */
+.fdp-edit-card {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+html.chakra-ui-dark .fdp-edit-card,
+body.chakra-ui-dark .fdp-edit-card {
+  background: #111c44;
+  border-color: rgba(255,255,255,0.08);
+}
+
+.fdp-edit-card-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 24px;
+  border-bottom: 1px solid #f0f0f5;
+  background: #fafbff;
+}
+
+html.chakra-ui-dark .fdp-edit-card-header,
+body.chakra-ui-dark .fdp-edit-card-header {
+  background: rgba(255,255,255,0.03);
+  border-bottom-color: rgba(255,255,255,0.06);
+}
+
+.fdp-edit-card-header-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: #eef2ff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #667eea;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+html.chakra-ui-dark .fdp-edit-card-header-icon,
+body.chakra-ui-dark .fdp-edit-card-header-icon {
+  background: rgba(102,126,234,0.15);
+  color: #a5b4fc;
+}
+
+.fdp-edit-card-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #1a202c;
+  line-height: 1.3;
+}
+
+html.chakra-ui-dark .fdp-edit-card-title,
+body.chakra-ui-dark .fdp-edit-card-title {
+  color: #fff;
+}
+
+.fdp-edit-card-body {
+  padding: 24px;
+}
+
+/* ─── Profile edit header ──────────────────────────────────────────── */
+.fdp-edit-profile-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+  padding-bottom: 20px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid #f0f0f5;
+}
+
+html.chakra-ui-dark .fdp-edit-profile-header,
+body.chakra-ui-dark .fdp-edit-profile-header {
+  border-bottom-color: rgba(255,255,255,0.06);
+}
+
+.fdp-edit-avatar-col {
+  flex-shrink: 0;
+}
+
+.fdp-edit-name-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  flex: 1;
+  min-width: 0;
+}
+
+@media (max-width: 480px) {
+  .fdp-edit-name-row {
+    grid-template-columns: 1fr;
+  }
+  .fdp-edit-profile-header {
+    flex-direction: column;
+  }
+}
+
+/* ─── Form grid ────────────────────────────────────────────────────── */
+.fdp-form-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px 20px;
+}
+
+.fdp-form-grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px 20px;
+}
+
+.fdp-form-grid-1 {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+
+@media (max-width: 900px) {
+  .fdp-form-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .fdp-form-grid,
+  .fdp-form-grid-2 {
+    grid-template-columns: 1fr;
+  }
+}
+
+.fdp-form-col-full {
+  grid-column: 1 / -1;
+}
+
+/* ─── Form field ───────────────────────────────────────────────────── */
+.fdp-form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.fdp-form-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: #718096;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+html.chakra-ui-dark .fdp-form-label,
+body.chakra-ui-dark .fdp-form-label {
+  color: #718096;
+}
+
+.fdp-form-label-required {
+  color: #e53e3e;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.fdp-form-hint {
+  font-size: 11px;
+  color: #a0aec0;
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: 0;
+  margin-left: 4px;
+}
+
+/* ─── Input / Select / Textarea base ──────────────────────────────── */
+.fdp-input,
+.fdp-select,
+.fdp-textarea {
+  width: 100%;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: #2d3748;
+  background: #fff;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 9px 12px;
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  box-sizing: border-box;
+  font-family: inherit;
+  line-height: 1.5;
+}
+
+html.chakra-ui-dark .fdp-input,
+html.chakra-ui-dark .fdp-select,
+html.chakra-ui-dark .fdp-textarea,
+body.chakra-ui-dark .fdp-input,
+body.chakra-ui-dark .fdp-select,
+body.chakra-ui-dark .fdp-textarea {
+  background: #1a2455;
+  border-color: rgba(255,255,255,0.12);
+  color: #e2e8f0;
+}
+
+.fdp-input:focus,
+.fdp-select:focus,
+.fdp-textarea:focus {
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102,126,234,0.15);
+}
+
+.fdp-input:hover:not(:focus),
+.fdp-select:hover:not(:focus),
+.fdp-textarea:hover:not(:focus) {
+  border-color: #b794f4;
+}
+
+.fdp-input:disabled,
+.fdp-select:disabled,
+.fdp-textarea:disabled {
+  background: #f7f8fc;
+  color: #a0aec0;
+  cursor: not-allowed;
+}
+
+html.chakra-ui-dark .fdp-input:disabled,
+html.chakra-ui-dark .fdp-select:disabled,
+html.chakra-ui-dark .fdp-textarea:disabled,
+body.chakra-ui-dark .fdp-input:disabled,
+body.chakra-ui-dark .fdp-select:disabled,
+body.chakra-ui-dark .fdp-textarea:disabled {
+  background: rgba(255,255,255,0.04);
+}
+
+.fdp-select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23a0aec0' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 36px;
+  cursor: pointer;
+}
+
+.fdp-textarea {
+  resize: vertical;
+  min-height: 96px;
+}
+
+/* ─── Char counter ─────────────────────────────────────────────────── */
+.fdp-char-counter {
+  font-size: 11px;
+  color: #a0aec0;
+  text-align: right;
+  margin-top: 3px;
+}
+
+.fdp-char-counter.over {
+  color: #e53e3e;
+}
+
+/* ─── Checkbox group ───────────────────────────────────────────────── */
+.fdp-checkbox-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  background: #fafbff;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 8px;
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+html.chakra-ui-dark .fdp-checkbox-group,
+body.chakra-ui-dark .fdp-checkbox-group {
+  background: rgba(255,255,255,0.03);
+  border-color: rgba(255,255,255,0.1);
+}
+
+.fdp-checkbox-group-search {
+  padding: 8px 10px;
+  border-bottom: 1px solid #e2e8f0;
+  background: #fff;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+html.chakra-ui-dark .fdp-checkbox-group-search,
+body.chakra-ui-dark .fdp-checkbox-group-search {
+  background: #1a2455;
+  border-bottom-color: rgba(255,255,255,0.08);
+}
+
+.fdp-checkbox-group-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px;
+  max-height: 180px;
+  overflow-y: auto;
+}
+
+.fdp-checkbox-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #2d3748;
+  cursor: pointer;
+  padding: 4px 6px;
+  border-radius: 6px;
+  transition: background 0.1s;
+  user-select: none;
+}
+
+.fdp-checkbox-item:hover {
+  background: #eef2ff;
+}
+
+html.chakra-ui-dark .fdp-checkbox-item,
+body.chakra-ui-dark .fdp-checkbox-item {
+  color: #e2e8f0;
+}
+
+html.chakra-ui-dark .fdp-checkbox-item:hover,
+body.chakra-ui-dark .fdp-checkbox-item:hover {
+  background: rgba(102,126,234,0.12);
+}
+
+.fdp-checkbox-item input[type="checkbox"] {
+  width: 15px;
+  height: 15px;
+  accent-color: #667eea;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.fdp-checkbox-inline-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+  padding: 12px;
+  background: #fafbff;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 8px;
+}
+
+html.chakra-ui-dark .fdp-checkbox-inline-row,
+body.chakra-ui-dark .fdp-checkbox-inline-row {
+  background: rgba(255,255,255,0.03);
+  border-color: rgba(255,255,255,0.1);
+}
+
+/* ─── Project edit card ────────────────────────────────────────────── */
+.fdp-project-edit-card {
+  background: #fff;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 16px;
+  transition: border-color 0.15s;
+}
+
+.fdp-project-edit-card:focus-within {
+  border-color: #667eea;
+}
+
+html.chakra-ui-dark .fdp-project-edit-card,
+body.chakra-ui-dark .fdp-project-edit-card {
+  background: #111c44;
+  border-color: rgba(255,255,255,0.1);
+}
+
+.fdp-project-edit-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px;
+  background: #f7f8fc;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+html.chakra-ui-dark .fdp-project-edit-card-header,
+body.chakra-ui-dark .fdp-project-edit-card-header {
+  background: rgba(255,255,255,0.03);
+  border-bottom-color: rgba(255,255,255,0.06);
+}
+
+.fdp-project-edit-card-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: #667eea;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.fdp-project-edit-card-label {
+  font-size: 13px;
+  font-weight: 700;
+  color: #1a202c;
+  margin-left: 10px;
+}
+
+html.chakra-ui-dark .fdp-project-edit-card-label,
+body.chakra-ui-dark .fdp-project-edit-card-label {
+  color: #fff;
+}
+
+.fdp-project-edit-card-body {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* ─── Save / action bar ────────────────────────────────────────────── */
+.fdp-edit-action-bar {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 8px;
+}
+
+.fdp-save-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 10px 24px;
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #fff;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: opacity 0.15s, transform 0.1s;
+  outline: none;
+}
+
+.fdp-save-btn:hover {
+  opacity: 0.92;
+  transform: translateY(-1px);
+}
+
+.fdp-save-btn:active {
+  transform: translateY(0);
+}
+
+.fdp-save-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* ─── Empty / loading states in edit ──────────────────────────────── */
+.fdp-edit-empty {
+  text-align: center;
+  padding: 32px;
+  color: #a0aec0;
+  font-size: 13.5px;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   CUSTOM SELECT (FdpSelect) — replaces native <select> dropdown
+   ═══════════════════════════════════════════════════════════════════ */
+
+.fdp-csel-wrap {
+  position: relative;
+  width: 100%;
+}
+
+.fdp-csel-wrap--disabled {
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+/* ─── Trigger button ───────────────────────────────────────────────── */
+.fdp-csel-trigger {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 9px 12px;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: #2d3748;
+  background: #fff;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 8px;
+  cursor: pointer;
+  text-align: left;
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  font-family: inherit;
+  line-height: 1.5;
+  box-sizing: border-box;
+}
+
+.fdp-csel-trigger:hover {
+  border-color: #b794f4;
+}
+
+.fdp-csel-trigger:focus,
+.fdp-csel-trigger[aria-expanded="true"] {
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102,126,234,0.15);
+}
+
+html.chakra-ui-dark .fdp-csel-trigger,
+body.chakra-ui-dark .fdp-csel-trigger {
+  background: #1a2455;
+  border-color: rgba(255,255,255,0.12);
+  color: #e2e8f0;
+}
+
+html.chakra-ui-dark .fdp-csel-trigger:hover,
+body.chakra-ui-dark .fdp-csel-trigger:hover {
+  border-color: #7c6fcd;
+}
+
+html.chakra-ui-dark .fdp-csel-trigger:focus,
+html.chakra-ui-dark .fdp-csel-trigger[aria-expanded="true"],
+body.chakra-ui-dark .fdp-csel-trigger:focus,
+body.chakra-ui-dark .fdp-csel-trigger[aria-expanded="true"] {
+  border-color: #a5b4fc;
+  box-shadow: 0 0 0 3px rgba(165,180,252,0.15);
+}
+
+.fdp-csel-value {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.fdp-csel-placeholder {
+  color: #a0aec0;
+}
+
+html.chakra-ui-dark .fdp-csel-placeholder,
+body.chakra-ui-dark .fdp-csel-placeholder {
+  color: #4a5568;
+}
+
+.fdp-csel-arrow {
+  flex-shrink: 0;
+  color: #a0aec0;
+  transition: transform 0.18s;
+}
+
+.fdp-csel-arrow--open {
+  transform: rotate(180deg);
+}
+
+/* ─── Dropdown panel ───────────────────────────────────────────────── */
+.fdp-csel-dropdown {
+  background: #fff;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.10), 0 2px 6px rgba(0,0,0,0.06);
+  overflow: hidden;
+  animation: fdp-csel-in 0.12s ease;
+}
+
+@keyframes fdp-csel-in {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+html.chakra-ui-dark .fdp-csel-dropdown,
+body.chakra-ui-dark .fdp-csel-dropdown {
+  background: #1e2d6b;
+  border-color: rgba(255,255,255,0.12);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.35);
+}
+
+/* ─── Search box ───────────────────────────────────────────────────── */
+.fdp-csel-search-wrap {
+  padding: 8px 10px;
+  border-bottom: 1px solid #f0f0f5;
+  background: #fafbff;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+html.chakra-ui-dark .fdp-csel-search-wrap,
+body.chakra-ui-dark .fdp-csel-search-wrap {
+  background: #1a2455;
+  border-bottom-color: rgba(255,255,255,0.08);
+}
+
+.fdp-csel-search {
+  width: 100%;
+  padding: 6px 10px;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: #2d3748;
+  background: #fff;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 6px;
+  outline: none;
+  font-family: inherit;
+  box-sizing: border-box;
+  transition: border-color 0.15s;
+}
+
+.fdp-csel-search:focus {
+  border-color: #667eea;
+  box-shadow: 0 0 0 2px rgba(102,126,234,0.12);
+}
+
+html.chakra-ui-dark .fdp-csel-search,
+body.chakra-ui-dark .fdp-csel-search {
+  background: #111c44;
+  border-color: rgba(255,255,255,0.12);
+  color: #e2e8f0;
+}
+
+/* ─── Options list ─────────────────────────────────────────────────── */
+.fdp-csel-list {
+  max-height: 220px;
+  overflow-y: auto;
+  padding: 4px;
+  scrollbar-width: thin;
+  scrollbar-color: #e2e8f0 transparent;
+}
+
+.fdp-csel-list::-webkit-scrollbar {
+  width: 5px;
+}
+
+.fdp-csel-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.fdp-csel-list::-webkit-scrollbar-thumb {
+  background: #e2e8f0;
+  border-radius: 4px;
+}
+
+html.chakra-ui-dark .fdp-csel-list::-webkit-scrollbar-thumb,
+body.chakra-ui-dark .fdp-csel-list::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.12);
+}
+
+/* ─── Option item ──────────────────────────────────────────────────── */
+.fdp-csel-opt {
+  padding: 8px 12px;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: #2d3748;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.1s, color 0.1s;
+  user-select: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.fdp-csel-opt:hover {
+  background: #eef2ff;
+  color: #667eea;
+}
+
+.fdp-csel-opt--active {
+  background: #eef2ff;
+  color: #667eea;
+  font-weight: 600;
+}
+
+html.chakra-ui-dark .fdp-csel-opt,
+body.chakra-ui-dark .fdp-csel-opt {
+  color: #e2e8f0;
+}
+
+html.chakra-ui-dark .fdp-csel-opt:hover,
+body.chakra-ui-dark .fdp-csel-opt:hover {
+  background: rgba(102,126,234,0.15);
+  color: #a5b4fc;
+}
+
+html.chakra-ui-dark .fdp-csel-opt--active,
+body.chakra-ui-dark .fdp-csel-opt--active {
+  background: rgba(102,126,234,0.2);
+  color: #a5b4fc;
+}
+
+/* ─── Empty state ──────────────────────────────────────────────────── */
+.fdp-csel-empty {
+  padding: 12px;
+  font-size: 12.5px;
+  color: #a0aec0;
+  text-align: center;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   MULTI-SELECT (FdpMultiSelect)
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* ─── Multi-select trigger (chips inside) ──────────────────────────── */
+.fdp-msel-trigger {
+  height: auto !important;
+  min-height: 40px;
+  align-items: flex-start !important;
+  padding: 6px 12px !important;
+  cursor: pointer;
+}
+
+.fdp-msel-trigger-inner {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+}
+
+.fdp-msel-chips-inline {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 2px 0;
+}
+
+/* ─── Selected chips row (legacy — kept for compat) ────────────────── */
+.fdp-msel-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: 6px;
+}
+
+.fdp-msel-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px 3px 10px;
+  background: #eef2ff;
+  color: #667eea;
+  border: 1px solid #c7d2fe;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+html.chakra-ui-dark .fdp-msel-chip,
+body.chakra-ui-dark .fdp-msel-chip {
+  background: rgba(102,126,234,0.18);
+  color: #a5b4fc;
+  border-color: rgba(102,126,234,0.3);
+}
+
+.fdp-msel-chip-remove {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border: none;
+  background: none;
+  color: #667eea;
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+  border-radius: 50%;
+  padding: 0;
+  transition: background 0.1s;
+}
+
+.fdp-msel-chip-remove:hover {
+  background: #c7d2fe;
+}
+
+html.chakra-ui-dark .fdp-msel-chip-remove,
+body.chakra-ui-dark .fdp-msel-chip-remove {
+  color: #a5b4fc;
+}
+
+html.chakra-ui-dark .fdp-msel-chip-remove:hover,
+body.chakra-ui-dark .fdp-msel-chip-remove:hover {
+  background: rgba(102,126,234,0.3);
+}
+
+/* ─── Option row ───────────────────────────────────────────────────── */
+.fdp-msel-opt {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.1s;
+  user-select: none;
+}
+
+.fdp-msel-opt:hover {
+  background: #f5f7ff;
+}
+
+.fdp-msel-opt--checked {
+  background: #eef2ff;
+}
+
+html.chakra-ui-dark .fdp-msel-opt:hover,
+body.chakra-ui-dark .fdp-msel-opt:hover {
+  background: rgba(102,126,234,0.1);
+}
+
+html.chakra-ui-dark .fdp-msel-opt--checked,
+body.chakra-ui-dark .fdp-msel-opt--checked {
+  background: rgba(102,126,234,0.18);
+}
+
+/* ─── Custom checkbox box ──────────────────────────────────────────── */
+.fdp-msel-checkbox {
+  width: 16px;
+  height: 16px;
+  border: 1.5px solid #cbd5e0;
+  border-radius: 4px;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: background 0.12s, border-color 0.12s;
+}
+
+.fdp-msel-checkbox--checked {
+  background: #667eea;
+  border-color: #667eea;
+}
+
+html.chakra-ui-dark .fdp-msel-checkbox,
+body.chakra-ui-dark .fdp-msel-checkbox {
+  background: #1a2455;
+  border-color: rgba(255,255,255,0.2);
+}
+
+html.chakra-ui-dark .fdp-msel-checkbox--checked,
+body.chakra-ui-dark .fdp-msel-checkbox--checked {
+  background: #667eea;
+  border-color: #667eea;
+}
+
+.fdp-msel-opt-label {
+  font-size: 13.5px;
+  font-weight: 500;
+  color: #2d3748;
+  flex: 1;
+}
+
+html.chakra-ui-dark .fdp-msel-opt-label,
+body.chakra-ui-dark .fdp-msel-opt-label {
+  color: #e2e8f0;
 }

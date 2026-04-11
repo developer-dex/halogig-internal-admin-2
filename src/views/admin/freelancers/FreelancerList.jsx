@@ -53,6 +53,8 @@ import {
   Checkbox,
 } from '@chakra-ui/react';
 import './freelancerDetailPage.css';
+import FdpSelect from './FdpSelect';
+import FdpMultiSelect from './FdpMultiSelect';
 
 import { 
   MdVisibility, 
@@ -2425,161 +2427,96 @@ export const FreelancerDetailContent = ({
     return (
       <VStack align="stretch" spacing={6}>
         {isEditMode ? (
-          <Card bg={cardBg} p={6}>
-            <VStack align="stretch" spacing={4}>
-              <HStack spacing={4} align="start">
-                <Avatar
-                  size="xl"
-                  src={displayData.profile_image}
-                  name={formatFreelancerDisplayName(displayData.first_name, displayData.last_name)}
-                  bg="brand.500"
-                />
-                <VStack align="start" spacing={2} flex={1}>
-                  <HStack spacing={2} w="100%">
-                    <FormControl>
-                      <FormLabel fontSize="xs">First Name</FormLabel>
-                      <Input
-                        value={displayData.first_name || ''}
-                        onChange={(e) => updateFormData('primaryIntroduction', 'user', { ...displayData, first_name: e.target.value })}
-                        fontSize="sm"
-                        borderColor={borderColor}
-                      />
-                    </FormControl>
-                    <FormControl>
-                      <FormLabel fontSize="xs">Last Name</FormLabel>
-                      <Input
-                        value={displayData.last_name || ''}
-                        onChange={(e) => updateFormData('primaryIntroduction', 'user', { ...displayData, last_name: e.target.value })}
-                        fontSize="sm"
-                        borderColor={borderColor}
-                      />
-                    </FormControl>
-                  </HStack>
-                </VStack>
-              </HStack>
+          <div className="fdp-edit-card">
+            <div className="fdp-edit-card-header">
+              <div className="fdp-edit-card-header-icon"><MdPerson /></div>
+              <span className="fdp-edit-card-title">Personal Information</span>
+            </div>
+            <div className="fdp-edit-card-body">
+              {/* Avatar + Name row */}
+              <div className="fdp-edit-profile-header">
+                <div className="fdp-edit-avatar-col">
+                  <Avatar
+                    size="xl"
+                    src={displayData.profile_image}
+                    name={formatFreelancerDisplayName(displayData.first_name, displayData.last_name)}
+                    // bg="brand.500"
+                  />
+                </div>
+                <div className="fdp-edit-name-row">
+                  <div className="fdp-form-field">
+                    <label className="fdp-form-label">First Name</label>
+                    <input
+                      className="fdp-input"
+                      value={displayData.first_name || ''}
+                      onChange={(e) => updateFormData('primaryIntroduction', 'user', { ...displayData, first_name: e.target.value })}
+                    />
+                  </div>
+                  <div className="fdp-form-field">
+                    <label className="fdp-form-label">Last Name</label>
+                    <input
+                      className="fdp-input"
+                      value={displayData.last_name || ''}
+                      onChange={(e) => updateFormData('primaryIntroduction', 'user', { ...displayData, last_name: e.target.value })}
+                    />
+                  </div>
+                </div>
+              </div>
 
-              <Divider />
+              {/* Contact fields */}
+              <div className="fdp-form-grid" style={{ marginBottom: 16 }}>
+                <div className="fdp-form-field">
+                  <label className="fdp-form-label"><MdEmail size={12} /> Email</label>
+                  <input className="fdp-input" value={displayData.email || ''} onChange={(e) => updateFormData('primaryIntroduction', 'user', { ...displayData, email: e.target.value })} />
+                </div>
+                <div className="fdp-form-field">
+                  <label className="fdp-form-label"><MdPhone size={12} /> Mobile</label>
+                  <input className="fdp-input" value={displayData.mobile || ''} onChange={(e) => updateFormData('primaryIntroduction', 'user', { ...displayData, mobile: e.target.value })} />
+                </div>
+                <div className="fdp-form-field">
+                  <label className="fdp-form-label"><MdPerson size={12} /> Gender</label>
+                  <input className="fdp-input" value={displayData.gender || ''} onChange={(e) => updateFormData('primaryIntroduction', 'user', { ...displayData, gender: e.target.value })} />
+                </div>
+                <div className="fdp-form-field">
+                  <label className="fdp-form-label"><MdBusiness size={12} /> Company</label>
+                  <input className="fdp-input" value={displayData.company_name || ''} onChange={(e) => updateFormData('primaryIntroduction', 'user', { ...displayData, company_name: e.target.value })} />
+                </div>
+              </div>
 
-              <VStack align="stretch" spacing={4}>
-                <Grid templateColumns={{ base: '1fr', md: 'repeat(2, 1fr)', lg: 'repeat(3, 1fr)' }} gap={4}>
-                  {renderEditableField(
-                    <MdEmail />,
-                    'Email',
-                    displayData.email,
-                    (value) => updateFormData('primaryIntroduction', 'user', { ...displayData, email: value })
-                  )}
-                  {renderEditableField(
-                    <MdPhone />,
-                    'Mobile',
-                    displayData.mobile,
-                    (value) => updateFormData('primaryIntroduction', 'user', { ...displayData, mobile: value })
-                  )}
-                  {renderEditableField(
-                    <MdPerson />,
-                    'Gender',
-                    displayData.gender,
-                    (value) => updateFormData('primaryIntroduction', 'user', { ...displayData, gender: value })
-                  )}
-                  {renderEditableField(
-                    <MdBusiness />,
-                    'Company',
-                    displayData.company_name,
-                    (value) => updateFormData('primaryIntroduction', 'user', { ...displayData, company_name: value })
-                  )}
-                </Grid>
-
-                <Grid templateColumns={{ base: '1fr', md: 'repeat(3, 1fr)' }} gap={4}>
-                  <GridItem colSpan={{ base: 12, md: 4 }}>
-                    <FormControl mb={4}>
-                      <FormLabel fontSize="xs" fontWeight="600" color="gray.500" textTransform="uppercase">
-                        <HStack spacing={2}>
-                          <MdLocationOn />
-                          <Text>Country</Text>
-                        </HStack>
-                      </FormLabel>
-                      <Select
-                        placeholder="Select a country"
-                        value={countryValue || ''}
-                        onChange={(e) => handleCountryChange(e.target.value)}
-                        borderColor={borderColor}
-                        _hover={{ borderColor: 'brand.500' }}
-                        _focus={{ borderColor: 'brand.500', boxShadow: '0 0 0 1px brand.500' }}
-                        fontSize="sm"
-                      >
-                        {countryOptions.map((country) => (
-                          <option key={country.value} value={country.value}>
-                            {country.label}
-                          </option>
-                        ))}
-                      </Select>
-                    </FormControl>
-                  </GridItem>
-
-                  <GridItem colSpan={{ base: 12, md: 4 }}>
-                    <FormControl mb={4}>
-                      <FormLabel fontSize="xs" fontWeight="600" color="gray.500" textTransform="uppercase">
-                        <HStack spacing={2}>
-                          <MdLocationOn />
-                          <Text>State</Text>
-                        </HStack>
-                      </FormLabel>
-                      <Select
-                        placeholder={states.length > 0 ? 'Select a state' : 'No states found'}
-                        value={stateValue || ''}
-                        onChange={(e) => handleStateChange(e.target.value)}
-                        isDisabled={!countryValue || states.length === 0}
-                        borderColor={borderColor}
-                        _hover={{ borderColor: 'brand.500' }}
-                        _focus={{ borderColor: 'brand.500', boxShadow: '0 0 0 1px brand.500' }}
-                        fontSize="sm"
-                      >
-                        {states.length > 0 ? (
-                          states.map((state) => (
-                            <option key={state.value} value={state.value}>
-                              {state.label}
-                            </option>
-                          ))
-                        ) : (
-                          <option value="" disabled>No states found</option>
-                        )}
-                      </Select>
-                    </FormControl>
-                  </GridItem>
-
-                  <GridItem colSpan={{ base: 12, md: 4 }}>
-                    <FormControl mb={4}>
-                      <FormLabel fontSize="xs" fontWeight="600" color="gray.500" textTransform="uppercase">
-                        <HStack spacing={2}>
-                          <MdLocationOn />
-                          <Text>City</Text>
-                        </HStack>
-                      </FormLabel>
-                      <Select
-                        placeholder={cities.length > 0 ? 'Select a city' : 'No cities found'}
-                        value={cityValue || ''}
-                        onChange={(e) => handleCityChange(e.target.value)}
-                        isDisabled={!stateValue || cities.length === 0}
-                        borderColor={borderColor}
-                        _hover={{ borderColor: 'brand.500' }}
-                        _focus={{ borderColor: 'brand.500', boxShadow: '0 0 0 1px brand.500' }}
-                        fontSize="sm"
-                      >
-                        {cities.length > 0 ? (
-                          cities.map((city) => (
-                            <option key={city.value} value={city.value}>
-                              {city.label}
-                            </option>
-                          ))
-                        ) : (
-                          <option value="" disabled>No cities found</option>
-                        )}
-                      </Select>
-                    </FormControl>
-                  </GridItem>
-                </Grid>
-              </VStack>
-            </VStack>
-          </Card>
+              {/* Location row */}
+              <div className="fdp-form-grid">
+                <div className="fdp-form-field">
+                  <label className="fdp-form-label"><MdLocationOn size={12} /> Country</label>
+                  <FdpSelect
+                    value={countryValue || ''}
+                    onChange={handleCountryChange}
+                    options={countryOptions}
+                    placeholder="Select a country"
+                  />
+                </div>
+                <div className="fdp-form-field">
+                  <label className="fdp-form-label"><MdLocationOn size={12} /> State</label>
+                  <FdpSelect
+                    value={stateValue || ''}
+                    onChange={handleStateChange}
+                    options={states}
+                    placeholder={states.length > 0 ? 'Select a state' : 'No states found'}
+                    disabled={!countryValue || states.length === 0}
+                  />
+                </div>
+                <div className="fdp-form-field">
+                  <label className="fdp-form-label"><MdLocationOn size={12} /> City</label>
+                  <FdpSelect
+                    value={cityValue || ''}
+                    onChange={handleCityChange}
+                    options={cities}
+                    placeholder={cities.length > 0 ? 'Select a city' : 'No cities found'}
+                    disabled={!stateValue || cities.length === 0}
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
         ) : detailVariant === 'page' ? (
           <div className="fdp-section-card">
             <div className="fdp-section-card-accent" />
@@ -2711,16 +2648,15 @@ export const FreelancerDetailContent = ({
           </Card>
         )}
         {isEditMode && (
-          <Flex justify="flex-end" pt={4}>
-            <Button
-              colorScheme="brand"
+          <div className="fdp-edit-action-bar">
+            <button
+              className="fdp-save-btn"
               onClick={() => handleUpdate('Primary Introduction')}
-              isLoading={isUpdating}
-              loadingText="Updating..."
+              disabled={isUpdating}
             >
-              Update Primary Introduction
-            </Button>
-          </Flex>
+              {isUpdating ? 'Saving…' : 'Save Personal Information'}
+            </button>
+          </div>
         )}
       </VStack>
     );
@@ -2838,338 +2774,121 @@ export const FreelancerDetailContent = ({
     }
 
     return (
-      <VStack align="stretch" spacing={6}>
-        <Card bg={cardBg} p={6}>
-          <VStack align="stretch" spacing={4}>
-            <HStack spacing={2} mb={4}>
-              <MdWork size={24} color="brand.500" />
-              <Text fontSize="lg" fontWeight="bold" color={textColor}>
-                Professional Overview
-              </Text>
-            </HStack>
-
+      <div className="fdp-edit-wrap">
+        <div className="fdp-edit-card">
+          <div className="fdp-edit-card-header">
+            <div className="fdp-edit-card-header-icon"><MdWork /></div>
+            <span className="fdp-edit-card-title">Professional Overview</span>
+          </div>
+          <div className="fdp-edit-card-body">
             {isEditMode ? (
-              <VStack align="stretch" spacing={4}>
-                {/* Category and Subcategory Section */}
-                <Grid templateColumns={{ base: '1fr', md: 'repeat(2, 1fr)' }} gap={4}>
-                  <GridItem>
-                    <FormControl mb={4}>
-                      <FormLabel fontSize="xs" fontWeight="600" color="gray.500" textTransform="uppercase">
-                        <HStack spacing={2}>
-                          <MdBusiness />
-                          <Text>Project Category</Text>
-                        </HStack>
-                      </FormLabel>
-                      <Select
-                        placeholder="Select a category"
-                        value={selectedCategoryId || ''}
-                        onChange={handleCategoryChange}
-                        borderColor={borderColor}
-                        _hover={{ borderColor: 'brand.500' }}
-                        _focus={{ borderColor: 'brand.500', boxShadow: '0 0 0 1px brand.500' }}
-                        fontSize="sm"
-                        isDisabled={isLoadingCategories}
-                      >
-                        {categories.map((category) => (
-                          <option key={category.id} value={category.id}>
-                            {category.name}
-                          </option>
-                        ))}
-                      </Select>
-                    </FormControl>
-                  </GridItem>
-                  
-                  <GridItem>
-                    <FormControl mb={4}>
-                      <FormLabel fontSize="xs" fontWeight="600" color="gray.500" textTransform="uppercase">
-                        <HStack spacing={2}>
-                          <MdBusiness />
-                          <Text>Project Sub Category</Text>
-                        </HStack>
-                      </FormLabel>
-                      <Box
-                        border="1px solid"
-                        borderColor={borderColor}
-                        borderRadius="md"
-                        bg={cardBg}
-                      >
-                        {subCategories.length > 0 && (
-                          <Box p={2} borderBottom="1px solid" borderColor={borderColor}>
-                            <Input
-                              placeholder="Search subcategories..."
-                              value={subCategorySearchTerm}
-                              onChange={(e) => setSubCategorySearchTerm(e.target.value)}
-                              size="sm"
-                              borderColor={borderColor}
-                              _focus={{ borderColor: 'brand.500', boxShadow: '0 0 0 1px brand.500' }}
-                            />
-                          </Box>
-                        )}
-                        <Box
-                          p={3}
-                          maxH="200px"
-                          overflowY="auto"
-                        >
-                          {subCategories.length > 0 ? (
-                            (() => {
-                              const filteredSubCategories = subCategories.filter(subCat =>
-                                subCat.name.toLowerCase().includes(subCategorySearchTerm.toLowerCase())
-                              );
-                              return filteredSubCategories.length > 0 ? (
-                                <VStack align="start" spacing={2}>
-                                  {filteredSubCategories.map((subCategory) => (
-                                    <Checkbox
-                                      key={subCategory.id}
-                                      isChecked={selectedSubCategoryIds.includes(subCategory.id.toString())}
-                                      onChange={(e) => handleSubCategoryChange(subCategory.id.toString(), e.target.checked)}
-                                      fontSize="sm"
-                                      colorScheme="brand"
-                                    >
-                                      {subCategory.name}
-                                    </Checkbox>
-                                  ))}
-                                </VStack>
-                              ) : (
-                                <Text fontSize="sm" color="gray.500">
-                                  No subcategories found matching "{subCategorySearchTerm}"
-                                </Text>
-                              );
-                            })()
-                          ) : (
-                            <Text fontSize="sm" color="gray.500">
-                              {selectedCategoryId ? 'No subcategories found' : 'Please select a category first'}
-                            </Text>
-                          )}
-                        </Box>
-                      </Box>
-                    </FormControl>
-                  </GridItem>
-                </Grid>
-                
-                {/* Other fields */}
-                <Grid templateColumns={{ base: '1fr', md: 'repeat(2, 1fr)', lg: 'repeat(3, 1fr)' }} gap={4}>
-                  {renderEditableField(
-                    <MdWork />,
-                    'Profile Headline',
-                    data.profile_headline,
-                    (value) => updateFormData('professionalExperience', 'data', { ...data, profile_headline: value }),
-                    true
-                  )}
-                  {renderEditableField(
-                    <MdAttachMoney />,
-                    'Rate per Hour',
-                    data.rateperhour_2,
-                    (value) => updateFormData('professionalExperience', 'data', { ...data, rateperhour_2: value })
-                  )}
-                </Grid>
-                
-                {/* Languages Multi-Select */}
-                <FormControl mb={4}>
-                  <FormLabel fontSize="xs" fontWeight="600" color="gray.500" textTransform="uppercase">
-                    <HStack spacing={2}>
-                      <MdLanguage />
-                      <Text>Languages</Text>
-                    </HStack>
-                  </FormLabel>
-                  <Box
-                    border="1px solid"
-                    borderColor={borderColor}
-                    borderRadius="md"
-                    p={3}
-                    maxH="200px"
-                    overflowY="auto"
-                    bg={cardBg}
-                  >
-                    {languageOptions.length > 0 ? (
-                      <VStack align="start" spacing={2}>
-                        {languageOptions.map((language) => (
-                          <Checkbox
-                            key={language.value}
-                            isChecked={selectedLanguages.includes(language.value)}
-                            onChange={(e) => handleLanguageChange(language.value, e.target.checked)}
-                            fontSize="sm"
-                            colorScheme="brand"
-                          >
-                            {language.label}
-                          </Checkbox>
-                        ))}
-                      </VStack>
-                    ) : (
-                      <Text fontSize="sm" color="gray.500">
-                        No languages available
-                      </Text>
-                    )}
-                  </Box>
-                </FormControl>
-                
-                {/* Technologies Multi-Select (only shown when showTechnicalExpertise is true) */}
+              <>
+                <div className="fdp-form-grid-2" style={{ marginBottom: 16 }}>
+                  <div className="fdp-form-field">
+                    <label className="fdp-form-label"><MdBusiness size={12} /> Project Category</label>
+                    <FdpSelect
+                      value={selectedCategoryId || ''}
+                      onChange={(val) => handleCategoryChange({ target: { value: val } })}
+                      options={categories.map((cat) => ({ value: String(cat.id), label: cat.name }))}
+                      placeholder="Select a category"
+                      disabled={isLoadingCategories}
+                    />
+                  </div>
+                  <div className="fdp-form-field">
+                    <label className="fdp-form-label"><MdBusiness size={12} /> Project Sub Category</label>
+                    <FdpMultiSelect
+                      selectedValues={selectedSubCategoryIds}
+                      onChange={(val, checked) => handleSubCategoryChange(val, checked)}
+                      options={subCategories.map((s) => ({ value: String(s.id), label: s.name }))}
+                      placeholder={selectedCategoryId ? 'Select subcategories…' : 'Select a category first'}
+                      searchPlaceholder="Search subcategories…"
+                      disabled={!selectedCategoryId || subCategories.length === 0}
+                    />
+                  </div>
+                </div>
+                <div className="fdp-form-grid-2" style={{ marginBottom: 16 }}>
+                  <div className="fdp-form-field fdp-form-col-full">
+                    <label className="fdp-form-label"><MdWork size={12} /> Profile Headline</label>
+                    <input className="fdp-input" value={data.profile_headline || ''} onChange={(e) => updateFormData('professionalExperience', 'data', { ...data, profile_headline: e.target.value })} />
+                  </div>
+                  <div className="fdp-form-field">
+                    <label className="fdp-form-label"><MdAttachMoney size={12} /> Rate per Hour</label>
+                    <input className="fdp-input" value={data.rateperhour_2 || ''} onChange={(e) => updateFormData('professionalExperience', 'data', { ...data, rateperhour_2: e.target.value })} />
+                  </div>
+                </div>
+                <div className="fdp-form-field" style={{ marginBottom: 16 }}>
+                  <label className="fdp-form-label"><MdLanguage size={12} /> Languages</label>
+                  <div className="fdp-checkbox-inline-row">
+                    {languageOptions.map((lang) => (
+                      <label key={lang.value} className="fdp-checkbox-item" style={{ padding: '2px 4px' }}>
+                        <input type="checkbox" checked={selectedLanguages.includes(lang.value)} onChange={(e) => handleLanguageChange(lang.value, e.target.checked)} />
+                        {lang.label}
+                      </label>
+                    ))}
+                  </div>
+                </div>
                 {showTechnicalExpertise && (
-                  <FormControl mb={4}>
-                    <FormLabel fontSize="xs" fontWeight="600" color="gray.500" textTransform="uppercase">
-                      <HStack spacing={2}>
-                        <MdBusiness />
-                        <Text>Technical Expertise</Text>
-                      </HStack>
-                    </FormLabel>
-                    <Box
-                      border="1px solid"
-                      borderColor={borderColor}
-                      borderRadius="md"
-                      bg={cardBg}
-                    >
-                      {technologies.length > 0 && (
-                        <Box p={2} borderBottom="1px solid" borderColor={borderColor}>
-                          <Input
-                            placeholder="Search technologies..."
-                            value={technologySearchTerm}
-                            onChange={(e) => setTechnologySearchTerm(e.target.value)}
-                            size="sm"
-                            borderColor={borderColor}
-                            _focus={{ borderColor: 'brand.500', boxShadow: '0 0 0 1px brand.500' }}
-                          />
-                        </Box>
-                      )}
-                      <Box
-                        p={3}
-                        maxH="200px"
-                        overflowY="auto"
-                      >
-                        {technologies.length > 0 ? (
-                          (() => {
-                            const filteredTechnologies = technologies.filter(tech =>
-                              tech.name.toLowerCase().includes(technologySearchTerm.toLowerCase())
-                            );
-                            return filteredTechnologies.length > 0 ? (
-                              <VStack align="start" spacing={2}>
-                                {filteredTechnologies.map((technology) => (
-                                  <Checkbox
-                                    key={technology.id || technology.name}
-                                    isChecked={selectedTechnologies.includes(technology.name)}
-                                    onChange={(e) => handleTechnologyChange(technology.name, e.target.checked)}
-                                    fontSize="sm"
-                                    colorScheme="brand"
-                                  >
-                                    {technology.name}
-                                  </Checkbox>
-                                ))}
-                              </VStack>
-                            ) : (
-                              <Text fontSize="sm" color="gray.500">
-                                No technologies found matching "{technologySearchTerm}"
-                              </Text>
-                            );
-                          })()
-                        ) : (
-                          <Text fontSize="sm" color="gray.500">
-                            {isLoadingTechnologies ? 'Loading technologies...' : 'No technologies found'}
-                          </Text>
-                        )}
-                      </Box>
-                    </Box>
-                  </FormControl>
+                  <div className="fdp-form-field">
+                    <label className="fdp-form-label"><MdBusiness size={12} /> Technical Expertise</label>
+                    <FdpMultiSelect
+                      selectedValues={selectedTechnologies}
+                      onChange={(val, checked) => handleTechnologyChange(val, checked)}
+                      options={technologies.map((t) => ({ value: t.name, label: t.name }))}
+                      placeholder={isLoadingTechnologies ? 'Loading…' : 'Select technologies…'}
+                      searchPlaceholder="Search technologies…"
+                      disabled={isLoadingTechnologies}
+                    />
+                  </div>
                 )}
-              </VStack>
+              </>
             ) : (
               <>
                 <Grid templateColumns={{ base: '1fr', md: 'repeat(2, 1fr)', lg: 'repeat(3, 1fr)' }} gap={4}>
                   {data.profile_headline && renderInfoItem(<MdWork />, 'Profile Headline', data.profile_headline, true)}
                   <GridItem colSpan={{ base: 12, md: 6, lg: 4 }}>
                     <VStack align="start" spacing={1} mb={4}>
-                      <HStack spacing={2}>
-                        <MdBusiness />
-                        <Text fontSize="xs" fontWeight="600" color="gray.500" textTransform="uppercase">
-                          Category
-                        </Text>
-                      </HStack>
-                      <Text fontSize="sm" fontWeight="500" color={textColor}>
-                        {category?.name || '--'}
-                      </Text>
-                      {subCategoryDisplay && (
-                        <>
-                          <Text fontSize="xs" fontWeight="600" color="gray.500" textTransform="uppercase" mt={4}>
-                            Sub Category
-                          </Text>
-                          <Text fontSize="sm" fontWeight="500" color={textColor}>
-                            {subCategoryDisplay}
-                          </Text>
-                        </>
-                      )}
+                      <HStack spacing={2}><MdBusiness /><Text fontSize="xs" fontWeight="600" color="gray.500" textTransform="uppercase">Category</Text></HStack>
+                      <Text fontSize="sm" fontWeight="500" color={textColor}>{category?.name || '--'}</Text>
+                      {subCategoryDisplay && (<><Text fontSize="xs" fontWeight="600" color="gray.500" textTransform="uppercase" mt={4}>Sub Category</Text><Text fontSize="sm" fontWeight="500" color={textColor}>{subCategoryDisplay}</Text></>)}
                     </VStack>
                   </GridItem>
                   {renderInfoItem(<MdAttachMoney />, 'Rate per Hour', formatCurrency(data.rateperhour_2, data.currency?.split('-')[1]))}
                   {renderInfoItem(<MdLanguage />, 'Languages', data.languages)}
                 </Grid>
-
                 {data.technologty_pre && (
                   <Box mt={4}>
-                    <HStack spacing={2} mb={2}>
-                      <MdBusiness size={20} />
-                      <Text fontSize="xs" fontWeight="600" color="gray.500" textTransform="uppercase">
-                        Technologies
-                      </Text>
-                    </HStack>
+                    <HStack spacing={2} mb={2}><MdBusiness size={20} /><Text fontSize="xs" fontWeight="600" color="gray.500" textTransform="uppercase">Technologies</Text></HStack>
                     <HStack spacing={2} flexWrap="wrap">
-                      {data.technologty_pre.split(',').map((tech, index) => (
-                        <Tag key={index} colorScheme="brand" size="sm" borderRadius="md">
-                          {tech.trim()}
-                        </Tag>
-                      ))}
+                      {data.technologty_pre.split(',').map((tech, index) => (<Tag key={index} colorScheme="brand" size="sm" borderRadius="md">{tech.trim()}</Tag>))}
                     </HStack>
                   </Box>
                 )}
               </>
             )}
-          </VStack>
-        </Card>
-
-        <Card bg={cardBg} p={6}>
-          <VStack align="stretch" spacing={4}>
-            <HStack spacing={2} mb={4}>
-              <MdPublic size={24} color="brand.500" />
-              <Text fontSize="lg" fontWeight="bold" color={textColor}>
-                Platform Links
-              </Text>
-            </HStack>
-
+          </div>
+        </div>
+        <div className="fdp-edit-card">
+          <div className="fdp-edit-card-header">
+            <div className="fdp-edit-card-header-icon"><MdPublic /></div>
+            <span className="fdp-edit-card-title">Platform Links</span>
+          </div>
+          <div className="fdp-edit-card-body">
             {isEditMode ? (
-              <Grid templateColumns={{ base: '1fr', md: 'repeat(2, 1fr)' }} gap={4}>
-                {renderEditableField(
-                  <MdLink />,
-                  'Upwork Profile Link',
-                  data.upwork_platform_profile_link,
-                  (value) => updateFormData('professionalExperience', 'data', { ...data, upwork_platform_profile_link: value })
-                )}
-                {renderEditableField(
-                  <MdLink />,
-                  'Fiverr Profile Link',
-                  data.fiver_platform_profile_link,
-                  (value) => updateFormData('professionalExperience', 'data', { ...data, fiver_platform_profile_link: value })
-                )}
-                {renderEditableField(
-                  <MdLink />,
-                  'Freelancer Profile Link',
-                  data.freelancer_platform_profile_link,
-                  (value) => updateFormData('professionalExperience', 'data', { ...data, freelancer_platform_profile_link: value })
-                )}
-                {renderEditableField(
-                  <MdLink />,
-                  'PeoplePerHour Profile Link',
-                  data.pph_platform_profile_link,
-                  (value) => updateFormData('professionalExperience', 'data', { ...data, pph_platform_profile_link: value })
-                )}
-                {renderEditableField(
-                  <MdLink />,
-                  'Truelancer Profile Link',
-                  data.truelancer_platform_profile_link,
-                  (value) => updateFormData('professionalExperience', 'data', { ...data, truelancer_platform_profile_link: value })
-                )}
-                {renderEditableField(
-                  <MdLink />,
-                  'Other Platform Profile Link',
-                  data.other_platform_profile_link,
-                  (value) => updateFormData('professionalExperience', 'data', { ...data, other_platform_profile_link: value })
-                )}
-              </Grid>
+              <div className="fdp-form-grid-2">
+                {[
+                  { label: 'Upwork', field: 'upwork_platform_profile_link' },
+                  { label: 'Fiverr', field: 'fiver_platform_profile_link' },
+                  { label: 'Freelancer', field: 'freelancer_platform_profile_link' },
+                  { label: 'PeoplePerHour', field: 'pph_platform_profile_link' },
+                  { label: 'Truelancer', field: 'truelancer_platform_profile_link' },
+                  { label: 'Other Platform', field: 'other_platform_profile_link' },
+                ].map(({ label, field }) => (
+                  <div key={field} className="fdp-form-field">
+                    <label className="fdp-form-label"><MdLink size={12} /> {label}</label>
+                    <input className="fdp-input" value={data[field] || ''} onChange={(e) => updateFormData('professionalExperience', 'data', { ...data, [field]: e.target.value })} placeholder="https://..." />
+                  </div>
+                ))}
+              </div>
             ) : (
               <Grid templateColumns={{ base: '1fr', md: 'repeat(2, 1fr)' }} gap={4}>
                 {[
@@ -3178,43 +2897,27 @@ export const FreelancerDetailContent = ({
                   { name: 'Freelancer', active: data.freelancer_platform, link: data.freelancer_platform_profile_link },
                   { name: 'PeoplePerHour', active: data.pph_platform, link: data.pph_platform_profile_link },
                   { name: 'Truelancer', active: data.truelancer_platform, link: data.truelancer_platform_profile_link },
-                  { name: data.other_platform || 'Other', active: !!data.other_platform, link: data.other_platform_profile_link }
-                ].filter(platform => platform.active).map((platform, index) => (
+                  { name: data.other_platform || 'Other', active: !!data.other_platform, link: data.other_platform_profile_link },
+                ].filter((p) => p.active).map((platform, index) => (
                   <GridItem key={index}>
                     <VStack align="start" spacing={1}>
-                      <HStack spacing={2}>
-                        <MdLink size={16} />
-                        <Text fontSize="xs" fontWeight="600" color="gray.500" textTransform="uppercase">
-                          {platform.name}
-                        </Text>
-                      </HStack>
-                      {platform.link ? (
-                        <Link href={platform.link} target="_blank" rel="noopener noreferrer" color="brand.500" fontSize="sm" isExternal>
-                          {platform.link}
-                        </Link>
-                      ) : (
-                        <Text fontSize="sm" color={textColor}>Active (No link provided)</Text>
-                      )}
+                      <HStack spacing={2}><MdLink size={16} /><Text fontSize="xs" fontWeight="600" color="gray.500" textTransform="uppercase">{platform.name}</Text></HStack>
+                      {platform.link ? (<Link href={platform.link} target="_blank" rel="noopener noreferrer" color="brand.500" fontSize="sm" isExternal>{platform.link}</Link>) : (<Text fontSize="sm" color={textColor}>Active (No link provided)</Text>)}
                     </VStack>
                   </GridItem>
                 ))}
               </Grid>
             )}
-          </VStack>
-        </Card>
+          </div>
+        </div>
         {isEditMode && (
-          <Flex justify="flex-end" pt={4}>
-            <Button
-              colorScheme="brand"
-              onClick={() => handleUpdate('Professional Experience')}
-              isLoading={isUpdating}
-              loadingText="Updating..."
-            >
-              Update Professional Experience
-            </Button>
-          </Flex>
+          <div className="fdp-edit-action-bar">
+            <button className="fdp-save-btn" onClick={() => handleUpdate('Professional Experience')} disabled={isUpdating}>
+              {isUpdating ? 'Saving…' : 'Save Professional Experience'}
+            </button>
+          </div>
         )}
-      </VStack>
+      </div>
     );
   };
 
@@ -3354,16 +3057,14 @@ export const FreelancerDetailContent = ({
     }
 
     return (
-      <VStack align="stretch" spacing={4}>
-        <Card bg={cardBg} p={6}>
-          <HStack spacing={2} mb={4}>
-            <MdFolder size={24} color="brand.500" />
-            <Text fontSize="lg" fontWeight="bold" color={textColor}>
-              Projects ({count || projectsData.length})
-            </Text>
-          </HStack>
-
-          <VStack align="stretch" spacing={6}>
+      <div className="fdp-edit-wrap">
+        <div className="fdp-edit-card">
+          <div className="fdp-edit-card-header">
+            <div className="fdp-edit-card-header-icon"><MdFolder /></div>
+            <span className="fdp-edit-card-title">Projects</span>
+            <span className="fdp-count-badge" style={{ marginLeft: 8 }}>{count || projectsData.length}</span>
+          </div>
+          <div className="fdp-edit-card-body">
             {projectsData.map((project, index) => {
               const platforms = [
                 { name: 'Web', active: project.is_web_platform },
@@ -3376,252 +3077,108 @@ export const FreelancerDetailContent = ({
               const projectTechs = project.technologty_pre ? project.technologty_pre.split(',').map(t => t.trim()).filter(t => t) : [];
 
               return (
-                <Card key={project.id || index} bg={hoverBg} p={6} border="1px solid" borderColor={borderColor}>
-                  <VStack align="stretch" spacing={4}>
+                <div key={project.id || index} className="fdp-project-edit-card">
+                  <div className="fdp-project-edit-card-header">
+                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                      <span className="fdp-project-edit-card-num">{index + 1}</span>
+                      <span className="fdp-project-edit-card-label">
+                        {project.project_name || `Project ${index + 1}`}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="fdp-project-edit-card-body">
                     {isEditMode ? (
                       <>
-                        {/* Project Name */}
-                        <FormControl>
-                          <FormLabel fontSize="xs" fontWeight="600" color="gray.500" textTransform="uppercase">
-                            Project Name <span style={{ color: 'red' }}>*</span>
-                          </FormLabel>
-                          <Input
-                            value={project.project_name || ''}
-                            onChange={(e) => {
-                              const value = e.target.value;
-                              if (value.length <= 100) {
-                                updateNestedFormData('projects', index, 'project_name', value);
-                              }
-                            }}
-                            fontSize="sm"
-                            borderColor={borderColor}
-                            maxLength={100}
-                            _hover={{ borderColor: 'brand.500' }}
-                            _focus={{ borderColor: 'brand.500', boxShadow: '0 0 0 1px brand.500' }}
-                          />
-                        </FormControl>
+                        <div className="fdp-form-grid-2">
+                          <div className="fdp-form-field">
+                            <label className="fdp-form-label">Project Name <span className="fdp-form-label-required">*</span></label>
+                            <input className="fdp-input" value={project.project_name || ''} maxLength={100} onChange={(e) => { if (e.target.value.length <= 100) updateNestedFormData('projects', index, 'project_name', e.target.value); }} />
+                          </div>
+                          <div className="fdp-form-field">
+                            <label className="fdp-form-label">Project Type <span className="fdp-form-label-required">*</span></label>
+                            <FdpSelect
+                              value={project.project_type || ''}
+                              onChange={(val) => updateNestedFormData('projects', index, 'project_type', val)}
+                              options={projectTypeOptions}
+                              placeholder="Select Project Type"
+                            />
+                          </div>
+                        </div>
 
-                        {/* Project Type */}
-                        <FormControl>
-                          <FormLabel fontSize="xs" fontWeight="600" color="gray.500" textTransform="uppercase">
-                            Project Type <span style={{ color: 'red' }}>*</span>
-                          </FormLabel>
-                          <Select
-                            value={project.project_type || ''}
-                            onChange={(e) => updateNestedFormData('projects', index, 'project_type', e.target.value)}
-                            fontSize="sm"
-                            borderColor={borderColor}
-                            _hover={{ borderColor: 'brand.500' }}
-                            _focus={{ borderColor: 'brand.500', boxShadow: '0 0 0 1px brand.500' }}
-                          >
-                            <option value="">Select Project Type</option>
-                            {projectTypeOptions.map(option => (
-                              <option key={option.value} value={option.value}>{option.label}</option>
-                            ))}
-                          </Select>
-                        </FormControl>
-
-                        {/* Application Type - Conditional */}
                         {!hideApplicationTypeForProjects && (
-                          <FormControl>
-                            <FormLabel fontSize="xs" fontWeight="600" color="gray.500" textTransform="uppercase">
-                              Application Type <span style={{ color: 'red' }}>*</span>
-                            </FormLabel>
-                            <VStack align="start" spacing={2}>
-                              <Checkbox
-                                isChecked={project.is_mobile_platform || false}
-                                onChange={(e) => updateNestedFormData('projects', index, 'is_mobile_platform', e.target.checked)}
-                                fontSize="sm"
-                                colorScheme="brand"
-                              >
-                                Mobile App
-                              </Checkbox>
-                              <Checkbox
-                                isChecked={project.is_web_platform || false}
-                                onChange={(e) => updateNestedFormData('projects', index, 'is_web_platform', e.target.checked)}
-                                fontSize="sm"
-                                colorScheme="brand"
-                              >
-                                Website
-                              </Checkbox>
-                              <Checkbox
-                                isChecked={project.is_desktop_platform || false}
-                                onChange={(e) => updateNestedFormData('projects', index, 'is_desktop_platform', e.target.checked)}
-                                fontSize="sm"
-                                colorScheme="brand"
-                              >
-                                Desktop App
-                              </Checkbox>
-                              <Checkbox
-                                isChecked={project.is_embedding_platform || false}
-                                onChange={(e) => updateNestedFormData('projects', index, 'is_embedding_platform', e.target.checked)}
-                                fontSize="sm"
-                                colorScheme="brand"
-                              >
-                                Embedded Project
-                              </Checkbox>
-                            </VStack>
-                          </FormControl>
+                          <div className="fdp-form-field" style={{ marginTop: 12 }}>
+                            <label className="fdp-form-label">Application Type <span className="fdp-form-label-required">*</span></label>
+                            <div className="fdp-checkbox-inline-row">
+                              {[
+                                { label: 'Mobile App', field: 'is_mobile_platform' },
+                                { label: 'Website', field: 'is_web_platform' },
+                                { label: 'Desktop App', field: 'is_desktop_platform' },
+                                { label: 'Embedded', field: 'is_embedding_platform' },
+                              ].map(({ label, field }) => (
+                                <label key={field} className="fdp-checkbox-item" style={{ padding: '2px 4px' }}>
+                                  <input type="checkbox" checked={project[field] || false} onChange={(e) => updateNestedFormData('projects', index, field, e.target.checked)} />
+                                  {label}
+                                </label>
+                              ))}
+                            </div>
+                          </div>
                         )}
 
-                        {/* Duration and Technology in a row */}
-                        <Grid templateColumns={{ base: '1fr', md: 'repeat(2, 1fr)' }} gap={4}>
-                          <FormControl>
-                            <FormLabel fontSize="xs" fontWeight="600" color="gray.500" textTransform="uppercase">
-                              Duration (Months) <span style={{ color: 'red' }}>*</span>
-                            </FormLabel>
-                            <Input
-                              type="text"
-                              value={project.duration || ''}
-                              onChange={(e) => {
-                                const value = e.target.value.replace(/[^0-9]/g, '');
-                                if (value === '' || (parseInt(value) <= 50)) {
-                                  updateNestedFormData('projects', index, 'duration', value);
-                                }
-                              }}
-                              fontSize="sm"
-                              borderColor={borderColor}
-                              maxLength={2}
-                              _hover={{ borderColor: 'brand.500' }}
-                              _focus={{ borderColor: 'brand.500', boxShadow: '0 0 0 1px brand.500' }}
-                            />
-                          </FormControl>
-
-                          {/* Technology - Conditional */}
+                        <div className="fdp-form-grid-2" style={{ marginTop: 12 }}>
+                          <div className="fdp-form-field">
+                            <label className="fdp-form-label">Duration (Months) <span className="fdp-form-label-required">*</span></label>
+                            <input className="fdp-input" type="text" value={project.duration || ''} maxLength={2} onChange={(e) => { const v = e.target.value.replace(/[^0-9]/g, ''); if (v === '' || parseInt(v) <= 50) updateNestedFormData('projects', index, 'duration', v); }} />
+                          </div>
                           {!hideApplicationTypeForProjects && (
-                            <FormControl>
-                              <FormLabel fontSize="xs" fontWeight="600" color="gray.500" textTransform="uppercase">
-                                Technology <span style={{ color: 'red' }}>*</span>
-                              </FormLabel>
-                              <Box
-                                border="1px solid"
-                                borderColor={borderColor}
-                                borderRadius="md"
-                                p={3}
-                                maxH="200px"
-                                overflowY="auto"
-                                bg={cardBg}
-                              >
-                                {projectTechnologies.length > 0 ? (
-                                  <VStack align="start" spacing={2}>
-                                    {projectTechnologies.map((tech) => (
-                                      <Checkbox
-                                        key={tech.value}
-                                        isChecked={projectTechs.includes(tech.value)}
-                                        onChange={(e) => handleProjectTechnologyChange(index, tech.value, e.target.checked)}
-                                        fontSize="sm"
-                                        colorScheme="brand"
-                                      >
-                                        {tech.label}
-                                      </Checkbox>
-                                    ))}
-                                  </VStack>
-                                ) : (
-                                  <Text fontSize="sm" color="gray.500">
-                                    No technologies available
-                                  </Text>
-                                )}
-                              </Box>
-                            </FormControl>
+                            <div className="fdp-form-field">
+                              <label className="fdp-form-label">Technology <span className="fdp-form-label-required">*</span></label>
+                              <FdpMultiSelect
+                                selectedValues={projectTechs}
+                                onChange={(val, checked) => handleProjectTechnologyChange(index, val, checked)}
+                                options={projectTechnologies}
+                                placeholder="Select technologies…"
+                                searchPlaceholder="Search technologies…"
+                              />
+                            </div>
                           )}
-                        </Grid>
+                        </div>
 
-                        {/* Industry */}
-                        <FormControl>
-                          <FormLabel fontSize="xs" fontWeight="600" color="gray.500" textTransform="uppercase">
-                            Industry that Product was designed for <span style={{ color: 'red' }}>*</span>
-                          </FormLabel>
-                          <Select
-                            value={project.industry ? project.industry.toString() : ''}
-                            onChange={(e) => updateNestedFormData('projects', index, 'industry', e.target.value)}
-                            fontSize="sm"
-                            borderColor={borderColor}
-                            placeholder="Select a Customer Industry"
-                            _hover={{ borderColor: 'brand.500' }}
-                            _focus={{ borderColor: 'brand.500', boxShadow: '0 0 0 1px brand.500' }}
-                          >
-                            <option value="">Select Industry</option>
-                            {projectIndustries.map(industry => (
-                              <option key={industry.value} value={industry.value}>{industry.label}</option>
-                            ))}
-                          </Select>
-                        </FormControl>
+                        <div className="fdp-form-grid-2" style={{ marginTop: 12 }}>
+                          <div className="fdp-form-field">
+                            <label className="fdp-form-label">Industry <span className="fdp-form-label-required">*</span></label>
+                            <FdpSelect
+                              value={project.industry ? project.industry.toString() : ''}
+                              onChange={(val) => updateNestedFormData('projects', index, 'industry', val)}
+                              options={projectIndustries}
+                              placeholder="Select Industry"
+                            />
+                          </div>
+                          <div className="fdp-form-field">
+                            <label className="fdp-form-label">Project Location <span className="fdp-form-label-required">*</span></label>
+                            <FdpSelect
+                              value={project.project_location || ''}
+                              onChange={(val) => updateNestedFormData('projects', index, 'project_location', val)}
+                              options={projectCountryOptions}
+                              placeholder="Select Location"
+                            />
+                          </div>
+                        </div>
 
-                        {/* Project Details */}
-                        <FormControl>
-                          <FormLabel fontSize="xs" fontWeight="600" color="gray.500" textTransform="uppercase">
-                            Project Details <span style={{ color: 'red' }}>*</span>
-                            <span style={{ fontSize: '12px', marginLeft: '10px', color: '#666', fontWeight: 'normal' }}>
-                              (Min 100, Max 300 characters)
-                            </span>
-                          </FormLabel>
-                          <Textarea
-                            value={project.project_details || ''}
-                            onChange={(e) => {
-                              const value = e.target.value;
-                              if (value.length <= 300) {
-                                updateNestedFormData('projects', index, 'project_details', value);
-                              }
-                            }}
-                            fontSize="sm"
-                            borderColor={borderColor}
-                            rows={4}
-                            minLength={100}
-                            maxLength={300}
-                            _hover={{ borderColor: 'brand.500' }}
-                            _focus={{ borderColor: 'brand.500', boxShadow: '0 0 0 1px brand.500' }}
-                          />
-                          <Text 
-                            fontSize="xs" 
-                            color={project.project_details && project.project_details.length > 300 ? 'red.500' : 'gray.500'}
-                            textAlign="right"
-                            mt={1}
-                          >
-                            {project.project_details ? project.project_details.length : 0}/300
-                          </Text>
-                        </FormControl>
+                        <div className="fdp-form-field" style={{ marginTop: 12 }}>
+                          <label className="fdp-form-label">
+                            Project Details <span className="fdp-form-label-required">*</span>
+                            <span className="fdp-form-hint">(Min 100, Max 300 chars)</span>
+                          </label>
+                          <textarea className="fdp-textarea" value={project.project_details || ''} rows={4} maxLength={300} onChange={(e) => { if (e.target.value.length <= 300) updateNestedFormData('projects', index, 'project_details', e.target.value); }} />
+                          <div className={`fdp-char-counter${project.project_details?.length > 300 ? ' over' : ''}`}>
+                            {project.project_details?.length || 0}/300
+                          </div>
+                        </div>
 
-                        {/* Project Location */}
-                        <FormControl>
-                          <FormLabel fontSize="xs" fontWeight="600" color="gray.500" textTransform="uppercase">
-                            Project Location <span style={{ color: 'red' }}>*</span>
-                          </FormLabel>
-                          <Select
-                            value={project.project_location || ''}
-                            onChange={(e) => updateNestedFormData('projects', index, 'project_location', e.target.value)}
-                            fontSize="sm"
-                            borderColor={borderColor}
-                            placeholder="Select Project Location"
-                            _hover={{ borderColor: 'brand.500' }}
-                            _focus={{ borderColor: 'brand.500', boxShadow: '0 0 0 1px brand.500' }}
-                          >
-                            <option value="">Select Location</option>
-                            {projectCountryOptions.map(country => (
-                              <option key={country.value} value={country.value}>{country.label}</option>
-                            ))}
-                          </Select>
-                        </FormControl>
-
-                        {/* Project Url */}
-                        <FormControl>
-                          <FormLabel fontSize="xs" fontWeight="600" color="gray.500" textTransform="uppercase">
-                            Project Url
-                          </FormLabel>
-                          <Input
-                            value={project.project_link || ''}
-                            onChange={(e) => {
-                              const value = e.target.value;
-                              if (value.length <= 50) {
-                                updateNestedFormData('projects', index, 'project_link', value);
-                              }
-                            }}
-                            fontSize="sm"
-                            borderColor={borderColor}
-                            maxLength={50}
-                            _hover={{ borderColor: 'brand.500' }}
-                            _focus={{ borderColor: 'brand.500', boxShadow: '0 0 0 1px brand.500' }}
-                          />
-                        </FormControl>
+                        <div className="fdp-form-field" style={{ marginTop: 12 }}>
+                          <label className="fdp-form-label">Project URL</label>
+                          <input className="fdp-input" value={project.project_link || ''} maxLength={50} onChange={(e) => { if (e.target.value.length <= 50) updateNestedFormData('projects', index, 'project_link', e.target.value); }} placeholder="https://..." />
+                        </div>
                       </>
                     ) : (
                       <>
@@ -3697,25 +3254,20 @@ export const FreelancerDetailContent = ({
                         )}
                       </>
                     )}
-                  </VStack>
-                </Card>
+                  </div>
+                </div>
               );
             })}
-          </VStack>
-        </Card>
+          </div>
+        </div>
         {isEditMode && (
-          <Flex justify="flex-end" pt={4}>
-            <Button
-              colorScheme="brand"
-              onClick={() => handleUpdate('Projects')}
-              isLoading={isUpdating}
-              loadingText="Updating..."
-            >
-              Update Projects
-            </Button>
-          </Flex>
+          <div className="fdp-edit-action-bar">
+            <button className="fdp-save-btn" onClick={() => handleUpdate('Projects')} disabled={isUpdating}>
+              {isUpdating ? 'Saving…' : 'Save Projects'}
+            </button>
+          </div>
         )}
-      </VStack>
+      </div>
     );
   };
 
@@ -3822,11 +3374,11 @@ export const FreelancerDetailContent = ({
           </Box>
         </Card>
         {isEditMode && (
-          <Flex justify="flex-end" pt={4}>
-            <Button colorScheme="brand" onClick={() => handleUpdate('Certifications')} isLoading={isUpdating} loadingText="Updating...">
-              Update Certifications
-            </Button>
-          </Flex>
+          <div className="fdp-edit-action-bar">
+            <button className="fdp-save-btn" onClick={() => handleUpdate('Certifications')} disabled={isUpdating}>
+              {isUpdating ? 'Saving…' : 'Save Certifications'}
+            </button>
+          </div>
         )}
       </VStack>
     );
@@ -3892,315 +3444,143 @@ export const FreelancerDetailContent = ({
 
     const renderGraduationEntry = (element, i) => {
       return (
-        <Card key={i} bg={hoverBg} p={4} border="1px solid" borderColor={borderColor} mb={4}>
-          <VStack align="stretch" spacing={4}>
-            {/* Degree and University Name Row */}
-            <Grid templateColumns={{ base: '1fr', md: 'repeat(2, 1fr)' }} gap={4}>
-              <FormControl>
-                <FormLabel fontSize="xs" fontWeight="600" color="gray.500" textTransform="uppercase">
-                  Bachelor's degree <span style={{ color: 'red' }}>*</span>
-                </FormLabel>
-                <Select
+        <div key={i} className="fdp-project-edit-card" style={{ marginBottom: 12 }}>
+          <div className="fdp-project-edit-card-header">
+            <div style={{ display: 'flex', alignItems: 'center' }}>
+              <span className="fdp-project-edit-card-num">{i + 1}</span>
+              <span className="fdp-project-edit-card-label">Graduation Entry</span>
+            </div>
+          </div>
+          <div className="fdp-project-edit-card-body">
+            <div className="fdp-form-grid-2" style={{ marginBottom: 14 }}>
+              <div className="fdp-form-field">
+                <label className="fdp-form-label">Bachelor's Degree <span className="fdp-form-label-required">*</span></label>
+                <FdpSelect
                   value={element.degree || ''}
-                  onChange={(e) => handleGraduationChange(i, 'degree', e.target.value)}
-                  fontSize="sm"
-                  borderColor={borderColor}
+                  onChange={(val) => handleGraduationChange(i, 'degree', val)}
+                  options={graduationDegreeOptions}
                   placeholder="Select Bachelor's degree"
-                  _hover={{ borderColor: 'brand.500' }}
-                  _focus={{ borderColor: 'brand.500', boxShadow: '0 0 0 1px brand.500' }}
-                >
-                  <option value="">Select Bachelor's degree</option>
-                  {graduationDegreeOptions.map(option => (
-                    <option key={option.value} value={option.value}>{option.label}</option>
-                  ))}
-                </Select>
+                />
                 {educationValidated && (!element.degree || element.degree === '') && (
-                  <Text fontSize="xs" color="red.500" mt={1}>
-                    Please select a bachelor's degree.
-                  </Text>
+                  <span style={{ fontSize: 11, color: '#e53e3e', marginTop: 3, display: 'block' }}>Please select a bachelor's degree.</span>
                 )}
-              </FormControl>
-
-              <FormControl>
-                <FormLabel fontSize="xs" fontWeight="600" color="gray.500" textTransform="uppercase">
-                  University Name <span style={{ color: 'red' }}>*</span>
-                </FormLabel>
-                <Input
-                  type="text"
-                  value={element.university_name || ''}
-                  onChange={(e) => {
-                    const value = e.target.value;
-                    if (value.length <= 50) {
-                      handleGraduationChange(i, 'university_name', value);
-                    }
-                  }}
-                  fontSize="sm"
-                  borderColor={borderColor}
-                  maxLength={50}
-                  _hover={{ borderColor: 'brand.500' }}
-                  _focus={{ borderColor: 'brand.500', boxShadow: '0 0 0 1px brand.500' }}
-                />
+              </div>
+              <div className="fdp-form-field">
+                <label className="fdp-form-label">University Name <span className="fdp-form-label-required">*</span></label>
+                <input className="fdp-input" type="text" value={element.university_name || ''} maxLength={50} onChange={(e) => { if (e.target.value.length <= 50) handleGraduationChange(i, 'university_name', e.target.value); }} />
                 {educationValidated && (!element.university_name || element.university_name.trim() === '') && (
-                  <Text fontSize="xs" color="red.500" mt={1}>
-                    Please provide a valid university name.
-                  </Text>
+                  <span style={{ fontSize: 11, color: '#e53e3e', marginTop: 3, display: 'block' }}>Please provide a valid university name.</span>
                 )}
-              </FormControl>
-            </Grid>
-
-            {/* Year of Graduation and Education Type Row */}
-            <Grid templateColumns={{ base: '1fr', md: 'repeat(2, 1fr)' }} gap={4}>
-              <FormControl>
-                <FormLabel fontSize="xs" fontWeight="600" color="gray.500" textTransform="uppercase">
-                  Year of Graduation <span style={{ color: 'red' }}>*</span>
-                </FormLabel>
-                <HStack spacing={2}>
-                  <Select
+              </div>
+            </div>
+            <div className="fdp-form-grid-2">
+              <div className="fdp-form-field">
+                <label className="fdp-form-label">Year of Graduation <span className="fdp-form-label-required">*</span></label>
+                <div style={{ display: 'flex', gap: 8 }}>
+                  <FdpSelect
                     value={element.month || ''}
-                    onChange={(e) => handleGraduationChange(i, 'month', e.target.value)}
-                    fontSize="sm"
-                    borderColor={borderColor}
+                    onChange={(val) => handleGraduationChange(i, 'month', val)}
+                    options={generateYearOptions().map((y) => ({ value: String(y), label: String(y) }))}
                     placeholder="From"
-                    _hover={{ borderColor: 'brand.500' }}
-                    _focus={{ borderColor: 'brand.500', boxShadow: '0 0 0 1px brand.500' }}
-                  >
-                    <option value="">From</option>
-                    {generateYearOptions().map(year => (
-                      <option key={year} value={year}>{year}</option>
-                    ))}
-                  </Select>
-                  <Select
+                  />
+                  <FdpSelect
                     value={element.year || ''}
-                    onChange={(e) => handleGraduationChange(i, 'year', e.target.value)}
-                    fontSize="sm"
-                    borderColor={borderColor}
+                    onChange={(val) => handleGraduationChange(i, 'year', val)}
+                    options={[{ value: '0', label: 'Pursuing' }, ...(element.month ? getTillYearOptions(element.month).map((y) => ({ value: String(y), label: String(y) })) : [])]}
                     placeholder="Till"
-                    isDisabled={!element.month}
-                    _hover={{ borderColor: 'brand.500' }}
-                    _focus={{ borderColor: 'brand.500', boxShadow: '0 0 0 1px brand.500' }}
-                  >
-                    <option value="">Till</option>
-                    <option value="0">Pursuing</option>
-                    {element.month && getTillYearOptions(element.month).map(year => (
-                      <option key={year} value={year}>{year}</option>
-                    ))}
-                  </Select>
-                </HStack>
+                    disabled={!element.month}
+                  />
+                </div>
                 {educationValidated && ((!element.month || element.month === '') || (!element.year || element.year === '')) && (
-                  <Text fontSize="xs" color="red.500" mt={1}>
-                    Please select both from and till years.
-                  </Text>
+                  <span style={{ fontSize: 11, color: '#e53e3e', marginTop: 3, display: 'block' }}>Please select both from and till years.</span>
                 )}
-              </FormControl>
-
-              <FormControl>
-                <FormLabel fontSize="xs" fontWeight="600" color="gray.500" textTransform="uppercase">
-                  Education Type <span style={{ color: 'red' }}>*</span>
-                </FormLabel>
-                <Select
+              </div>
+              <div className="fdp-form-field">
+                <label className="fdp-form-label">Education Type <span className="fdp-form-label-required">*</span></label>
+                <FdpSelect
                   value={element.education_type || ''}
-                  onChange={(e) => handleGraduationChange(i, 'education_type', e.target.value)}
-                  fontSize="sm"
-                  borderColor={borderColor}
+                  onChange={(val) => handleGraduationChange(i, 'education_type', val)}
+                  options={educationTypeOptions}
                   placeholder="Select Education Type"
-                  _hover={{ borderColor: 'brand.500' }}
-                  _focus={{ borderColor: 'brand.500', boxShadow: '0 0 0 1px brand.500' }}
-                >
-                  <option value="">Select Education Type</option>
-                  {educationTypeOptions.map(option => (
-                    <option key={option.value} value={option.value}>{option.label}</option>
-                  ))}
-                </Select>
+                />
                 {educationValidated && (!element.education_type || element.education_type === '') && (
-                  <Text fontSize="xs" color="red.500" mt={1}>
-                    Please select an education type.
-                  </Text>
+                  <span style={{ fontSize: 11, color: '#e53e3e', marginTop: 3, display: 'block' }}>Please select an education type.</span>
                 )}
-              </FormControl>
-            </Grid>
-
-            {/* Add/Remove Buttons */}
-            <HStack spacing={2} justify="flex-start">
-              {graduationList.length !== 1 && (
-                <IconButton
-                  icon={<MdDelete />}
-                  size="sm"
-                  colorScheme="red"
-                  variant="outline"
-                  onClick={() => handleRemoveGraduation(i, element.id)}
-                  aria-label="Remove graduation"
-                />
-              )}
-              {graduationList.length - 1 === i && (
-                <IconButton
-                  icon={<MdAdd />}
-                  size="sm"
-                  colorScheme="brand"
-                  variant="outline"
-                  onClick={handleAddGraduation}
-                  aria-label="Add graduation"
-                />
-              )}
-            </HStack>
-          </VStack>
-        </Card>
+              </div>
+            </div>
+          </div>
+        </div>
       );
     };
 
     const renderPostGraduationEntry = (element, i) => {
       return (
-        <Card key={i} bg={hoverBg} p={4} border="1px solid" borderColor={borderColor} mb={4}>
-          <VStack align="stretch" spacing={4}>
-            {/* Degree and University Name Row */}
-            <Grid templateColumns={{ base: '1fr', md: 'repeat(2, 1fr)' }} gap={4}>
-              <FormControl>
-                <FormLabel fontSize="xs" fontWeight="600" color="gray.500" textTransform="uppercase">
-                  Master's degree
-                </FormLabel>
-                <Select
+        <div key={i} className="fdp-project-edit-card" style={{ marginBottom: 12 }}>
+          <div className="fdp-project-edit-card-header">
+            <div style={{ display: 'flex', alignItems: 'center' }}>
+              <span className="fdp-project-edit-card-num">{i + 1}</span>
+              <span className="fdp-project-edit-card-label">Post Graduation Entry</span>
+            </div>
+          </div>
+          <div className="fdp-project-edit-card-body">
+            <div className="fdp-form-grid-2" style={{ marginBottom: 14 }}>
+              <div className="fdp-form-field">
+                <label className="fdp-form-label">Master's Degree</label>
+                <FdpSelect
                   value={element.degree || ''}
-                  onChange={(e) => handlePostGraduationChange(i, 'degree', e.target.value)}
-                  fontSize="sm"
-                  borderColor={borderColor}
+                  onChange={(val) => handlePostGraduationChange(i, 'degree', val)}
+                  options={postGraduationDegreeOptions}
                   placeholder="Select Master's degree"
-                  _hover={{ borderColor: 'brand.500' }}
-                  _focus={{ borderColor: 'brand.500', boxShadow: '0 0 0 1px brand.500' }}
-                >
-                  <option value="">Select Master's degree</option>
-                  {postGraduationDegreeOptions.map(option => (
-                    <option key={option.value} value={option.value}>{option.label}</option>
-                  ))}
-                </Select>
+                />
                 {educationValidated && hasAnyPostGraduationData() && (!element.degree || element.degree === '') && (
-                  <Text fontSize="xs" color="red.500" mt={1}>
-                    Please select a master's degree.
-                  </Text>
+                  <span style={{ fontSize: 11, color: '#e53e3e', marginTop: 3, display: 'block' }}>Please select a master's degree.</span>
                 )}
-              </FormControl>
-
-              <FormControl>
-                <FormLabel fontSize="xs" fontWeight="600" color="gray.500" textTransform="uppercase">
-                  University Name
-                </FormLabel>
-                <Input
-                  type="text"
-                  value={element.university_name || ''}
-                  onChange={(e) => {
-                    const value = e.target.value;
-                    if (value.length <= 50) {
-                      handlePostGraduationChange(i, 'university_name', value);
-                    }
-                  }}
-                  fontSize="sm"
-                  borderColor={borderColor}
-                  maxLength={50}
-                  _hover={{ borderColor: 'brand.500' }}
-                  _focus={{ borderColor: 'brand.500', boxShadow: '0 0 0 1px brand.500' }}
-                />
+              </div>
+              <div className="fdp-form-field">
+                <label className="fdp-form-label">University Name</label>
+                <input className="fdp-input" type="text" value={element.university_name || ''} maxLength={50} onChange={(e) => { if (e.target.value.length <= 50) handlePostGraduationChange(i, 'university_name', e.target.value); }} />
                 {educationValidated && hasAnyPostGraduationData() && (!element.university_name || element.university_name.trim() === '') && (
-                  <Text fontSize="xs" color="red.500" mt={1}>
-                    Please provide a valid university name.
-                  </Text>
+                  <span style={{ fontSize: 11, color: '#e53e3e', marginTop: 3, display: 'block' }}>Please provide a valid university name.</span>
                 )}
-              </FormControl>
-            </Grid>
-
-            {/* Year of Graduation and Education Type Row */}
-            <Grid templateColumns={{ base: '1fr', md: 'repeat(2, 1fr)' }} gap={4}>
-              <FormControl>
-                <FormLabel fontSize="xs" fontWeight="600" color="gray.500" textTransform="uppercase">
-                  Year of Graduation
-                </FormLabel>
-                <HStack spacing={2}>
-                  <Select
+              </div>
+            </div>
+            <div className="fdp-form-grid-2">
+              <div className="fdp-form-field">
+                <label className="fdp-form-label">Year of Graduation</label>
+                <div style={{ display: 'flex', gap: 8 }}>
+                  <FdpSelect
                     value={element.month || ''}
-                    onChange={(e) => handlePostGraduationChange(i, 'month', e.target.value)}
-                    fontSize="sm"
-                    borderColor={borderColor}
+                    onChange={(val) => handlePostGraduationChange(i, 'month', val)}
+                    options={getPostGraduationFromYearOptions().map((y) => ({ value: String(y), label: String(y) }))}
                     placeholder="From"
-                    _hover={{ borderColor: 'brand.500' }}
-                    _focus={{ borderColor: 'brand.500', boxShadow: '0 0 0 1px brand.500' }}
-                  >
-                    <option value="">From</option>
-                    {getPostGraduationFromYearOptions().map(year => (
-                      <option key={year} value={year}>{year}</option>
-                    ))}
-                  </Select>
-                  <Select
+                  />
+                  <FdpSelect
                     value={element.year || ''}
-                    onChange={(e) => handlePostGraduationChange(i, 'year', e.target.value)}
-                    fontSize="sm"
-                    borderColor={borderColor}
+                    onChange={(val) => handlePostGraduationChange(i, 'year', val)}
+                    options={[{ value: '0', label: 'Pursuing' }, ...(element.month ? getTillYearOptions(element.month).map((y) => ({ value: String(y), label: String(y) })) : [])]}
                     placeholder="Till"
-                    isDisabled={!element.month}
-                    _hover={{ borderColor: 'brand.500' }}
-                    _focus={{ borderColor: 'brand.500', boxShadow: '0 0 0 1px brand.500' }}
-                  >
-                    <option value="">Till</option>
-                    <option value="0">Pursuing</option>
-                    {element.month && getTillYearOptions(element.month).map(year => (
-                      <option key={year} value={year}>{year}</option>
-                    ))}
-                  </Select>
-                </HStack>
+                    disabled={!element.month}
+                  />
+                </div>
                 {educationValidated && hasAnyPostGraduationData() && ((!element.month || element.month === '') || (!element.year || element.year === '')) && (
-                  <Text fontSize="xs" color="red.500" mt={1}>
-                    Please select both from and till years.
-                  </Text>
+                  <span style={{ fontSize: 11, color: '#e53e3e', marginTop: 3, display: 'block' }}>Please select both from and till years.</span>
                 )}
-              </FormControl>
-
-              <FormControl>
-                <FormLabel fontSize="xs" fontWeight="600" color="gray.500" textTransform="uppercase">
-                  Education Type
-                </FormLabel>
-                <Select
+              </div>
+              <div className="fdp-form-field">
+                <label className="fdp-form-label">Education Type</label>
+                <FdpSelect
                   value={element.education_type || ''}
-                  onChange={(e) => handlePostGraduationChange(i, 'education_type', e.target.value)}
-                  fontSize="sm"
-                  borderColor={borderColor}
+                  onChange={(val) => handlePostGraduationChange(i, 'education_type', val)}
+                  options={educationTypeOptions}
                   placeholder="Select Education Type"
-                  _hover={{ borderColor: 'brand.500' }}
-                  _focus={{ borderColor: 'brand.500', boxShadow: '0 0 0 1px brand.500' }}
-                >
-                  <option value="">Select Education Type</option>
-                  {educationTypeOptions.map(option => (
-                    <option key={option.value} value={option.value}>{option.label}</option>
-                  ))}
-                </Select>
+                />
                 {educationValidated && hasAnyPostGraduationData() && (!element.education_type || element.education_type === '') && (
-                  <Text fontSize="xs" color="red.500" mt={1}>
-                    Please select an education type.
-                  </Text>
+                  <span style={{ fontSize: 11, color: '#e53e3e', marginTop: 3, display: 'block' }}>Please select an education type.</span>
                 )}
-              </FormControl>
-            </Grid>
-
-            {/* Add/Remove Buttons */}
-            <HStack spacing={2} justify="flex-start">
-              {postGraduationList.length !== 1 && (
-                <IconButton
-                  icon={<MdDelete />}
-                  size="sm"
-                  colorScheme="red"
-                  variant="outline"
-                  onClick={() => handleRemovePostGraduation(i, element.id)}
-                  aria-label="Remove post graduation"
-                />
-              )}
-              {postGraduationList.length - 1 === i && (
-                <IconButton
-                  icon={<MdAdd />}
-                  size="sm"
-                  colorScheme="brand"
-                  variant="outline"
-                  onClick={handleAddPostGraduation}
-                  aria-label="Add post graduation"
-                />
-              )}
-            </HStack>
-          </VStack>
-        </Card>
+              </div>
+            </div>
+          </div>
+        </div>
       );
     };
 
@@ -4303,16 +3683,11 @@ export const FreelancerDetailContent = ({
         </Card>
 
         {isEditMode && (
-          <Flex justify="flex-end" pt={4}>
-            <Button
-              colorScheme="brand"
-              onClick={() => handleUpdate('Education')}
-              isLoading={isUpdating}
-              loadingText="Updating..."
-            >
-              Update Education
-            </Button>
-          </Flex>
+          <div className="fdp-edit-action-bar">
+            <button className="fdp-save-btn" onClick={() => handleUpdate('Education')} disabled={isUpdating}>
+              {isUpdating ? 'Saving…' : 'Save Education'}
+            </button>
+          </div>
         )}
       </VStack>
     );
