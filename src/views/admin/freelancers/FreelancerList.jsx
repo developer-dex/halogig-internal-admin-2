@@ -2581,37 +2581,22 @@ export const FreelancerDetailContent = ({
             </VStack>
           </Card>
         ) : detailVariant === 'page' ? (
-          <Card
-            bg={cardBg}
-            overflow="hidden"
-            shadow="md"
-            borderWidth="1px"
-            borderColor={borderColor}
-          >
-            <Box h="3px" bgGradient="linear(to-r, brand.400, purple.500)" />
-            <CardBody px={{ base: 5, md: 8 }} py={{ base: 6, md: 8 }}>
-              <Flex
-                direction={{ base: 'column', lg: 'row' }}
-                gap={{ base: 6, lg: 10 }}
-                align={{ base: 'center', lg: 'flex-start' }}
-                mb={8}
-              >
-                <Avatar
-                  size="xl"
-                  src={displayData.profile_image}
-                  name={formatFreelancerDisplayName(displayData.first_name, displayData.last_name)}
-                  // bg="brand.500"
-                  // boxShadow="lg"
-                />
-                <VStack align={{ base: 'center', lg: 'flex-start' }} spacing={3} flex={1}>
-                  <Heading
-                    as="h1"
-                    size="lg"
-                    color={textColor}
-                    textAlign={{ base: 'center', lg: 'left' }}
-                  >
+          <div className="fdp-section-card">
+            <div className="fdp-section-card-accent" />
+            <div className="fdp-section-card-body">
+              {/* Profile header */}
+              <div className="fdp-profile-header">
+                <div className="fdp-avatar-wrap">
+                  <Avatar
+                    size="xl"
+                    src={displayData.profile_image}
+                    name={formatFreelancerDisplayName(displayData.first_name, displayData.last_name)}
+                  />
+                </div>
+                <div className="fdp-profile-meta">
+                  <div className="fdp-profile-name">
                     {formatFreelancerDisplayName(displayData.first_name, displayData.last_name) || '—'}
-                  </Heading>
+                  </div>
                   <Badge
                     colorScheme={getStatusBadgeScheme(displayData.status)}
                     variant="solid"
@@ -2624,28 +2609,66 @@ export const FreelancerDetailContent = ({
                   >
                     {displayData.status || 'Unknown'}
                   </Badge>
-                </VStack>
-              </Flex>
-              <Divider mb={8} />
-              <Text className="freelancer-detail-field-label" mb={4}>
-                Contact and profile
-              </Text>
-              <Grid templateColumns="repeat(12, 1fr)" gap={4}>
-                {renderInfoItem(<MdEmail />, 'Email', displayData.email)}
-                {renderInfoItem(<MdPhone />, 'Mobile', displayData.mobile)}
-                {renderInfoItem(<MdPerson />, 'Gender', displayData.gender)}
-                {renderInfoItem(<MdBusiness />, 'Legal Entity Type', designation?.name)}
-                {renderInfoItem(<MdBusiness />, 'Company', displayData.company_name)}
-                {renderInfoItem(
-                  <MdLocationOn />,
-                  'Location',
-                  [displayData.city, displayData.state, displayData.country].filter(Boolean).join(', '),
+                </div>
+              </div>
+
+              <hr className="fdp-divider" />
+
+              <div className="fdp-section-heading">Contact &amp; Profile</div>
+              <div className="fdp-info-grid">
+                {displayData.email && (
+                  <div className="fdp-info-item">
+                    <span className="freelancer-detail-field-label">Email</span>
+                    <span className="freelancer-detail-field-value">{displayData.email}</span>
+                  </div>
                 )}
-                {displayData.address && renderInfoItem(<MdLocationOn />, 'Address', displayData.address, true)}
-                {displayData.aboutme && renderInfoItem(<MdPerson />, 'About', displayData.aboutme, true)}
-              </Grid>
-            </CardBody>
-          </Card>
+                {displayData.mobile && (
+                  <div className="fdp-info-item">
+                    <span className="freelancer-detail-field-label">Mobile</span>
+                    <span className="freelancer-detail-field-value">{displayData.mobile}</span>
+                  </div>
+                )}
+                {displayData.gender && (
+                  <div className="fdp-info-item">
+                    <span className="freelancer-detail-field-label">Gender</span>
+                    <span className="freelancer-detail-field-value">{displayData.gender}</span>
+                  </div>
+                )}
+                {designation?.name && (
+                  <div className="fdp-info-item">
+                    <span className="freelancer-detail-field-label">Legal Entity Type</span>
+                    <span className="freelancer-detail-field-value">{designation.name}</span>
+                  </div>
+                )}
+                {displayData.company_name && (
+                  <div className="fdp-info-item">
+                    <span className="freelancer-detail-field-label">Company</span>
+                    <span className="freelancer-detail-field-value">{displayData.company_name}</span>
+                  </div>
+                )}
+                {[displayData.city, displayData.state, displayData.country].filter(Boolean).length > 0 && (
+                  <div className="fdp-info-item">
+                    <span className="freelancer-detail-field-label">Location</span>
+                    <span className="freelancer-detail-field-value">
+                      {[displayData.city, displayData.state, displayData.country].filter(Boolean).join(', ')}
+                    </span>
+                  </div>
+                )}
+                {displayData.address && (
+                  <div className="fdp-info-item" style={{ gridColumn: '1 / -1' }}>
+                    <span className="freelancer-detail-field-label">Address</span>
+                    <span className="freelancer-detail-field-value">{displayData.address}</span>
+                  </div>
+                )}
+                {displayData.aboutme && (
+                  <div className="fdp-info-item" style={{ gridColumn: '1 / -1' }}>
+                    <span className="freelancer-detail-field-label">About</span>
+                    <span className="freelancer-detail-field-value">{displayData.aboutme}</span>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
         ) : (
           <Card bg={cardBg} p={6}>
             <VStack align="stretch" spacing={4}>
@@ -2731,78 +2754,86 @@ export const FreelancerDetailContent = ({
       ].filter((p) => p.active);
 
       return (
-        <VStack align="stretch" spacing={6} w="100%">
-          <Card bg={cardBg} borderWidth="1px" borderColor={borderColor} shadow="none" borderRadius="lg" overflow="hidden">
-            <Box p={{ base: 5, md: 6 }}>
-              <Text className="freelancer-detail-field-label" mb={2}>
-                Professional overview
-              </Text>
-              {data.profile_headline ? (
-                  <Text className="freelancer-detail-field-value" color={textColor}  mb={6}>
-                    {data.profile_headline}
-                  </Text>
-              ) : null}
-              <SimpleGrid columns={{ base: 1, sm: 2, lg: 4 }} spacingX={{ base: 4, md: 8 }} spacingY={5}>
-                <PageFieldRow label="Category" value={category?.name} />
-                <PageFieldRow label="Sub category" value={subCategoryDisplay || null} />
-                <PageFieldRow label="Rate per hour" value={rateStr && rateStr !== '--' ? rateStr : null} />
-                <PageFieldRow label="Languages" value={data.languages} />
-              </SimpleGrid>
-              {data.technologty_pre ? (
-                <Box mt={5} textAlign="left">
-                  <Text className="freelancer-detail-field-label" mb={2}>
-                    Technologies
-                  </Text>
-                  <HStack spacing={2} flexWrap="wrap">
+        <div>
+          {/* Professional overview card */}
+          <div className="fdp-section-card" style={{ marginBottom: 20 }}>
+            <div className="fdp-section-card-body">
+              <div className="fdp-section-heading">Professional Overview</div>
+              {data.profile_headline && (
+                <p className="freelancer-detail-field-value" style={{ marginBottom: 16 }}>
+                  {data.profile_headline}
+                </p>
+              )}
+              <div className="fdp-info-grid" style={{ marginBottom: 16 }}>
+                {category?.name && (
+                  <div className="fdp-info-item">
+                    <span className="freelancer-detail-field-label">Category</span>
+                    <span className="freelancer-detail-field-value">{category.name}</span>
+                  </div>
+                )}
+                {subCategoryDisplay && (
+                  <div className="fdp-info-item">
+                    <span className="freelancer-detail-field-label">Sub Category</span>
+                    <span className="freelancer-detail-field-value">{subCategoryDisplay}</span>
+                  </div>
+                )}
+                {rateStr && rateStr !== '--' && (
+                  <div className="fdp-info-item">
+                    <span className="freelancer-detail-field-label">Rate per Hour</span>
+                    <span className="freelancer-detail-field-value">{rateStr}</span>
+                  </div>
+                )}
+                {data.languages && (
+                  <div className="fdp-info-item">
+                    <span className="freelancer-detail-field-label">Languages</span>
+                    <span className="freelancer-detail-field-value">{data.languages}</span>
+                  </div>
+                )}
+              </div>
+              {data.technologty_pre && (
+                <div>
+                  <span className="freelancer-detail-field-label" style={{ display: 'block', marginBottom: 8 }}>Technologies</span>
+                  <div className="fdp-chips-row">
                     {data.technologty_pre.split(',').map((tech, idx) => (
                       <DetailOutlineChip key={idx}>{tech.trim()}</DetailOutlineChip>
                     ))}
-                  </HStack>
-                </Box>
-              ) : null}
-            </Box>
-          </Card>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
 
-          <Card bg={cardBg} borderWidth="1px" borderColor={borderColor} shadow="none" borderRadius="lg">
-            <Box p={{ base: 5, md: 6 }}>
-              <Text className="freelancer-detail-field-label" mb={4}>
-                Platform links
-              </Text>
+          {/* Platform links card */}
+          <div className="fdp-section-card">
+            <div className="fdp-section-card-body">
+              <div className="fdp-section-heading">Platform Links</div>
               {platformRows.length === 0 ? (
-                <Text className="freelancer-detail-field-value" color="gray.500">
-                  No platform links on file.
-                </Text>
+                <p className="freelancer-detail-field-value" style={{ color: '#a0aec0' }}>No platform links on file.</p>
               ) : (
-                <VStack align="stretch" spacing={4}>
+                <div>
                   {platformRows.map((platform, idx) => (
-                    <Box key={`${platform.name}-${idx}`} borderBottomWidth={idx < platformRows.length - 1 ? '1px' : 0} borderColor={borderColor} pb={idx < platformRows.length - 1 ? 4 : 0}>
-                      <Text className="freelancer-detail-field-label" mb={1}>
-                        {platform.name}
-                      </Text>
+                    <div key={`${platform.name}-${idx}`} className="fdp-platform-row">
+                      <span className="fdp-platform-dot" />
+                      <span className="fdp-platform-name">{platform.name}</span>
                       {platform.link ? (
-                        <Link
+                        <a
                           href={platform.link}
                           target="_blank"
                           rel="noopener noreferrer"
-                          color="brand.600"
-                          className="freelancer-detail-field-value"
-                          isExternal
-                          wordBreak="break-all"
+                          className="fdp-platform-link"
                         >
                           {platform.link}
-                        </Link>
+                        </a>
                       ) : (
-                        <Text className="freelancer-detail-field-value" color={textColor}>
-                          Active (no URL provided)
-                        </Text>
+                        <span className="freelancer-detail-field-value">Active (no URL provided)</span>
                       )}
-                    </Box>
+                    </div>
                   ))}
-                </VStack>
+                </div>
               )}
-            </Box>
-          </Card>
-        </VStack>
+            </div>
+          </div>
+        </div>
       );
     }
 
@@ -3228,14 +3259,12 @@ export const FreelancerDetailContent = ({
 
     if (!isEditMode && detailVariant === 'page') {
       return (
-        <VStack align="stretch" spacing={5} w="100%">
-          <Text className="freelancer-detail-field-value" fontWeight="bold" color={textColor} letterSpacing="-0.01em">
-            Projects
-            <Text as="span" fontWeight="normal" color="gray.500" ml={2}>
-              ({count || projectsData.length})
-            </Text>
-          </Text>
-          <VStack align="stretch" spacing={4}>
+        <div>
+          <div className="fdp-section-title-row">
+            <span className="fdp-section-title">Projects</span>
+            <span className="fdp-count-badge">{count || projectsData.length}</span>
+          </div>
+          <div>
             {projectsData.map((project, index) => {
               const platforms = [
                 { name: 'Web', active: project.is_web_platform },
@@ -3249,85 +3278,78 @@ export const FreelancerDetailContent = ({
                 : [];
 
               return (
-                <Card
-                  key={project.id || index}
-                  bg={cardBg}
-                  borderWidth="1px"
-                  borderColor={borderColor}
-                  shadow="none"
-                  borderRadius="lg"
-                >
-                  <Box p={{ base: 5, md: 6 }}>
-                    <Text className="freelancer-detail-field-label" mb={2}>
-                      Project Name
-                    </Text>
-                    <Text
-                      className="freelancer-detail-field-value"
-                      mb={4}
-                    >
+                <div key={project.id || index} className="fdp-project-card" style={{ marginBottom: 16 }}>
+                  <div className="fdp-project-card-header">
+                    <span className="fdp-project-name">
                       {project.project_name || `Project ${index + 1}`}
-                    </Text>
-                    <SimpleGrid columns={{ base: 1, sm: 3 }} spacing={{ base: 4, md: 6 }} mb={4}>
-                      <PageFieldRow
-                        label="Duration"
-                        value={project.duration ? `${project.duration} months` : null}
-                      />
-                      <PageFieldRow label="Location" value={project.project_location} />
-                      <PageFieldRow label="Type" value={getProjectTypeLabel(project.project_type)} />
-                    </SimpleGrid>
-                    {projectTechs.length > 0 ? (
-                      <Box mb={4} textAlign="left">
-                        <Text className="freelancer-detail-field-label" mb={2}>
-                          Technologies
-                        </Text>
-                        <HStack spacing={2} flexWrap="wrap">
+                    </span>
+                    {project.project_type && (
+                      <span className="fdp-project-type-badge">
+                        {getProjectTypeLabel(project.project_type)}
+                      </span>
+                    )}
+                  </div>
+                  <div className="fdp-project-card-body">
+                    <div className="fdp-project-meta-grid">
+                      {project.duration && (
+                        <div className="fdp-info-item">
+                          <span className="freelancer-detail-field-label">Duration</span>
+                          <span className="freelancer-detail-field-value">{project.duration} months</span>
+                        </div>
+                      )}
+                      {project.project_location && (
+                        <div className="fdp-info-item">
+                          <span className="freelancer-detail-field-label">Location</span>
+                          <span className="freelancer-detail-field-value">{project.project_location}</span>
+                        </div>
+                      )}
+                      {project.industry && (
+                        <div className="fdp-info-item">
+                          <span className="freelancer-detail-field-label">Industry</span>
+                          <span className="freelancer-detail-field-value">{project.industry}</span>
+                        </div>
+                      )}
+                    </div>
+                    {projectTechs.length > 0 && (
+                      <div style={{ marginBottom: 12 }}>
+                        <span className="freelancer-detail-field-label" style={{ display: 'block', marginBottom: 6 }}>Technologies</span>
+                        <div className="fdp-chips-row">
                           {projectTechs.map((tech, techIndex) => (
                             <DetailOutlineChip key={techIndex}>{tech}</DetailOutlineChip>
                           ))}
-                        </HStack>
-                      </Box>
-                    ) : null}
-                    {hasPlatforms ? (
-                      <Box mb={4} textAlign="left">
-                        <Text className="freelancer-detail-field-label" mb={2}>
-                          Platforms
-                        </Text>
-                        <HStack spacing={2} flexWrap="wrap">
+                        </div>
+                      </div>
+                    )}
+                    {hasPlatforms && (
+                      <div style={{ marginBottom: 12 }}>
+                        <span className="freelancer-detail-field-label" style={{ display: 'block', marginBottom: 6 }}>Platforms</span>
+                        <div className="fdp-chips-row">
                           {platforms.map((platform, platformIndex) => (
                             <DetailOutlineChip key={platformIndex}>{platform.name}</DetailOutlineChip>
                           ))}
-                        </HStack>
-                      </Box>
-                    ) : null}
-                    {project.project_details ? (
-                      <Box mb={4} textAlign="left">
-                        <Text className="freelancer-detail-field-label" mb={2}>
-                          Description
-                        </Text>
-                        <Text className="freelancer-detail-field-value" color={textColor} lineHeight="tall">
-                          {project.project_details}
-                        </Text>
-                      </Box>
-                    ) : null}
-                    {project.project_link ? (
-                      <Link
+                        </div>
+                      </div>
+                    )}
+                    {project.project_details && (
+                      <p className="fdp-project-description">{project.project_details}</p>
+                    )}
+                    {project.project_link && (
+                      <a
                         href={project.project_link}
                         target="_blank"
                         rel="noopener noreferrer"
-                        color="brand.600"
-                        className="freelancer-detail-field-value"
-                        fontWeight="medium"
-                        isExternal
+                        className="fdp-platform-link"
+                        style={{ display: 'inline-block', marginTop: 8 }}
                       >
-                        View project
-                      </Link>
-                    ) : null}
-                  </Box>
-                </Card>
+                        View project →
+                      </a>
+                    )}
+                  </div>
+                </div>
               );
             })}
-          </VStack>
-        </VStack>
+          </div>
+        </div>
       );
     }
 
@@ -3708,76 +3730,59 @@ export const FreelancerDetailContent = ({
     const isPageViewCert = !isEditMode && detailVariant === 'page';
     const certCellAlign = isPageViewCert ? 'left' : undefined;
 
+    if (isPageViewCert) {
+      return (
+        <div>
+          <div className="fdp-section-title-row">
+            <span className="fdp-section-title">Certifications</span>
+            <span className="fdp-count-badge">{count || certsData.length}</span>
+          </div>
+          <div className="fdp-cert-table-wrap">
+            <table className="fdp-cert-table">
+              <thead>
+                <tr>
+                  <th>Certificate Name</th>
+                  <th>Institution</th>
+                  <th>Certificate No.</th>
+                  <th>From</th>
+                  <th>Till</th>
+                </tr>
+              </thead>
+              <tbody>
+                {certsData.map((cert, index) => (
+                  <tr key={cert.certificate_id || index}>
+                    <td>{cert.name || '--'}</td>
+                    <td>{cert.institutename || '--'}</td>
+                    <td>{cert.certificate_no || '--'}</td>
+                    <td>{cert.from_date || '--'}</td>
+                    <td>{cert.till_date === '0' ? 'Present' : cert.till_date || '--'}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      );
+    }
+
     return (
       <VStack align="stretch" spacing={4} w="100%">
-        <Card
-          bg={cardBg}
-          p={isPageViewCert ? 5 : 6}
-          borderWidth={isPageViewCert ? '1px' : undefined}
-          borderColor={isPageViewCert ? borderColor : undefined}
-          boxShadow={isPageViewCert ? 'none' : undefined}
-          borderRadius={isPageViewCert ? 'lg' : undefined}
-        >
-          {isPageViewCert ? (
-            <Text className="freelancer-detail-field-value" fontWeight="bold" color={textColor} mb={4} textAlign="left">
-              Certifications
-              <Text as="span" fontWeight="normal" color="gray.500" ml={2}>
-                ({count || certsData.length})
-              </Text>
+        <Card bg={cardBg} p={6} borderWidth="1px" borderColor={borderColor} borderRadius="lg" boxShadow="none">
+          <HStack spacing={2} mb={4}>
+            <MdCardMembership size={24} color="brand.500" />
+            <Text fontSize="lg" fontWeight="bold" color={textColor}>
+              Certifications ({count || certsData.length})
             </Text>
-          ) : (
-            <HStack spacing={2} mb={4}>
-              <MdCardMembership size={24} color="brand.500" />
-              <Text fontSize="lg" fontWeight="bold" color={textColor}>
-                Certifications ({count || certsData.length})
-              </Text>
-            </HStack>
-          )}
-
+          </HStack>
           <Box overflowX="auto">
             <Table variant="simple" size="sm">
               <Thead>
                 <Tr>
-                  <Th
-                    borderColor={borderColor}
-                    textAlign={certCellAlign}
-                    className={isPageViewCert ? 'freelancer-detail-field-label' : undefined}
-                    color={isPageViewCert ? undefined : textColor}
-                  >
-                    Certificate Name
-                  </Th>
-                  <Th
-                    borderColor={borderColor}
-                    textAlign={certCellAlign}
-                    className={isPageViewCert ? 'freelancer-detail-field-label' : undefined}
-                    color={isPageViewCert ? undefined : textColor}
-                  >
-                    Institution
-                  </Th>
-                  <Th
-                    borderColor={borderColor}
-                    textAlign={certCellAlign}
-                    className={isPageViewCert ? 'freelancer-detail-field-label' : undefined}
-                    color={isPageViewCert ? undefined : textColor}
-                  >
-                    Certificate No.
-                  </Th>
-                  <Th
-                    borderColor={borderColor}
-                    textAlign={certCellAlign}
-                    className={isPageViewCert ? 'freelancer-detail-field-label' : undefined}
-                    color={isPageViewCert ? undefined : textColor}
-                  >
-                    From
-                  </Th>
-                  <Th
-                    borderColor={borderColor}
-                    textAlign={certCellAlign}
-                    className={isPageViewCert ? 'freelancer-detail-field-label' : undefined}
-                    color={isPageViewCert ? undefined : textColor}
-                  >
-                    Till
-                  </Th>
+                  <Th borderColor={borderColor} color={textColor}>Certificate Name</Th>
+                  <Th borderColor={borderColor} color={textColor}>Institution</Th>
+                  <Th borderColor={borderColor} color={textColor}>Certificate No.</Th>
+                  <Th borderColor={borderColor} color={textColor}>From</Th>
+                  <Th borderColor={borderColor} color={textColor}>Till</Th>
                 </Tr>
               </Thead>
               <Tbody>
@@ -3786,59 +3791,28 @@ export const FreelancerDetailContent = ({
                     {isEditMode ? (
                       <>
                         <Td borderColor={borderColor}>
-                          <Input
-                            value={cert.name || ''}
-                            onChange={(e) => updateNestedFormData('certifications', index, 'name', e.target.value)}
-                            fontSize="sm"
-                            borderColor={borderColor}
-                            size="sm"
-                          />
+                          <Input value={cert.name || ''} onChange={(e) => updateNestedFormData('certifications', index, 'name', e.target.value)} fontSize="sm" borderColor={borderColor} size="sm" />
                         </Td>
                         <Td borderColor={borderColor}>
-                          <Input
-                            value={cert.institutename || ''}
-                            onChange={(e) => updateNestedFormData('certifications', index, 'institutename', e.target.value)}
-                            fontSize="sm"
-                            borderColor={borderColor}
-                            size="sm"
-                          />
+                          <Input value={cert.institutename || ''} onChange={(e) => updateNestedFormData('certifications', index, 'institutename', e.target.value)} fontSize="sm" borderColor={borderColor} size="sm" />
                         </Td>
                         <Td borderColor={borderColor}>
-                          <Input
-                            value={cert.certificate_no || ''}
-                            onChange={(e) => updateNestedFormData('certifications', index, 'certificate_no', e.target.value)}
-                            fontSize="sm"
-                            borderColor={borderColor}
-                            size="sm"
-                          />
+                          <Input value={cert.certificate_no || ''} onChange={(e) => updateNestedFormData('certifications', index, 'certificate_no', e.target.value)} fontSize="sm" borderColor={borderColor} size="sm" />
                         </Td>
                         <Td borderColor={borderColor}>
-                          <Input
-                            value={cert.from_date || ''}
-                            onChange={(e) => updateNestedFormData('certifications', index, 'from_date', e.target.value)}
-                            fontSize="sm"
-                            borderColor={borderColor}
-                            size="sm"
-                          />
+                          <Input value={cert.from_date || ''} onChange={(e) => updateNestedFormData('certifications', index, 'from_date', e.target.value)} fontSize="sm" borderColor={borderColor} size="sm" />
                         </Td>
                         <Td borderColor={borderColor}>
-                          <Input
-                            value={cert.till_date === '0' ? '' : cert.till_date || ''}
-                            onChange={(e) => updateNestedFormData('certifications', index, 'till_date', e.target.value)}
-                            fontSize="sm"
-                            borderColor={borderColor}
-                            size="sm"
-                            placeholder="Present"
-                          />
+                          <Input value={cert.till_date === '0' ? '' : cert.till_date || ''} onChange={(e) => updateNestedFormData('certifications', index, 'till_date', e.target.value)} fontSize="sm" borderColor={borderColor} size="sm" placeholder="Present" />
                         </Td>
                       </>
                     ) : (
                       <>
-                        <Td borderColor={borderColor} color={textColor} textAlign={certCellAlign} className={isPageViewCert ? 'freelancer-detail-field-value' : undefined}>{cert.name || '--'}</Td>
-                        <Td borderColor={borderColor} color={textColor} textAlign={certCellAlign} className={isPageViewCert ? 'freelancer-detail-field-value' : undefined}>{cert.institutename || '--'}</Td>
-                        <Td borderColor={borderColor} color={textColor} textAlign={certCellAlign} className={isPageViewCert ? 'freelancer-detail-field-value' : undefined}>{cert.certificate_no || '--'}</Td>
-                        <Td borderColor={borderColor} color={textColor} textAlign={certCellAlign} className={isPageViewCert ? 'freelancer-detail-field-value' : undefined}>{cert.from_date || '--'}</Td>
-                        <Td borderColor={borderColor} color={textColor} textAlign={certCellAlign} className={isPageViewCert ? 'freelancer-detail-field-value' : undefined}>{cert.till_date === '0' ? 'Present' : cert.till_date || '--'}</Td>
+                        <Td borderColor={borderColor} color={textColor}>{cert.name || '--'}</Td>
+                        <Td borderColor={borderColor} color={textColor}>{cert.institutename || '--'}</Td>
+                        <Td borderColor={borderColor} color={textColor}>{cert.certificate_no || '--'}</Td>
+                        <Td borderColor={borderColor} color={textColor}>{cert.from_date || '--'}</Td>
+                        <Td borderColor={borderColor} color={textColor}>{cert.till_date === '0' ? 'Present' : cert.till_date || '--'}</Td>
                       </>
                     )}
                   </Tr>
@@ -3849,18 +3823,14 @@ export const FreelancerDetailContent = ({
         </Card>
         {isEditMode && (
           <Flex justify="flex-end" pt={4}>
-            <Button
-              colorScheme="brand"
-              onClick={() => handleUpdate('Certifications')}
-              isLoading={isUpdating}
-              loadingText="Updating..."
-            >
+            <Button colorScheme="brand" onClick={() => handleUpdate('Certifications')} isLoading={isUpdating} loadingText="Updating...">
               Update Certifications
             </Button>
           </Flex>
         )}
       </VStack>
     );
+
   };
 
   const renderEducation = () => {
@@ -3881,59 +3851,42 @@ export const FreelancerDetailContent = ({
       const formatEduYear = (edu) =>
         edu.year === '0' ? 'Pursuing' : edu.month && edu.year ? `${edu.month} - ${edu.year}` : null;
 
+      const renderEduGroup = (list, isPost, groupLabel) => {
+        if (!list || list.length === 0) return null;
+        return (
+          <div style={{ marginBottom: 24 }}>
+            <div className="fdp-section-title-row">
+              <span className="fdp-section-title">{groupLabel}</span>
+              <span className="fdp-count-badge">{list.length}</span>
+            </div>
+            {list.map((edu, index) => (
+              <div key={edu.id || index} className="fdp-edu-card">
+                <div className="fdp-edu-icon">
+                  <MdSchool />
+                </div>
+                <div className="fdp-edu-content">
+                  <div className="fdp-edu-degree">{formatEduDegree(edu, isPost) || '—'}</div>
+                  {edu.university_name && (
+                    <div className="fdp-edu-university">{edu.university_name}</div>
+                  )}
+                  <div className="fdp-edu-meta">
+                    <Text className='year'>{formatEduYear(edu) && <span>{formatEduYear(edu)}</span>}</Text>
+                    {formatEduType(edu) && (
+                      <span className="fdp-edu-type-badge">{formatEduType(edu)}</span>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        );
+      };
+
       return (
-        <VStack align="stretch" spacing={10} w="100%">
-          {graduation.length > 0 ? (
-            <Box w="100%">
-              <Text className="freelancer-detail-field-label" mb={4} textAlign="left">
-                Graduation
-              </Text>
-              <VStack spacing={4} align="stretch">
-                {graduation.map((edu, index) => (
-                  <Box
-                    key={edu.id || index}
-                    borderWidth="1px"
-                    borderColor={borderColor}
-                    borderRadius="md"
-                    p={{ base: 4, md: 5 }}
-                  >
-                    <SimpleGrid columns={{ base: 1, sm: 2 }} spacingX={8} spacingY={4}>
-                      <PageFieldRow label="Degree" value={formatEduDegree(edu, false)} />
-                      <PageFieldRow label="University" value={edu.university_name} />
-                      <PageFieldRow label="Education type" value={formatEduType(edu)} />
-                      <PageFieldRow label="Year" value={formatEduYear(edu)} />
-                    </SimpleGrid>
-                  </Box>
-                ))}
-              </VStack>
-            </Box>
-          ) : null}
-          {postGraduation.length > 0 ? (
-            <Box w="100%">
-              <Text className="freelancer-detail-field-label" mb={4} textAlign="left">
-                Post graduate (optional)
-              </Text>
-              <VStack spacing={4} align="stretch">
-                {postGraduation.map((edu, index) => (
-                  <Box
-                    key={edu.id || index}
-                    borderWidth="1px"
-                    borderColor={borderColor}
-                    borderRadius="md"
-                    p={{ base: 4, md: 5 }}
-                  >
-                    <SimpleGrid columns={{ base: 1, sm: 2 }} spacingX={8} spacingY={4}>
-                      <PageFieldRow label="Degree" value={formatEduDegree(edu, true)} />
-                      <PageFieldRow label="University" value={edu.university_name} />
-                      <PageFieldRow label="Education type" value={formatEduType(edu)} />
-                      <PageFieldRow label="Year" value={formatEduYear(edu)} />
-                    </SimpleGrid>
-                  </Box>
-                ))}
-              </VStack>
-            </Box>
-          ) : null}
-        </VStack>
+        <div>
+          {renderEduGroup(graduation, false, 'Graduation')}
+          {renderEduGroup(postGraduation, true, 'Post Graduation')}
+        </div>
       );
     }
 
@@ -4365,96 +4318,103 @@ export const FreelancerDetailContent = ({
     );
   };
 
+  if (detailVariant === 'page') {
+    const PAGE_TABS = [
+      { label: 'Overview', icon: <MdPerson className="fdp-tab-icon" /> },
+      { label: 'Experience', icon: <MdWork className="fdp-tab-icon" /> },
+      { label: 'Projects', icon: <MdFolder className="fdp-tab-icon" /> },
+      { label: 'Certifications', icon: <MdCardMembership className="fdp-tab-icon" /> },
+      { label: 'Education', icon: <MdSchool className="fdp-tab-icon" /> },
+    ];
+
+    const tabPanelContent = [
+      renderPrimaryIntroduction(),
+      renderProfessionalExperience(),
+      renderProjects(),
+      renderCertifications(),
+      renderEducation(),
+    ];
+
+    return (
+      <div>
+        {/* Custom tab bar */}
+        <div className="fdp-tab-bar" role="tablist">
+          {PAGE_TABS.map((tab, i) => (
+            <button
+              key={tab.label}
+              role="tab"
+              aria-selected={tabIndex === i}
+              className={`fdp-tab${tabIndex === i ? ' active' : ''}`}
+              onClick={() => onTabChange(i)}
+              type="button"
+            >
+              {tab.icon}
+              {tab.label}
+            </button>
+          ))}
+        </div>
+
+        {/* Tab panel */}
+        <div className="fdp-tab-panel" role="tabpanel">
+          {tabPanelContent[tabIndex]}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <Tabs
       index={tabIndex}
       onChange={onTabChange}
       colorScheme="brand"
-      variant={detailVariant === 'page' ? 'line' : 'enclosed'}
+      variant="enclosed"
       isLazy
       lazyBehavior="keepMounted"
     >
       <TabList
         overflowX="auto"
-        borderBottomWidth={detailVariant === 'page' ? '1px' : undefined}
-        borderColor={detailVariant === 'page' ? borderColor : undefined}
-        pb={detailVariant === 'page' ? 0 : undefined}
-        gap={detailVariant === 'page' ? 1 : 0}
-        justifyContent={detailVariant === 'page' ? 'flex-start' : undefined}
         flexWrap="wrap"
         w="100%"
-        sx={detailVariant === 'page' ? undefined : { overflow: 'hidden' }}
+        sx={{ overflow: 'hidden' }}
       >
-        {detailVariant === 'page' ? (
-          <>
-            <Tab whiteSpace="nowrap" px={4} py={3} fontWeight="semibold" fontSize="sm">
-              Overview
-            </Tab>
-            <Tab whiteSpace="nowrap" px={4} py={3} fontWeight="semibold" fontSize="sm">
-              Experience
-            </Tab>
-            <Tab whiteSpace="nowrap" px={4} py={3} fontWeight="semibold" fontSize="sm">
-              Projects
-            </Tab>
-            <Tab whiteSpace="nowrap" px={4} py={3} fontWeight="semibold" fontSize="sm">
-              Certifications
-            </Tab>
-            <Tab whiteSpace="nowrap" px={4} py={3} fontWeight="semibold" fontSize="sm">
-              Education
-            </Tab>
-          </>
-        ) : (
-          <>
-            <Tab whiteSpace="nowrap">
-              <HStack spacing={2}>
-                <MdPerson />
-                <Text>Primary Introduction</Text>
-              </HStack>
-            </Tab>
-            <Tab>
-              <HStack spacing={2}>
-                <MdWork />
-                <Text>Professional Experience</Text>
-              </HStack>
-            </Tab>
-            <Tab>
-              <HStack spacing={2}>
-                <MdFolder />
-                <Text>Projects</Text>
-              </HStack>
-            </Tab>
-            <Tab>
-              <HStack spacing={2}>
-                <MdCardMembership />
-                <Text>Certifications</Text>
-              </HStack>
-            </Tab>
-            <Tab>
-              <HStack spacing={2}>
-                <MdSchool />
-                <Text>Education</Text>
-              </HStack>
-            </Tab>
-          </>
-        )}
+        <Tab whiteSpace="nowrap">
+          <HStack spacing={2}>
+            <MdPerson />
+            <Text>Primary Introduction</Text>
+          </HStack>
+        </Tab>
+        <Tab>
+          <HStack spacing={2}>
+            <MdWork />
+            <Text>Professional Experience</Text>
+          </HStack>
+        </Tab>
+        <Tab>
+          <HStack spacing={2}>
+            <MdFolder />
+            <Text>Projects</Text>
+          </HStack>
+        </Tab>
+        <Tab>
+          <HStack spacing={2}>
+            <MdCardMembership />
+            <Text>Certifications</Text>
+          </HStack>
+        </Tab>
+        <Tab>
+          <HStack spacing={2}>
+            <MdSchool />
+            <Text>Education</Text>
+          </HStack>
+        </Tab>
       </TabList>
 
       <TabPanels>
-        <TabPanel px={0} pt={detailVariant === 'page' ? 6 : 4}>
-          {renderPrimaryIntroduction()}
-        </TabPanel>
-        <TabPanel px={0} pt={detailVariant === 'page' ? 6 : 4}>
-          {renderProfessionalExperience()}
-        </TabPanel>
-        <TabPanel px={0} pt={detailVariant === 'page' ? 6 : 4}>
-          {renderProjects()}
-        </TabPanel>
-        <TabPanel px={0} pt={detailVariant === 'page' ? 6 : 4}>
-          {renderCertifications()}
-        </TabPanel>
-        <TabPanel px={0} pt={detailVariant === 'page' ? 6 : 4}>
-          {renderEducation()}
-        </TabPanel>
+        <TabPanel px={0} pt={4}>{renderPrimaryIntroduction()}</TabPanel>
+        <TabPanel px={0} pt={4}>{renderProfessionalExperience()}</TabPanel>
+        <TabPanel px={0} pt={4}>{renderProjects()}</TabPanel>
+        <TabPanel px={0} pt={4}>{renderCertifications()}</TabPanel>
+        <TabPanel px={0} pt={4}>{renderEducation()}</TabPanel>
       </TabPanels>
     </Tabs>
   );
