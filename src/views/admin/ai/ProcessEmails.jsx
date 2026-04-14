@@ -61,6 +61,18 @@ const SAMPLE_CSV_FILES = [
 
 const formatSampleFileDisplayName = (fileName) => fileName.replace(/_/g, " ");
 
+/** API values often use snake_case; render without underscores (e.g. email_only → Email Only). */
+const humanizeSnakeCase = (value) => {
+  if (value == null || value === "") return "";
+  const s = String(value).trim();
+  if (!s) return "";
+  return s
+    .split("_")
+    .filter(Boolean)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase())
+    .join(" ");
+};
+
 const BATCH_TABS = [
   { label: "All",         type: "all" },
   { label: "Neverbounce", type: "neverbounce" },
@@ -243,7 +255,7 @@ const ProcessEmails = () => {
         borderRadius="full"
         fontWeight="normal"
         fontSize="xs"
-        textTransform="capitalize"
+        textTransform="none"
         _hover={{ opacity: 0.8, transform: 'translateY(-2px)' }}
         _disabled={{
           opacity: 1,
@@ -255,7 +267,7 @@ const ProcessEmails = () => {
         isDisabled
         cursor="default"
       >
-        {status || "—"}
+        {humanizeSnakeCase(status) || "—"}
       </Button>
     );
   };
@@ -330,6 +342,39 @@ const ProcessEmails = () => {
       case "processing": return "blue";
       default: return "gray";
     }
+  };
+
+  const renderEmailStatus = (raw) => {
+    if (raw == null || raw === "") return <Text fontSize="sm" color="gray.400">—</Text>;
+    const s = String(raw).trim();
+    if (s === "" || s.toUpperCase() === "NULL") return <Text fontSize="sm" color="gray.400">—</Text>;
+    const key = s.toLowerCase();
+    if (key === "sent_to_instantly") {
+      return (
+        <Badge colorScheme="green" variant="subtle" fontSize="0.7em" textTransform="none" whiteSpace="nowrap">
+          Sent to Instantly
+        </Badge>
+      );
+    }
+    if (key === "email_generated") {
+      return (
+        <Badge colorScheme="blue" variant="subtle" fontSize="0.7em" textTransform="none" whiteSpace="nowrap">
+          Email generated
+        </Badge>
+      );
+    }
+    if (key === "email_only") {
+      return (
+        <Badge colorScheme="gray" variant="subtle" fontSize="0.7em" textTransform="none" whiteSpace="nowrap">
+          Email only
+        </Badge>
+      );
+    }
+    return (
+      <Badge colorScheme="gray" variant="subtle" fontSize="0.7em" textTransform="none" whiteSpace="nowrap">
+        {humanizeSnakeCase(s)}
+      </Badge>
+    );
   };
 
   const handleFileSelect = (event) => {
@@ -558,7 +603,7 @@ const ProcessEmails = () => {
                       {[
                         "Email", "Domain", "Contact Name",
                         "Business Nature", "Business Description", "Key Products",
-                        "Special Cat. 1",
+                        "Special Cat. 1", "Email Status",
                         ...(detailType !== "exa" ? ["NB Result", "NB Status", "Pipeline Status", "Valid"] : []),
                       ].map((h) => (
                         <Th key={h} borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="capitalize" bg={bgColor} whiteSpace="nowrap">{h}</Th>
@@ -568,7 +613,7 @@ const ProcessEmails = () => {
                   <Tbody>
                     {detailEmails.length === 0 ? (
                       <Tr>
-                        <Td colSpan={detailType !== "exa" ? 11 : 7} textAlign="center" py="40px">
+                        <Td colSpan={detailType !== "exa" ? 12 : 8} textAlign="center" py="40px">
                           <Text color="gray.400" fontSize="sm">No records found for this filter.</Text>
                         </Td>
                       </Tr>
@@ -596,20 +641,23 @@ const ProcessEmails = () => {
                           <Td borderColor={borderColor} pt="8px" pb="8px">
                             <Text fontSize="sm" color={textColor}>{em.special_category_1 || "—"}</Text>
                           </Td>
+                          <Td borderColor={borderColor} pt="8px" pb="8px" textAlign="center">
+                            {renderEmailStatus(em.email_status)}
+                          </Td>
                           {detailType !== "exa" && (
                             <>
                               <Td borderColor={borderColor} pt="8px" pb="8px" textAlign="center">
                                 {em.neverbounce_result
-                                  ? <Badge colorScheme={detailStatusColorMap(em.neverbounce_result)} variant="subtle" fontSize="0.7em" textTransform="capitalize">{em.neverbounce_result}</Badge>
+                                  ? <Badge colorScheme={detailStatusColorMap(em.neverbounce_result)} variant="subtle" fontSize="0.7em" textTransform="none">{humanizeSnakeCase(em.neverbounce_result)}</Badge>
                                   : <Text fontSize="sm" color="gray.400">—</Text>}
                               </Td>
                               <Td borderColor={borderColor} pt="8px" pb="8px" textAlign="center">
                                 {em.neverbounce_status
-                                  ? <Badge colorScheme={detailStatusColorMap(em.neverbounce_status)} variant="subtle" fontSize="0.7em" textTransform="capitalize">{em.neverbounce_status}</Badge>
+                                  ? <Badge colorScheme={detailStatusColorMap(em.neverbounce_status)} variant="subtle" fontSize="0.7em" textTransform="none">{humanizeSnakeCase(em.neverbounce_status)}</Badge>
                                   : <Text fontSize="sm" color="gray.400">—</Text>}
                               </Td>
                               <Td borderColor={borderColor} pt="8px" pb="8px">
-                                <Text fontSize="sm" color={textColor}>{em.pipeline_status || "—"}</Text>
+                                <Text fontSize="sm" color={textColor}>{humanizeSnakeCase(em.pipeline_status) || "—"}</Text>
                               </Td>
                               <Td borderColor={borderColor} pt="8px" pb="8px" textAlign="center">
                                 <Badge colorScheme={em.is_valid === 1 || em.is_valid === true ? "green" : "red"} variant="subtle" fontSize="0.7em">
@@ -725,7 +773,7 @@ const ProcessEmails = () => {
                               {item.neverbounce_status ? renderStatusTag(item.neverbounce_status) : <Text color={textColor} fontSize="sm">—</Text>}
                             </Td>
                             <Td borderColor={borderColor} pt="8px" pb="8px">
-                              <Text color={textColor} fontSize="sm" fontWeight="normal">{item.csv_type || "—"}</Text>
+                              <Text color={textColor} fontSize="sm" fontWeight="normal">{humanizeSnakeCase(item.csv_type) || "—"}</Text>
                             </Td>
                             <Td borderColor={borderColor} pt="8px" pb="8px">
                               <Text color={textColor} fontSize="sm" fontWeight="normal">{item.total_categorised ?? "—"}</Text>

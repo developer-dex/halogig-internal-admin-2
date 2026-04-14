@@ -31,6 +31,58 @@ const getAiBaseUrl = () => {
   return base.replace(/\/$/, "");
 };
 
+/** API values often use snake_case; render without underscores. */
+const humanizeSnakeCase = (value) => {
+  if (value == null || value === "") return "";
+  const s = String(value).trim();
+  if (!s) return "";
+  return s
+    .split("_")
+    .filter(Boolean)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase())
+    .join(" ");
+};
+
+const renderEmailStatus = (raw) => {
+  if (raw == null || raw === "") return <Text fontSize="sm" color="gray.400">—</Text>;
+  const s = String(raw).trim();
+  if (s === "" || s.toUpperCase() === "NULL") return <Text fontSize="sm" color="gray.400">—</Text>;
+  const key = s.toLowerCase();
+  if (key === "sent_to_instantly") {
+    return (
+      <Badge colorScheme="green" variant="subtle" fontSize="0.7em" textTransform="none" whiteSpace="nowrap">
+        Sent to Instantly
+      </Badge>
+    );
+  }
+  if (key === "email_generated") {
+    return (
+      <Badge colorScheme="blue" variant="subtle" fontSize="0.7em" textTransform="none" whiteSpace="nowrap">
+        Email generated
+      </Badge>
+    );
+  }
+  if (key === "email_only") {
+    return (
+      <Badge colorScheme="gray" variant="subtle" fontSize="0.7em" textTransform="none" whiteSpace="nowrap">
+        Email only
+      </Badge>
+    );
+  }
+  return (
+    <Badge colorScheme="gray" variant="subtle" fontSize="0.7em" textTransform="none" whiteSpace="nowrap">
+      {humanizeSnakeCase(s)}
+    </Badge>
+  );
+};
+
+/** GET /api/combined/all — only sent when user picks a value (not on initial load). */
+const EMAIL_STATUS_FILTER_OPTIONS = [
+  { value: "", label: "All email statuses" },
+  { value: "sent_to_instantly", label: "Sent to Instantly" },
+  { value: "email_generated", label: "Email generated" },
+];
+
 /**
  * Presets for GET /api/combined/all
  * "valid" uses is_valid=1 (see API docs if your backend expects a different param).
@@ -66,6 +118,8 @@ const CentralDataRecords = () => {
   const [batchName, setBatchName] = useState("");
   const [batchNames, setBatchNames] = useState([]);
   const [loadingBatches, setLoadingBatches] = useState(false);
+  /** Empty = omit `email_status` from the request. */
+  const [emailStatusFilter, setEmailStatusFilter] = useState("");
 
   const [rows, setRows] = useState([]);
   const [totalCount, setTotalCount] = useState(0);
@@ -120,6 +174,9 @@ const CentralDataRecords = () => {
     if (batchName.trim()) {
       params.batch_name = batchName.trim();
     }
+    if (emailStatusFilter === "sent_to_instantly" || emailStatusFilter === "email_generated") {
+      params.email_status = emailStatusFilter;
+    }
 
     setIsLoading(true);
     try {
@@ -149,7 +206,7 @@ const CentralDataRecords = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [page, pageSize, preset, batchName]);
+  }, [page, pageSize, preset, batchName, emailStatusFilter]);
 
   useEffect(() => {
     fetchCombined();
@@ -180,6 +237,11 @@ const CentralDataRecords = () => {
     setPage(1);
   };
 
+  const handleEmailStatusFilterChange = (e) => {
+    setEmailStatusFilter(e.target.value);
+    setPage(1);
+  };
+
   const handleRefresh = () => {
     setPage(1);
     fetchBatchNames();
@@ -195,7 +257,7 @@ const CentralDataRecords = () => {
         Central Data Records
       </Heading>
       <Text fontSize="sm" color="gray.500" mb={4} maxW="3xl">
-        Unified email records across all batches. Filter by pipeline or batch, then paginate with{" "}
+        Unified email records across all batches. Filter by pipeline, batch, or email status, then paginate with{" "}
         <Text as="span" fontFamily="mono" fontSize="xs">GET /api/combined/all</Text>.
       </Text>
 
@@ -235,6 +297,24 @@ const CentralDataRecords = () => {
               {batchNames.map((name) => (
                 <option key={name} value={name}>
                   {name}
+                </option>
+              ))}
+            </Select>
+          </FormControl>
+          <FormControl maxW="240px" minW="180px">
+            <FormLabel fontSize="sm" mb={1} color={textColor}>
+              Email status
+            </FormLabel>
+            <Select
+              size="sm"
+              value={emailStatusFilter}
+              onChange={handleEmailStatusFilterChange}
+              borderColor={borderColor}
+              _hover={{ borderColor: "brand.500" }}
+            >
+              {EMAIL_STATUS_FILTER_OPTIONS.map((o) => (
+                <option key={o.value || "all"} value={o.value}>
+                  {o.label}
                 </option>
               ))}
             </Select>
@@ -292,6 +372,7 @@ const CentralDataRecords = () => {
                     "NB status",
                     "NB validated",
                     "Pipeline",
+                    "Email status",
                     "Valid",
                     "Validation date",
                     "Created",
@@ -315,7 +396,7 @@ const CentralDataRecords = () => {
               <Tbody>
                 {rows.length === 0 ? (
                   <Tr>
-                    <Td colSpan={25} textAlign="center" py="40px" borderColor={borderColor}>
+                    <Td colSpan={26} textAlign="center" py="40px" borderColor={borderColor}>
                       <Text color="black">No records found</Text>
                     </Td>
                   </Tr>
@@ -399,6 +480,9 @@ const CentralDataRecords = () => {
                         </Td>
                         <Td borderColor={borderColor} pt="8px" pb="8px">
                           <Text fontSize="sm" color={textColor}>{em.pipeline_status || "—"}</Text>
+                        </Td>
+                        <Td borderColor={borderColor} pt="8px" pb="8px" textAlign="center">
+                          {renderEmailStatus(em.email_status)}
                         </Td>
                         <Td borderColor={borderColor} pt="8px" pb="8px" textAlign="center">
                           <Badge

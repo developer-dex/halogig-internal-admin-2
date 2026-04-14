@@ -356,7 +356,7 @@ const routes = [
         component: <InstantlyAnalytics />,
       },
       {
-        name: 'Email Clearens',
+        name: 'Email Clearance',
         layout: '/admin',
         path: '/ai/email-clearens',
         icon: <Icon as={MdCleaningServices} width="20px" height="20px" color="inherit" />,

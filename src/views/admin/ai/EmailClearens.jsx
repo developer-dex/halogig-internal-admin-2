@@ -154,7 +154,7 @@ const EmailClearens = () => {
   return (
     <Box>
       <Heading as="h1" size="lg" color={textColor} fontWeight="700" mb={2}>
-        Email Clearens
+        Email Clearance
       </Heading>
       <Text fontSize="sm" color="gray.500" mb={6} maxW="3xl">
         Upload a CSV that includes an email column (any layout). Rows whose emails appear in
