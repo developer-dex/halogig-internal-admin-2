@@ -82,7 +82,7 @@ const CentralDataRecords = () => {
     if (!aiBaseUrl) return;
     setLoadingBatches(true);
     try {
-      const { data } = await axios.get(`${aiBaseUrl}/api/draft/batch-names`);
+      const { data } = await axios.get(`${aiBaseUrl}/api/batch-names`);
       const raw = data?.batch_names;
       const list = Array.isArray(raw)
         ? raw.map((n) => (typeof n === "string" ? n : n?.batch_name ?? "")).filter(Boolean)
