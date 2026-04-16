@@ -25,6 +25,7 @@ import {
   MdAssignment,
   MdCleaningServices,
   MdDataset,
+  MdCampaign,
 } from 'react-icons/md';
 import { FaGoogle, FaLinkedin, FaTwitter } from 'react-icons/fa';
 
@@ -62,6 +63,7 @@ import Blog from 'views/admin/blog';
 import EmailDomainAnalysis from 'views/admin/ai';
 import EmailClearens from 'views/admin/ai/EmailClearens';
 import CentralDataRecords from 'views/admin/ai/CentralDataRecords';
+import DraftCampaigns from 'views/admin/ai/DraftCampaigns';
 import InstantlyAnalytics from 'views/admin/instantlyAnalytics';
 import FreelancerTickets from 'views/admin/freelancerTickets';
 import ClientTickets from 'views/admin/clientTickets';
@@ -368,6 +370,13 @@ const routes = [
         path: '/ai/central-data-records',
         icon: <Icon as={MdDataset} width="20px" height="20px" color="inherit" />,
         component: <CentralDataRecords />,
+      },
+      {
+        name: 'Draft Campaigns',
+        layout: '/admin',
+        path: '/ai/draft-campaigns',
+        icon: <Icon as={MdCampaign} width="20px" height="20px" color="inherit" />,
+        component: <DraftCampaigns />,
       },
     ],
   },
