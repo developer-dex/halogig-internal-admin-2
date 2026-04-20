@@ -105,7 +105,9 @@ export const apiEndPoints = {
   // Freelancer Payments endpoint
   GET_ALL_FREELANCER_PAYMENTS: "admin/freelancer-payments",
   
-  // Disputes endpoint
+  // Disputes endpoints
+  GET_ALL_ADMIN_DISPUTES: "admin/disputes/all",
+  UPDATE_ADMIN_DISPUTE_STATUS: "admin/disputes",
   GET_DISPUTES_BY_TYPE: "admin/disputes",
   
   // Sales Referral Leads (Admin)

@@ -26,6 +26,7 @@ import {
   MdCleaningServices,
   MdDataset,
   MdCampaign,
+  MdOutlineReportProblem,
 } from 'react-icons/md';
 import { FaGoogle, FaLinkedin, FaTwitter } from 'react-icons/fa';
 
@@ -52,6 +53,7 @@ import ClientList from 'views/admin/clients';
 import FreelancerList from 'views/admin/freelancers';
 import ReferralPartnerList from 'views/admin/referralPartners';
 import SalesReferralLeadList from 'views/admin/salesReferral';
+import DisputesList from 'views/admin/disputes';
 import ProjectList from 'views/admin/projects';
 import ContactList from 'views/admin/contacts';
 import WebsiteData from 'views/admin/websiteData';
@@ -241,6 +243,13 @@ const routes = [
         path: '/sales-referral-leads',
         icon: <Icon as={MdAssignment} width="20px" height="20px" color="inherit" />,
         component: <SalesReferralLeadList />,
+      },
+      {
+        name: 'Disputes',
+        layout: '/admin',
+        path: '/disputes',
+        icon: <Icon as={MdOutlineReportProblem} width="20px" height="20px" color="inherit" />,
+        component: <DisputesList />,
       },
     ],
   },
