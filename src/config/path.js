@@ -33,6 +33,7 @@ export const apiEndPoints = {
   UPDATE_PROJECT: "admin/project",
   UPDATE_PROJECT_STATUS: "admin/project",
   CREATE_CLIENT_PROJECT: "admin/client-project",
+  GET_PROJECT_PREFILL: "admin/project",
   
   // Project Bids endpoints
   GET_ALL_PROJECT_BIDS: "admin/project-bids",
@@ -120,6 +121,7 @@ export const apiEndPoints = {
   GET_ALL_TESTIMONIALS: "admin/testimonials",
   UPDATE_TESTIMONIAL: "admin/testimonial",
   DELETE_TESTIMONIAL: "admin/testimonial",
+  UPDATE_TESTIMONIAL_STATUS: "admin/testimonial",
   
   // Web Rotation Data endpoints
   GET_WEB_ROT_DATA: "admin/web-rot-data",

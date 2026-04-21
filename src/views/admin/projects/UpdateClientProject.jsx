@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useDeferredValue } from 'react';
+import React, { useState, useEffect, useMemo, useDeferredValue, useRef } from 'react';
 import {
   Box,
   Card,
@@ -26,30 +26,24 @@ import {
   MenuList,
   MenuItem,
 } from '@chakra-ui/react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, useParams } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
 import { ArrowBackIcon } from '@chakra-ui/icons';
 import { MdExpandMore } from 'react-icons/md';
-import { getApi, postApi } from '../../../services/api';
+import { getApi } from '../../../services/api';
 import { apiEndPoints } from '../../../config/path';
 import { showError, showSuccess } from '../../../helpers/messageHelper';
+import { updateProject } from '../../../features/admin/projectManagementSlice';
 
-export default function CreateClientProject() {
+export default function UpdateClientProject() {
   const navigate = useNavigate();
   const location = useLocation();
+  const dispatch = useDispatch();
+  const { projectId } = useParams();
 
-  // Get client data from navigation state
-  const clientInfo = location.state || {};
-  const projectPrefill = clientInfo?.projectPrefill || null;
-  const clientIdFromQuery = useMemo(() => {
-    try {
-      const params = new URLSearchParams(location.search || '');
-      const raw = params.get('client_id');
-      const n = raw ? Number(raw) : null;
-      return n && !Number.isNaN(n) ? n : null;
-    } catch {
-      return null;
-    }
-  }, [location.search]);
+  const returnPath = location.state?.returnPath || '/admin/offline-projects';
+  const [projectPrefill, setProjectPrefill] = useState(null);
+  const techPrefillMappedRef = useRef(false);
 
   const textColor = useColorModeValue('secondaryGray.900', 'white');
   const bgColor = useColorModeValue('#F4F7FE', 'black');
@@ -71,7 +65,9 @@ export default function CreateClientProject() {
     projectSummary: '',
     typeOfProject: 'maintenance',
     currency: 'INR-₹',
-    locationPreferancer: ''
+    locationPreferancer: '',
+    noticePeriodMin: '',
+    noticePeriodMax: '',
   });
 
   useEffect(() => {
@@ -103,6 +99,14 @@ export default function CreateClientProject() {
       typeOfProject: projectPrefill.type_of_project || prev.typeOfProject,
       currency: mappedCurrency || prev.currency,
       locationPreferancer: projectPrefill.location_preferancer || prev.locationPreferancer,
+      noticePeriodMin:
+        projectPrefill.notice_period_min !== undefined && projectPrefill.notice_period_min !== null
+          ? String(projectPrefill.notice_period_min)
+          : prev.noticePeriodMin,
+      noticePeriodMax:
+        projectPrefill.notice_period_max !== undefined && projectPrefill.notice_period_max !== null
+          ? String(projectPrefill.notice_period_max)
+          : prev.noticePeriodMax,
     }));
   }, [projectPrefill]);
 
@@ -118,6 +122,35 @@ export default function CreateClientProject() {
   const [subCategories, setSubCategories] = useState([]);
   const [technologies, setTechnologies] = useState([]);
   const [industries, setIndustries] = useState([]);
+
+  useEffect(() => {
+    techPrefillMappedRef.current = false;
+  }, [projectId]);
+
+  // Map saved technology names (comma-separated) to checkbox IDs once options are loaded
+  useEffect(() => {
+    if (!projectPrefill || !technologies.length) return;
+    if (techPrefillMappedRef.current) return;
+    const raw = projectPrefill.technologty_pre;
+    if (!raw) {
+      techPrefillMappedRef.current = true;
+      return;
+    }
+    const names = String(raw)
+      .split(',')
+      .map((s) => s.trim())
+      .filter(Boolean);
+    const ids = [];
+    names.forEach((name) => {
+      const tech = technologies.find((t) => (t.name || t.title) === name);
+      if (tech) ids.push(String(tech.id || tech._id));
+    });
+    if (ids.length) {
+      setFormData((prev) => ({ ...prev, technologyPreference: ids }));
+    }
+    techPrefillMappedRef.current = true;
+  }, [projectPrefill, technologies]);
+
   const [categorySearchTerm, setCategorySearchTerm] = useState('');
   const [subCategorySearchTerm, setSubCategorySearchTerm] = useState('');
   const [technologySearchTerm, setTechnologySearchTerm] = useState('');
@@ -194,30 +227,6 @@ export default function CreateClientProject() {
     [orderedFilteredTechnologies, technologyRenderLimit],
   );
 
-  // Fetch categories
-  const fetchCategories = async () => {
-    try {
-      setIsLoading(true);
-      const response = await getApi(apiEndPoints.GET_CATEGORIES);
-
-      // Match the structure used in dropdownDataSlice
-      if (Array.isArray(response?.data?.data)) {
-        setCategories(response.data.data);
-      } else if (Array.isArray(response?.data)) {
-        setCategories(response.data);
-      } else if (Array.isArray(response)) {
-        setCategories(response);
-      } else {
-        setCategories([]);
-      }
-    } catch (error) {
-      console.error('Error fetching categories:', error);
-      setCategories([]);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   // Fetch sub-categories
   const fetchSubCategories = async (categoryId) => {
     if (!categoryId) {
@@ -243,59 +252,16 @@ export default function CreateClientProject() {
     }
   };
 
-  // Fetch technologies
-  const fetchTechnologies = async () => {
-    try {
-      const response = await getApi(apiEndPoints.GET_TECHNOLOGIES);
-
-      // Match the structure used in dropdownDataSlice
-      if (Array.isArray(response?.data?.data)) {
-        setTechnologies(response.data.data);
-      } else if (Array.isArray(response?.data)) {
-        setTechnologies(response.data);
-      } else if (Array.isArray(response)) {
-        setTechnologies(response);
-      } else {
-        setTechnologies([]);
-      }
-    } catch (error) {
-      console.error('Error fetching technologies:', error);
-      setTechnologies([]);
-    }
-  };
-
-  // Fetch industries
-  const fetchIndustries = async () => {
-    try {
-      const response = await getApi(apiEndPoints.GET_INDUSTRIES);
-
-      // Match the structure used in dropdownDataSlice
-      if (Array.isArray(response?.data?.data)) {
-        setIndustries(response.data.data);
-      } else if (Array.isArray(response?.data)) {
-        setIndustries(response.data);
-      } else if (Array.isArray(response)) {
-        setIndustries(response);
-      } else {
-        setIndustries([]);
-      }
-    } catch (error) {
-      console.error('Error fetching industries:', error);
-      setIndustries([]);
-    }
-  };
-
-  // Fetch client city and country
-  const getClientCountyCityState = async () => {
-    if (!clientInfo.clientId) {
-      // Set defaults if no client ID
+  // Fetch client city and country (posted_by user)
+  const getClientCountyCityState = async (clientUserId) => {
+    if (!clientUserId) {
       setUserCity('City');
       setUserCountry('Country');
       return;
     }
 
     try {
-      const response = await getApi(`${apiEndPoints.GET_CLIENT_DETAILS}/${clientInfo.clientId}/details`);
+      const response = await getApi(`${apiEndPoints.GET_CLIENT_DETAILS}/${clientUserId}/details`);
       const clientData = response?.data?.data || response?.data || response;
 
       if (clientData) {
@@ -431,6 +397,19 @@ export default function CreateClientProject() {
         throw new Error('Please select a location preference');
       }
 
+      if (retainershipVisible) {
+        if (!formData.noticePeriodMin || !formData.noticePeriodMax) {
+          throw new Error('Please enter notice period range');
+        }
+        if (parseFloat(formData.noticePeriodMin) > parseFloat(formData.noticePeriodMax)) {
+          throw new Error('Maximum notice period must be greater than minimum notice period');
+        }
+      }
+
+      if (!projectPrefill) {
+        throw new Error('Project data is not loaded');
+      }
+
       // Get selected technology names - ensure we have valid IDs
       const selectedTechnologies = technologies.filter(tech => {
         const techId = String(tech.id || tech._id);
@@ -451,9 +430,8 @@ export default function CreateClientProject() {
         throw new Error('Please select at least one valid sub-category');
       }
 
-      // Prepare data for API - matching old admin structure
-      const postprojectData = {
-        posted_by_user_id: clientIdFromQuery || clientInfo.clientId || projectPrefill?.User?.id || null,
+      const projectData = {
+        posted_by_user_id: projectPrefill.posted_by_user_id,
         project_title: formData.projectTitle,
         project_category: String(formData.projectCategory),
         project_sub_category: subCategoryIds.join(','),
@@ -462,34 +440,42 @@ export default function CreateClientProject() {
         project_duration_min: formData.durationMin,
         project_duration_max: formData.durationMax,
         customer_industry: String(formData.customerIndustry),
-        technologty_pre: selectedTechnologies.map(tech => tech.name || tech.title).join(','),
-        notice_period: "0",
+        technologty_pre: selectedTechnologies.map((tech) => tech.name || tech.title).join(','),
+        notice_period: projectPrefill.notice_period || '0',
+        notice_period_min: formData.noticePeriodMin,
+        notice_period_max: formData.noticePeriodMax,
+        sales_amount: projectPrefill.sales_amount || '0',
+        sales_amount_to: projectPrefill.sales_amount_to || '0',
         project_amount: formData.rateMin,
+        project_amount_min: formData.rateMin,
         project_amount_max: formData.rateMax,
+        project_amount_to: formData.rateMax,
         model_engagement: formData.pricingModel,
         currency_type: formData.currency.split('-')[0],
         currency_symbol: formData.currency.split('-')[1],
-        currency: formData.currency,
         location_preferancer: formData.locationPreferancer,
-        created_by_admin: true,
-        is_published: false
+        status: projectPrefill.status,
       };
 
-      // Submit to API
-      const response = await postApi(apiEndPoints.CREATE_CLIENT_PROJECT, { postprojectData });
+      await dispatch(
+        updateProject({
+          projectId: Number(projectId),
+          projectData,
+        }),
+      ).unwrap();
 
-      if (!response.data) {
-        throw new Error(response.message || 'Failed to create project');
-      }
-
-      setSuccess('Project created successfully!');
-      showSuccess('Project created successfully!');
+      setSuccess('Project updated successfully!');
+      showSuccess('Project updated successfully!');
       setTimeout(() => {
-        navigate('/admin/offline-clients');
-      }, 2000);
+        navigate(returnPath);
+      }, 1200);
 
     } catch (error) {
-      const errorMessage = error.response?.data?.message || error.response?.data?.error || error.message || 'Failed to create project';
+      const errorMessage =
+        error?.response?.data?.message ||
+        error?.response?.data?.error ||
+        error?.message ||
+        'Failed to update project';
       setError(errorMessage);
       showError(errorMessage);
     } finally {
@@ -497,32 +483,78 @@ export default function CreateClientProject() {
     }
   };
 
-  // Load initial data
+  // Load project + dropdowns
   useEffect(() => {
-    const loadData = async () => {
+    if (!projectId) return undefined;
+
+    let cancelled = false;
+
+    const parseList = (response) => {
+      if (Array.isArray(response?.data?.data)) return response.data.data;
+      if (Array.isArray(response?.data)) return response.data;
+      if (Array.isArray(response)) return response;
+      return [];
+    };
+
+    const load = async () => {
       setIsLoading(true);
+      setProjectPrefill(null);
       try {
-        await Promise.all([
-          fetchCategories(),
-          fetchTechnologies(),
-          fetchIndustries(),
-          getClientCountyCityState()
+        const [catRes, techRes, indRes, projRes] = await Promise.all([
+          getApi(apiEndPoints.GET_CATEGORIES),
+          getApi(apiEndPoints.GET_TECHNOLOGIES),
+          getApi(apiEndPoints.GET_INDUSTRIES),
+          getApi(`${apiEndPoints.GET_PROJECT_PREFILL}/${projectId}/prefill`),
         ]);
-      } catch (error) {
-        console.error('Error loading initial data:', error);
+        if (cancelled) return;
+
+        setCategories(parseList(catRes));
+        setTechnologies(parseList(techRes));
+        setIndustries(parseList(indRes));
+
+        const project = projRes?.data?.data;
+        if (!project) {
+          showError('Project not found');
+          return;
+        }
+        setProjectPrefill(project);
+
+        const clientUserId = project?.User?.id || project?.posted_by_user_id;
+        await getClientCountyCityState(clientUserId);
+      } catch (err) {
+        console.error('Error loading update project page:', err);
+        showError(err?.response?.data?.message || 'Failed to load project');
       } finally {
-        setIsLoading(false);
+        if (!cancelled) setIsLoading(false);
       }
     };
 
-    loadData();
-  }, [clientInfo.clientId]);
+    load();
+    return () => {
+      cancelled = true;
+    };
+  }, [projectId]);
 
-  if (isLoading && categories.length === 0) {
+  if (isLoading) {
     return (
       <Flex justify="center" align="center" minH="400px">
         <Spinner size="xl" color="brand.500" />
       </Flex>
+    );
+  }
+
+  if (!projectPrefill) {
+    return (
+      <Box bg={bgColor} minH="100%" p={6}>
+        <Card bg={cardBg} borderRadius="2xl" borderWidth="1px" borderColor={sectionBorderColor} p={6}>
+          <Text color={textColor} mb={4}>
+            Unable to load this project. It may have been removed or you may not have access.
+          </Text>
+          <Button leftIcon={<ArrowBackIcon />} variant="outline" onClick={() => navigate(returnPath)}>
+            Back to projects
+          </Button>
+        </Card>
+      </Box>
     );
   }
 
@@ -534,21 +566,24 @@ export default function CreateClientProject() {
           <HStack mb="24px" spacing="16px">
             <IconButton
               icon={<ArrowBackIcon />}
-              onClick={() => navigate('/admin/offline-clients')}
+              onClick={() => navigate(returnPath)}
               variant="ghost"
-              aria-label="Back to Clients"
+              aria-label="Back to projects"
             />
             <Text color={textColor} fontSize="2xl" fontWeight="700">
-              Create Project for Client
+              Update Project
             </Text>
           </HStack>
 
           {/* Client Info */}
-          {clientInfo.clientName && (
+          {(projectPrefill?.User?.first_name || projectPrefill?.User?.email) && (
             <Alert status="info" mb="24px" borderRadius="8px">
               <AlertIcon />
-              Creating project for client: <strong>{clientInfo.clientName}</strong>
-              {clientInfo.clientEmail && ` (${clientInfo.clientEmail})`}
+              Client:{' '}
+              <strong>
+                {[projectPrefill?.User?.first_name, projectPrefill?.User?.last_name].filter(Boolean).join(' ') || '—'}
+              </strong>
+              {projectPrefill?.User?.email && ` (${projectPrefill.User.email})`}
             </Alert>
           )}
 
@@ -896,6 +931,42 @@ export default function CreateClientProject() {
                 </Box>
               )}
 
+              {/* Notice period — retainership (matches admin project edit modal) */}
+              {retainershipVisible && (
+                <Box gridColumn={{ base: '1', md: '1 / -1' }}>
+                  <FormLabel>Notice Period (In Days) *</FormLabel>
+                  <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4}>
+                    <FormControl isRequired>
+                      <Input
+                        type="number"
+                        value={formData.noticePeriodMin}
+                        onChange={(e) =>
+                          setFormData((prev) => ({ ...prev, noticePeriodMin: e.target.value }))
+                        }
+                        placeholder="Min"
+                        min={0}
+                      />
+                    </FormControl>
+                    <FormControl isRequired>
+                      <Input
+                        type="number"
+                        value={formData.noticePeriodMax}
+                        onChange={(e) =>
+                          setFormData((prev) => ({ ...prev, noticePeriodMax: e.target.value }))
+                        }
+                        placeholder="Max"
+                        min={formData.noticePeriodMin || 0}
+                      />
+                      {parseFloat(formData.noticePeriodMin) > parseFloat(formData.noticePeriodMax) && (
+                        <Text fontSize="xs" color="red.500" mt={1}>
+                          Max must be greater than Min
+                        </Text>
+                      )}
+                    </FormControl>
+                  </SimpleGrid>
+                </Box>
+              )}
+
               {/* Project Summary */}
               <FormControl gridColumn={{ base: '1', md: '1 / -1' }} isRequired>
                 <FormLabel>Project Summary *</FormLabel>
@@ -974,7 +1045,7 @@ export default function CreateClientProject() {
                 <Flex justify="flex-end" gap={3} mt={4}>
                   <Button
                     variant="ghost"
-                    onClick={() => navigate('/admin/offline-clients')}
+                    onClick={() => navigate(returnPath)}
                     disabled={isSubmitting}
                   >
                     Cancel
@@ -984,9 +1055,9 @@ export default function CreateClientProject() {
                     colorScheme="brand"
                     disabled={isSubmitting}
                     isLoading={isSubmitting}
-                    loadingText="Creating Project..."
+                    loadingText="Updating project..."
                   >
-                    Create Project
+                    Update Project
                   </Button>
                 </Flex>
               </Box>

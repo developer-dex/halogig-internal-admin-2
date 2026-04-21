@@ -1,6 +1,6 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import {
   Box,
   Card,
@@ -18,11 +18,6 @@ import {
   Spinner,
   HStack,
   Tooltip,
-  Badge,
-  Menu,
-  MenuButton,
-  MenuList,
-  MenuItem,
   Modal,
   ModalOverlay,
   ModalContent,
@@ -32,31 +27,15 @@ import {
   ModalCloseButton,
   useDisclosure,
   Checkbox,
-  FormControl,
-  FormLabel,
-  Input,
-  Select,
-  Textarea,
-  Radio,
-  RadioGroup,
-  Stack,
-  SimpleGrid,
-  FormHelperText,
 } from '@chakra-ui/react';
-import { MdChevronLeft, MdChevronRight, MdEdit, MdVisibility, MdContentCopy, MdExpandMore } from 'react-icons/md';
-import { projectData, updateProjectStatus, updateProject } from '../../../features/admin/projectManagementSlice';
-import {
-  fetchCategories,
-  fetchSubcategories,
-  fetchTechnologies,
-  fetchIndustries,
-  clearSubcategories
-} from '../../../features/admin/dropdownDataSlice';
+import { MdChevronLeft, MdChevronRight, MdEdit, MdContentCopy } from 'react-icons/md';
+import { projectData, updateProjectStatus } from '../../../features/admin/projectManagementSlice';
 import { showError, showSuccess } from '../../../helpers/messageHelper';
 import { copyToClipboard } from '../../../utils/utils';
 
 export default function ProjectList() {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const location = useLocation();
   const [currentPage, setCurrentPage] = useState(1);
   const [projects, setProjects] = useState([]);
@@ -64,67 +43,10 @@ export default function ProjectList() {
   const [totalCount, setTotalCount] = useState(0);
   const [selectedProject, setSelectedProject] = useState(null);
   const [selectedStatus, setSelectedStatus] = useState('');
-  const [isSaving, setIsSaving] = useState(false);
   const statusModal = useDisclosure();
-  const editModal = useDisclosure();
   const statusOptions = ['Pending', 'Approved', 'Rejected'];
   const [pageLimit, setPageLimit] = useState(50);
-  const [categorySearchTerm, setCategorySearchTerm] = useState('');
-  const [subCategorySearchTerm, setSubCategorySearchTerm] = useState('');
-  const [technologySearchTerm, setTechnologySearchTerm] = useState('');
   const isOfflineProjectView = location.pathname.includes('/offline-projects');
-
-  // Get dropdown data from Redux store
-  const dropdownData = useSelector((state) => state.dropdownDataReducer);
-  const categories = dropdownData?.categories || [];
-  const subcategories = dropdownData?.subcategories || [];
-  const technologies = dropdownData?.technologies || [];
-  const industries = dropdownData?.industries || [];
-
-  // Form data state
-  const [formData, setFormData] = useState({
-    project_category: '',
-    project_sub_category: '',
-    project_title: '',
-    technologty_pre: '',
-    model_engagement: 'hourly',
-    project_amount_min: '',
-    project_amount_max: '',
-    project_duration_min: '',
-    project_duration_max: '',
-    notice_period_min: '',
-    notice_period_max: '',
-    project_summary: '',
-    type_of_project: 'maintenance',
-    customer_industry: '',
-    currency_type: 'USD',
-    currency_symbol: '$',
-    location_preferancer: ''
-  });
-
-  const filteredCategories = useMemo(() => {
-    if (!Array.isArray(categories)) return [];
-    const query = categorySearchTerm.trim().toLowerCase();
-    if (!query) return categories;
-    return categories.filter((category) => category?.name?.toLowerCase().includes(query));
-  }, [categories, categorySearchTerm]);
-
-  const filteredSubcategories = useMemo(() => {
-    if (!Array.isArray(subcategories)) return [];
-    const query = subCategorySearchTerm.trim().toLowerCase();
-    if (!query) return subcategories;
-    return subcategories.filter((subcategory) => subcategory?.name?.toLowerCase().includes(query));
-  }, [subcategories, subCategorySearchTerm]);
-
-  const filteredTechnologies = useMemo(() => {
-    if (!Array.isArray(technologies)) return [];
-    const query = technologySearchTerm.trim().toLowerCase();
-    if (!query) return technologies;
-    return technologies.filter((tech) => {
-      const label = typeof tech === 'string' ? tech : tech?.name;
-      return label?.toLowerCase().includes(query);
-    });
-  }, [technologies, technologySearchTerm]);
 
   const { isLoading: reduxLoading, responseData } = useSelector((s) => s.projectDataReducer || {});
 
@@ -133,7 +55,6 @@ export default function ProjectList() {
   const bgColor = useColorModeValue('#FFFFFF', 'black');
   const hoverBg = useColorModeValue('gray.50', 'whiteAlpha.50');
   const modalBg = useColorModeValue('white', 'navy.800');
-  const inputBg = useColorModeValue('white', 'navy.700');
 
   const fetchProjects = async () => {
     setIsLoading(true);
@@ -170,58 +91,6 @@ export default function ProjectList() {
   useEffect(() => {
     fetchProjects();
   }, [currentPage, pageLimit, isOfflineProjectView]);
-
-  // Fetch dropdown data when edit modal opens
-  useEffect(() => {
-    if (editModal.isOpen) {
-      dispatch(fetchCategories());
-      dispatch(fetchTechnologies());
-      dispatch(fetchIndustries());
-    }
-  }, [dispatch, editModal.isOpen]);
-
-  // Handle form pre-filling when dropdown data is loaded
-  useEffect(() => {
-    if (editModal.isOpen && selectedProject && categories.length > 0 && technologies.length > 0 && industries.length > 0) {
-      // Map model_engagement string values
-      let pricingModel = selectedProject.model_engagement || 'hourly';
-
-      // Map type_of_project string values
-      let projectType = selectedProject.type_of_project || 'maintenance';
-
-      const updatedFormData = {
-        project_category: selectedProject.project_category || '',
-        project_sub_category: selectedProject.project_sub_category || '',
-        project_title: selectedProject.project_title || '',
-        technologty_pre: selectedProject.technologty_pre || '',
-        model_engagement: pricingModel,
-        project_amount_min: selectedProject.project_amount_min || selectedProject.project_amount || '',
-        project_amount_max: selectedProject.project_amount_max || selectedProject.project_amount || '',
-        project_duration_min: selectedProject.project_duration_min || '',
-        project_duration_max: selectedProject.project_duration_max || '',
-        notice_period_min: selectedProject.notice_period_min || '',
-        notice_period_max: selectedProject.notice_period_max || '',
-        project_summary: selectedProject.project_summary || '',
-        type_of_project: projectType,
-        customer_industry: selectedProject.customer_industry || '',
-        currency_type: selectedProject.currency_type || 'USD',
-        currency_symbol: selectedProject.currency_symbol || '$',
-        location_preferancer: selectedProject.location_preferancer || ''
-      };
-
-      setFormData(updatedFormData);
-    }
-  }, [editModal.isOpen, selectedProject, categories, technologies, industries]);
-
-  // Handle subcategories when they're loaded
-  useEffect(() => {
-    if (editModal.isOpen && selectedProject && subcategories.length > 0) {
-      setFormData(prev => ({
-        ...prev,
-        project_sub_category: selectedProject.project_sub_category || ''
-      }));
-    }
-  }, [editModal.isOpen, selectedProject, subcategories]);
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
@@ -272,153 +141,10 @@ export default function ProjectList() {
     }
   };
 
-  // Edit Modal handlers
   const handleEditClick = (project) => {
-    setSelectedProject(project);
-    setCategorySearchTerm('');
-    setSubCategorySearchTerm('');
-    setTechnologySearchTerm('');
-
-    // Map model_engagement string values
-    let pricingModel = project.model_engagement || 'hourly';
-
-    // Map type_of_project string values
-    let projectType = project.type_of_project || 'maintenance';
-
-    setFormData({
-      project_category: project.project_category || '',
-      project_sub_category: project.project_sub_category || '',
-      project_title: project.project_title || '',
-      technologty_pre: project.technologty_pre || '',
-      model_engagement: pricingModel,
-      project_amount_min: project.project_amount_min || project.project_amount || '',
-      project_amount_max: project.project_amount_max || project.project_amount || '',
-      project_duration_min: project.project_duration_min || '',
-      project_duration_max: project.project_duration_max || '',
-      notice_period_min: project.notice_period_min || '',
-      notice_period_max: project.notice_period_max || '',
-      project_summary: project.project_summary || '',
-      type_of_project: projectType,
-      customer_industry: project.customer_industry || '',
-      currency_type: project.currency_type || 'USD',
-      currency_symbol: project.currency_symbol || '$',
-      location_preferancer: project.location_preferancer || ''
+    navigate(`/admin/update-client-project/${project.id}`, {
+      state: { returnPath: location.pathname },
     });
-
-    editModal.onOpen();
-
-    // Fetch subcategories if category is selected
-    if (project.project_category) {
-      dispatch(fetchSubcategories(project.project_category));
-    }
-  };
-
-  const handleCloseEditModal = () => {
-    editModal.onClose();
-    setSelectedProject(null);
-    setCategorySearchTerm('');
-    setSubCategorySearchTerm('');
-    setTechnologySearchTerm('');
-    setFormData({
-      project_category: '',
-      project_sub_category: '',
-      project_title: '',
-      technologty_pre: '',
-      model_engagement: 'hourly',
-      project_amount_min: '',
-      project_amount_max: '',
-      project_duration_min: '',
-      project_duration_max: '',
-      notice_period_min: '',
-      notice_period_max: '',
-      project_summary: '',
-      type_of_project: 'maintenance',
-      customer_industry: '',
-      currency_type: 'USD',
-      currency_symbol: '$',
-      location_preferancer: ''
-    });
-  };
-
-  const handleInputChange = (field, value) => {
-    setFormData(prev => ({
-      ...prev,
-      [field]: value
-    }));
-  };
-
-  const handlePricingModelChange = (value) => {
-    setFormData(prev => ({
-      ...prev,
-      model_engagement: value,
-      // Reset related fields when pricing model changes
-      project_amount_min: '',
-      project_amount_max: '',
-      project_duration_min: '',
-      project_duration_max: '',
-      notice_period_min: '',
-      notice_period_max: ''
-    }));
-  };
-
-  const handleCategoryChange = (categoryId) => {
-    handleInputChange('project_category', categoryId);
-    handleInputChange('project_sub_category', ''); // Reset subcategory
-    dispatch(clearSubcategories()); // Clear existing subcategories
-    if (categoryId) {
-      dispatch(fetchSubcategories(categoryId));
-    }
-  };
-
-  const handleSaveChanges = async () => {
-    if (!selectedProject) return;
-
-    setIsSaving(true);
-
-    try {
-      // Map form data to API format
-      const updateData = {
-        posted_by_user_id: selectedProject.posted_by_user_id,
-        project_title: formData.project_title,
-        project_category: formData.project_category,
-        project_sub_category: formData.project_sub_category,
-        project_summary: formData.project_summary,
-        type_of_project: formData.type_of_project,
-        project_duration_min: formData.project_duration_min,
-        project_duration_max: formData.project_duration_max,
-        customer_industry: formData.customer_industry,
-        technologty_pre: formData.technologty_pre,
-        notice_period: selectedProject.notice_period || "0",
-        notice_period_min: formData.notice_period_min,
-        notice_period_max: formData.notice_period_max,
-        sales_amount: selectedProject.sales_amount || "0",
-        sales_amount_to: selectedProject.sales_amount_to || "0",
-        project_amount: formData.project_amount_min,
-        project_amount_min: formData.project_amount_min,
-        project_amount_max: formData.project_amount_max,
-        project_amount_to: formData.project_amount_max,
-        model_engagement: formData.model_engagement,
-        currency_type: formData.currency_type,
-        currency_symbol: formData.currency_symbol,
-        location_preferancer: formData.location_preferancer,
-        status: selectedProject.status
-      };
-
-      await dispatch(updateProject({
-        projectId: selectedProject.id,
-        projectData: updateData
-      }));
-
-      showSuccess('Project updated successfully');
-      handleCloseEditModal();
-      fetchProjects();
-
-    } catch (error) {
-      console.error('Error updating project:', error);
-      showError('Failed to update project');
-    } finally {
-      setIsSaving(false);
-    }
   };
 
   const getPricingModelName = (model) => {
@@ -460,31 +186,6 @@ export default function ProjectList() {
         return { bg: 'transparent', color: 'black', border: 'black.600' };
       default:
         return { bg: 'transparent', color: 'black', border: 'black.600' };
-    }
-  };
-
-  // Get dynamic labels based on pricing model
-  const getRateLabel = () => {
-    switch (formData.model_engagement) {
-      case 'hourly':
-        return 'Rate Per Hour';
-      case 'retainer':
-        return 'Rate Per Month';
-      case 'fixed':
-        return 'Total Project Amount';
-      default:
-        return 'Rate';
-    }
-  };
-
-  const getDurationLabel = () => {
-    switch (formData.model_engagement) {
-      case 'hourly':
-        return 'Contract Duration (In Hours)';
-      case 'fixed':
-        return 'Contract Duration (In Days)';
-      default:
-        return 'Contract Duration';
     }
   };
 
@@ -803,401 +504,6 @@ export default function ProjectList() {
             </Button>
             <Button colorScheme="brand" onClick={handleStatusChange}>
               OK
-            </Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
-
-      {/* Edit Project Modal */}
-      <Modal
-        isOpen={editModal.isOpen}
-        onClose={handleCloseEditModal}
-        size="xl"
-        scrollBehavior="inside"
-      >
-        <ModalOverlay />
-        <ModalContent bg={modalBg} maxW="800px">
-          <ModalHeader borderBottomWidth="1px">Edit Project</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody py={6}>
-            <Stack spacing={5}>
-              {/* Project Category */}
-              <FormControl>
-                <FormLabel fontWeight="600" fontSize="sm">Project Category</FormLabel>
-                <Menu closeOnSelect>
-                  <MenuButton
-                    as={Button}
-                    rightIcon={<MdExpandMore />}
-                    variant="outline"
-                    width="100%"
-                    justifyContent="space-between"
-                    textAlign="left"
-                    fontWeight="normal"
-                    bg={inputBg}
-                  >
-                    {formData.project_category
-                      ? categories.find((category) => String(category.id) === String(formData.project_category))?.name || 'Select Category'
-                      : 'Select Category'}
-                  </MenuButton>
-                  <MenuList maxH="300px" overflowY="auto" minW="300px">
-                    <Box p={2}>
-                      <Input
-                        placeholder="Search category..."
-                        size="sm"
-                        value={categorySearchTerm}
-                        onChange={(e) => setCategorySearchTerm(e.target.value)}
-                        onClick={(e) => e.stopPropagation()}
-                        onKeyDown={(e) => e.stopPropagation()}
-                      />
-                    </Box>
-                    {Array.isArray(filteredCategories) && filteredCategories.length > 0 ? (
-                      filteredCategories.map((category) => (
-                        <MenuItem
-                          key={category.id}
-                          onClick={() => handleCategoryChange(category.id)}
-                        >
-                          {category.name}
-                        </MenuItem>
-                      ))
-                    ) : (
-                      <MenuItem isDisabled>
-                        {Array.isArray(categories) && categories.length > 0 ? 'No categories found' : 'Loading categories...'}
-                      </MenuItem>
-                    )}
-                  </MenuList>
-                </Menu>
-              </FormControl>
-
-              {/* Project Sub Category */}
-              <FormControl>
-                <FormLabel fontWeight="600" fontSize="sm">Project Sub Category</FormLabel>
-                <Menu closeOnSelect>
-                  <MenuButton
-                    as={Button}
-                    rightIcon={<MdExpandMore />}
-                    variant="outline"
-                    width="100%"
-                    justifyContent="space-between"
-                    textAlign="left"
-                    fontWeight="normal"
-                    bg={inputBg}
-                    isDisabled={!formData.project_category}
-                  >
-                    {formData.project_sub_category
-                      ? subcategories.find((subcategory) => String(subcategory.id) === String(formData.project_sub_category))?.name || 'Select Sub Category'
-                      : (formData.project_category ? 'Select Sub Category' : 'Select a category first')}
-                  </MenuButton>
-                  <MenuList maxH="300px" overflowY="auto" minW="300px">
-                    <Box p={2}>
-                      <Input
-                        placeholder="Search sub category..."
-                        size="sm"
-                        value={subCategorySearchTerm}
-                        onChange={(e) => setSubCategorySearchTerm(e.target.value)}
-                        onClick={(e) => e.stopPropagation()}
-                        onKeyDown={(e) => e.stopPropagation()}
-                      />
-                    </Box>
-                    {Array.isArray(filteredSubcategories) && filteredSubcategories.length > 0 ? (
-                      filteredSubcategories.map((subcategory) => (
-                        <MenuItem
-                          key={subcategory.id}
-                          onClick={() => handleInputChange('project_sub_category', subcategory.id)}
-                        >
-                          {subcategory.name}
-                        </MenuItem>
-                      ))
-                    ) : (
-                      <MenuItem isDisabled>
-                        {Array.isArray(subcategories) && subcategories.length > 0 ? 'No sub categories found' : 'Loading subcategories...'}
-                      </MenuItem>
-                    )}
-                  </MenuList>
-                </Menu>
-              </FormControl>
-
-              {/* Project Title & Technology in a row */}
-              <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4}>
-                <FormControl>
-                  <FormLabel fontWeight="600" fontSize="sm">Project Title</FormLabel>
-                  <Input
-                    placeholder="Enter project title"
-                    value={formData.project_title}
-                    onChange={(e) => handleInputChange('project_title', e.target.value)}
-                    bg={inputBg}
-                  />
-                  {formData.project_title && formData.project_title.length < 20 && (
-                    <FormHelperText color="red.500" fontSize="xs">
-                      Please enter more than 20 characters
-                    </FormHelperText>
-                  )}
-                </FormControl>
-
-                <FormControl>
-                  <FormLabel fontWeight="600" fontSize="sm">Technology Preference</FormLabel>
-                  <Menu closeOnSelect>
-                    <MenuButton
-                      as={Button}
-                      rightIcon={<MdExpandMore />}
-                      variant="outline"
-                      width="100%"
-                      justifyContent="space-between"
-                      textAlign="left"
-                      fontWeight="normal"
-                      bg={inputBg}
-                    >
-                      {formData.technologty_pre || 'Select Technology'}
-                    </MenuButton>
-                    <MenuList maxH="300px" overflowY="auto" minW="300px">
-                      <Box p={2}>
-                        <Input
-                          placeholder="Search technology..."
-                          size="sm"
-                          value={technologySearchTerm}
-                          onChange={(e) => setTechnologySearchTerm(e.target.value)}
-                          onClick={(e) => e.stopPropagation()}
-                          onKeyDown={(e) => e.stopPropagation()}
-                        />
-                      </Box>
-                      {Array.isArray(filteredTechnologies) && filteredTechnologies.length > 0 ? (
-                        filteredTechnologies.map((tech, index) => {
-                          const techLabel = typeof tech === 'string' ? tech : tech.name;
-                          return (
-                            <MenuItem
-                              key={`${techLabel}-${index}`}
-                              onClick={() => handleInputChange('technologty_pre', techLabel)}
-                            >
-                              {techLabel}
-                            </MenuItem>
-                          );
-                        })
-                      ) : (
-                        <MenuItem isDisabled>
-                          {Array.isArray(technologies) && technologies.length > 0 ? 'No technologies found' : 'Loading technologies...'}
-                        </MenuItem>
-                      )}
-                    </MenuList>
-                  </Menu>
-                </FormControl>
-              </SimpleGrid>
-
-              {/* Pricing Model */}
-              <FormControl>
-                <FormLabel fontWeight="600" fontSize="sm">Pricing Model</FormLabel>
-                <RadioGroup
-                  value={formData.model_engagement}
-                  onChange={handlePricingModelChange}
-                >
-                  <Stack direction="row" spacing={6}>
-                    <Radio value="hourly" colorScheme="brand">Hourly</Radio>
-                    <Radio value="retainer" colorScheme="brand">Retainership</Radio>
-                    <Radio value="fixed" colorScheme="brand">Fixed Price</Radio>
-                  </Stack>
-                </RadioGroup>
-              </FormControl>
-
-              {/* Dynamic Rate Fields based on Pricing Model */}
-              <FormControl>
-                <FormLabel fontWeight="600" fontSize="sm">{getRateLabel()}</FormLabel>
-                <SimpleGrid columns={{ base: 1, md: 3 }} spacing={4}>
-                  <Input
-                    type="number"
-                    placeholder="Min"
-                    value={formData.project_amount_min}
-                    onChange={(e) => handleInputChange('project_amount_min', e.target.value)}
-                    bg={inputBg}
-                  />
-                  <Input
-                    type="number"
-                    placeholder="Max"
-                    value={formData.project_amount_max}
-                    onChange={(e) => handleInputChange('project_amount_max', e.target.value)}
-                    bg={inputBg}
-                  />
-                  <Select
-                    value={formData.currency_type}
-                    onChange={(e) => {
-                      const currency = e.target.value;
-                      const symbol = currency === 'USD' ? '$' : currency === 'INR' ? '₹' : '€';
-                      handleInputChange('currency_type', currency);
-                      handleInputChange('currency_symbol', symbol);
-                    }}
-                    bg={inputBg}
-                  >
-                    <option value="USD">USD - $</option>
-                    <option value="INR">INR - ₹</option>
-                    <option value="EUR">EUR - €</option>
-                  </Select>
-                </SimpleGrid>
-                {parseFloat(formData.project_amount_min) > parseFloat(formData.project_amount_max) &&
-                  formData.project_amount_min && formData.project_amount_max && (
-                    <FormHelperText color="red.500" fontSize="xs">
-                      Max amount must be greater than {formData.project_amount_min}
-                    </FormHelperText>
-                  )}
-              </FormControl>
-
-              {/* Contract Duration - Show for Hourly and Fixed Price */}
-              {(formData.model_engagement === 'hourly' || formData.model_engagement === 'fixed') && (
-                <FormControl>
-                  <FormLabel fontWeight="600" fontSize="sm">{getDurationLabel()}</FormLabel>
-                  <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4}>
-                    <Input
-                      type="number"
-                      placeholder="Min"
-                      value={formData.project_duration_min}
-                      onChange={(e) => handleInputChange('project_duration_min', e.target.value)}
-                      bg={inputBg}
-                    />
-                    <Input
-                      type="number"
-                      placeholder="Max"
-                      value={formData.project_duration_max}
-                      onChange={(e) => handleInputChange('project_duration_max', e.target.value)}
-                      bg={inputBg}
-                    />
-                  </SimpleGrid>
-                  {parseFloat(formData.project_duration_min) > parseFloat(formData.project_duration_max) &&
-                    formData.project_duration_min && formData.project_duration_max && (
-                      <FormHelperText color="red.500" fontSize="xs">
-                        Max duration must be greater than {formData.project_duration_min}
-                      </FormHelperText>
-                    )}
-                </FormControl>
-              )}
-
-              {/* Notice Period - Show only for Retainership */}
-              {formData.model_engagement === 'retainer' && (
-                <FormControl>
-                  <FormLabel fontWeight="600" fontSize="sm">Notice Period (In Days)</FormLabel>
-                  <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4}>
-                    <Input
-                      type="number"
-                      placeholder="Min"
-                      value={formData.notice_period_min}
-                      onChange={(e) => handleInputChange('notice_period_min', e.target.value)}
-                      bg={inputBg}
-                    />
-                    <Input
-                      type="number"
-                      placeholder="Max"
-                      value={formData.notice_period_max}
-                      onChange={(e) => handleInputChange('notice_period_max', e.target.value)}
-                      bg={inputBg}
-                    />
-                  </SimpleGrid>
-                  {parseFloat(formData.notice_period_min) > parseFloat(formData.notice_period_max) &&
-                    formData.notice_period_min && formData.notice_period_max && (
-                      <FormHelperText color="red.500" fontSize="xs">
-                        Max notice period must be greater than {formData.notice_period_min}
-                      </FormHelperText>
-                    )}
-                </FormControl>
-              )}
-
-              {/* Project Summary */}
-              <FormControl>
-                <FormLabel fontWeight="600" fontSize="sm">
-                  Project Summary
-                  {formData.model_engagement === 'retainer' && (
-                    <Text as="span" color="gray.500" fontWeight="normal" fontSize="xs" ml={2}>
-                      (Optional for Retainership)
-                    </Text>
-                  )}
-                </FormLabel>
-                <Textarea
-                  placeholder="Enter project summary"
-                  value={formData.project_summary}
-                  onChange={(e) => handleInputChange('project_summary', e.target.value)}
-                  rows={4}
-                  maxLength={300}
-                  bg={inputBg}
-                />
-                <Flex justify="space-between" mt={1}>
-                  <Box>
-                    {formData.model_engagement !== 'retainer' &&
-                      formData.project_summary &&
-                      formData.project_summary.length < 100 && (
-                        <FormHelperText color="red.500" fontSize="xs" mt={0}>
-                          Minimum 100 characters required
-                        </FormHelperText>
-                      )}
-                  </Box>
-                  <Text fontSize="xs" color="gray.500">
-                    {formData.project_summary?.length || 0}/300 characters
-                  </Text>
-                </Flex>
-              </FormControl>
-
-              {/* Type of Project */}
-              <FormControl>
-                <FormLabel fontWeight="600" fontSize="sm">Type of Project</FormLabel>
-                <RadioGroup
-                  value={formData.type_of_project}
-                  onChange={(value) => handleInputChange('type_of_project', value)}
-                >
-                  <Stack direction={{ base: 'column', md: 'row' }} spacing={4}>
-                    <Radio value="maintenance" colorScheme="brand">Maintenance</Radio>
-                    <Radio value="new-development" colorScheme="brand">New Development</Radio>
-                    <Radio value="maintenance-cum-new-development" colorScheme="brand">Maintenance Cum New Development</Radio>
-                  </Stack>
-                </RadioGroup>
-              </FormControl>
-
-              {/* Customer Industry */}
-              <FormControl>
-                <FormLabel fontWeight="600" fontSize="sm">Customer Industry</FormLabel>
-                <Select
-                  placeholder="Select Industry"
-                  value={formData.customer_industry}
-                  onChange={(e) => handleInputChange('customer_industry', e.target.value)}
-                  bg={inputBg}
-                >
-                  {Array.isArray(industries) && industries.length > 0 ? (
-                    industries.map((industry) => (
-                      <option key={industry.id} value={industry.id}>
-                        {industry.industry || industry.name || industry.title}
-                      </option>
-                    ))
-                  ) : (
-                    <option disabled>Loading industries...</option>
-                  )}
-                </Select>
-              </FormControl>
-
-              {/* Location Preference */}
-              <FormControl>
-                <FormLabel fontWeight="600" fontSize="sm">Location Preference</FormLabel>
-                <RadioGroup
-                  value={formData.location_preferancer}
-                  onChange={(value) => handleInputChange('location_preferancer', value)}
-                >
-                  <Stack direction={{ base: 'column', md: 'row' }} spacing={4}>
-                    <Radio value="city" colorScheme="brand">Anywhere in the City</Radio>
-                    <Radio value="country" colorScheme="brand">Anywhere in the Country</Radio>
-                    <Radio value="globaly" colorScheme="brand">Anywhere Globally</Radio>
-                  </Stack>
-                </RadioGroup>
-              </FormControl>
-            </Stack>
-          </ModalBody>
-
-          <ModalFooter borderTopWidth="1px">
-            <Button
-              variant="ghost"
-              mr={3}
-              onClick={handleCloseEditModal}
-              isDisabled={isSaving}
-            >
-              Cancel
-            </Button>
-            <Button
-              colorScheme="brand"
-              onClick={handleSaveChanges}
-              isLoading={isSaving}
-              loadingText="Updating..."
-            >
-              Update
             </Button>
           </ModalFooter>
         </ModalContent>

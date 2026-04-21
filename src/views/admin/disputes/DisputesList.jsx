@@ -1,8 +1,18 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import {
   Box,
+  Divider,
   Flex,
+  FormControl,
+  FormLabel,
+  Input,
+  SimpleGrid,
   Table,
+  Tab,
+  Tabs,
+  TabList,
+  TabPanel,
+  TabPanels,
   Thead,
   Tbody,
   Tr,
@@ -25,6 +35,7 @@ import {
   ModalFooter,
   useDisclosure,
 } from '@chakra-ui/react';
+import { useNavigate } from 'react-router-dom';
 import { MdChevronLeft, MdChevronRight } from 'react-icons/md';
 import { getApi, patchApi } from '../../../services/api';
 import { apiEndPoints } from '../../../config/path';
@@ -53,16 +64,26 @@ function formatUserName(user) {
 }
 
 function DisputesList() {
+  const navigate = useNavigate();
   const [page, setPage] = useState(1);
   const [pageLimit, setPageLimit] = useState(50);
   const [isLoading, setIsLoading] = useState(false);
   const [responseData, setResponseData] = useState(null);
 
   const statusModal = useDisclosure();
+  const actionModal = useDisclosure();
   const [selectedDispute, setSelectedDispute] = useState(null);
   const [initialStatusWhenOpened, setInitialStatusWhenOpened] = useState('');
   const [selectedStatus, setSelectedStatus] = useState('');
   const [isSubmittingStatus, setIsSubmittingStatus] = useState(false);
+
+  const [actionTabIndex, setActionTabIndex] = useState(0);
+  const [refundForm, setRefundForm] = useState({
+    amount: '',
+    charge: '',
+    ticketNumber: '',
+  });
+  const [isSubmittingAction, setIsSubmittingAction] = useState(false);
 
   const rows = useMemo(() => {
     const list = responseData?.disputes;
@@ -180,6 +201,93 @@ function DisputesList() {
     }
   };
 
+  const openAction = (row) => {
+    setSelectedDispute(row);
+    setActionTabIndex(0);
+    setRefundForm({
+      amount: row?.project_bid?.bid_amount ? String(row.project_bid.bid_amount) : '',
+      charge: '',
+      ticketNumber: '',
+    });
+    actionModal.onOpen();
+  };
+
+  const closeAction = () => {
+    actionModal.onClose();
+    setActionTabIndex(0);
+    setRefundForm({ amount: '', charge: '', ticketNumber: '' });
+  };
+
+  const applyRefundProcess = async () => {
+    if (!selectedDispute?.id) return;
+    const amount = String(refundForm.amount || '').trim();
+    const ticketNumber = String(refundForm.ticketNumber || '').trim();
+    if (!amount) {
+      showError('Amount is required');
+      return;
+    }
+    if (!ticketNumber) {
+      showError('Ticket number is required');
+      return;
+    }
+
+    setIsSubmittingAction(true);
+    try {
+      // Frontend-only for now; backend will be wired next.
+      showSuccess('Refund process saved (frontend only)');
+      closeAction();
+    } catch (e) {
+      showError('Failed to save refund process');
+    } finally {
+      setIsSubmittingAction(false);
+    }
+  };
+
+  const goToFreelancerChange = () => {
+    if (!selectedDispute) return;
+    const projectId = selectedDispute?.project_id ?? selectedDispute?.projectId;
+    if (!projectId) {
+      showError('Project ID not found for this dispute');
+      return;
+    }
+
+    setIsSubmittingAction(true);
+    getApi(`${apiEndPoints.GET_PROJECT_PREFILL}/${projectId}/prefill`)
+      .then((resp) => {
+        const project = resp?.data?.data;
+        const clientId = project?.User?.id || project?.posted_by_user_id || null;
+        const target = clientId ? `/admin/create-client-project?client_id=${clientId}` : '/admin/create-client-project';
+        navigate(target, {
+          state: {
+            disputePrefill: selectedDispute,
+            projectPrefill: project,
+            source: 'disputes-action',
+          },
+        });
+        closeAction();
+      })
+      .catch((e) => {
+        showError(e?.response?.data?.message || 'Failed to fetch project prefill data');
+      })
+      .finally(() => {
+        setIsSubmittingAction(false);
+      });
+  };
+
+  const applySettlement = async () => {
+    if (!selectedDispute?.id) return;
+    setIsSubmittingAction(true);
+    try {
+      // Frontend-only for now; backend will be wired next.
+      showSuccess('Settlement submitted (frontend only)');
+      closeAction();
+    } catch (e) {
+      showError('Failed to submit settlement');
+    } finally {
+      setIsSubmittingAction(false);
+    }
+  };
+
   return (
     <Box>
       <Card bg={bgColor}>
@@ -202,7 +310,7 @@ function DisputesList() {
                 borderColor={borderColor}
                 borderRadius="8px"
               >
-                <Table variant="simple" color="gray.500" minW="1100px">
+                <Table variant="simple" color="gray.500" minW="1250px">
                   <Thead position="sticky" top="0" zIndex="1" bg={bgColor}>
                     <Tr>
                       <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="capitalize" bg={bgColor}>
@@ -232,12 +340,15 @@ function DisputesList() {
                       <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="capitalize" bg={bgColor}>
                         Status
                       </Th>
+                      <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="capitalize" bg={bgColor}>
+                        Action
+                      </Th>
                     </Tr>
                   </Thead>
                   <Tbody>
                     {rows.length === 0 ? (
                       <Tr>
-                        <Td colSpan={9} textAlign="center" py="40px">
+                        <Td colSpan={10} textAlign="center" py="40px">
                           <Text color="black">No disputes found</Text>
                         </Td>
                       </Tr>
@@ -313,6 +424,16 @@ function DisputesList() {
                                 onClick={() => openStatus(row)}
                               >
                                 {statusDisplay}
+                              </Button>
+                            </Td>
+                            <Td borderColor={borderColor} textAlign="center" pt="8px" pb="8px">
+                              <Button
+                                size="sm"
+                                colorScheme="brand"
+                                variant="outline"
+                                onClick={() => openAction(row)}
+                              >
+                                Action
                               </Button>
                             </Td>
                           </Tr>
@@ -418,6 +539,127 @@ function DisputesList() {
             >
               Submit
             </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+
+      <Modal isOpen={actionModal.isOpen} onClose={closeAction} size="xl" isCentered>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Dispute Action</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <Tabs index={actionTabIndex} onChange={setActionTabIndex} variant="enclosed" colorScheme="brand">
+              <TabList>
+                <Tab>Refund Process</Tab>
+                <Tab>Freelancer Change with Halogig Model</Tab>
+                <Tab>Setelment Process</Tab>
+              </TabList>
+              <TabPanels>
+                <TabPanel px={0}>
+                  <SimpleGrid columns={{ base: 1, md: 2 }} spacing="14px">
+                    <FormControl>
+                      <FormLabel>Amount</FormLabel>
+                      <Input
+                        value={refundForm.amount}
+                        onChange={(e) => setRefundForm((p) => ({ ...p, amount: e.target.value }))}
+                        placeholder="Enter amount"
+                      />
+                    </FormControl>
+                    <FormControl>
+                      <FormLabel>Charge</FormLabel>
+                      <Input
+                        value={refundForm.charge}
+                        onChange={(e) => setRefundForm((p) => ({ ...p, charge: e.target.value }))}
+                        placeholder="Enter charge"
+                      />
+                    </FormControl>
+                    <FormControl>
+                      <FormLabel>Ticket number</FormLabel>
+                      <Input
+                        value={refundForm.ticketNumber}
+                        onChange={(e) => setRefundForm((p) => ({ ...p, ticketNumber: e.target.value }))}
+                        placeholder="Enter ticket number"
+                      />
+                    </FormControl>
+                    <FormControl>
+                      <FormLabel>Current date</FormLabel>
+                      <Input value={new Date().toLocaleString()} isReadOnly />
+                    </FormControl>
+                  </SimpleGrid>
+
+                  <Divider my="14px" />
+
+                  <SimpleGrid columns={{ base: 1, md: 2 }} spacing="14px">
+                    <FormControl>
+                      <FormLabel>Dispute By - email</FormLabel>
+                      <Input value={selectedDispute?.disputed_by?.email || '--'} isReadOnly />
+                    </FormControl>
+                    <FormControl>
+                      <FormLabel>Dispute For - email</FormLabel>
+                      <Input value={selectedDispute?.disputed_for?.email || '--'} isReadOnly />
+                    </FormControl>
+                    <FormControl>
+                      <FormLabel>Dispute By - first name</FormLabel>
+                      <Input value={selectedDispute?.disputed_by?.first_name || '--'} isReadOnly />
+                    </FormControl>
+                    <FormControl>
+                      <FormLabel>Dispute For - first name</FormLabel>
+                      <Input value={selectedDispute?.disputed_for?.first_name || '--'} isReadOnly />
+                    </FormControl>
+                    <FormControl>
+                      <FormLabel>Dispute By - last name</FormLabel>
+                      <Input value={selectedDispute?.disputed_by?.last_name || '--'} isReadOnly />
+                    </FormControl>
+                    <FormControl>
+                      <FormLabel>Dispute For - last name</FormLabel>
+                      <Input value={selectedDispute?.disputed_for?.last_name || '--'} isReadOnly />
+                    </FormControl>
+                    <FormControl>
+                      <FormLabel>Project title</FormLabel>
+                      <Input value={selectedDispute?.project?.project_title || '--'} isReadOnly />
+                    </FormControl>
+                    <FormControl>
+                      <FormLabel>Dispute raised on date</FormLabel>
+                      <Input value={formatDateTime(selectedDispute?.raised_on)} isReadOnly />
+                    </FormControl>
+                  </SimpleGrid>
+                </TabPanel>
+
+                <TabPanel px={0}>
+                  <Text fontSize="sm" color="gray.600" mb="10px">
+                    Create a new client project for the freelancer change flow. You’ll be redirected and the page can use the dispute details to prefill the form.
+                  </Text>
+                  <Button colorScheme="brand" onClick={goToFreelancerChange}>
+                    Create Client Project
+                  </Button>
+                </TabPanel>
+
+                <TabPanel px={0}>
+                  <Text fontSize="md" fontWeight="600" mb="10px">
+                    Are you sure everything will shortout from freelancer and client ?
+                  </Text>
+                  <Text fontSize="sm" color="gray.600">
+                    This will mark the settlement flow as submitted for this dispute (frontend only for now).
+                  </Text>
+                </TabPanel>
+              </TabPanels>
+            </Tabs>
+          </ModalBody>
+          <ModalFooter>
+            <Button variant="ghost" mr={3} onClick={closeAction}>
+              Cancel
+            </Button>
+            {actionTabIndex === 0 ? (
+              <Button colorScheme="brand" onClick={applyRefundProcess} isLoading={isSubmittingAction}>
+                Submit
+              </Button>
+            ) : null}
+            {actionTabIndex === 2 ? (
+              <Button colorScheme="brand" onClick={applySettlement} isLoading={isSubmittingAction}>
+                Submit
+              </Button>
+            ) : null}
           </ModalFooter>
         </ModalContent>
       </Modal>

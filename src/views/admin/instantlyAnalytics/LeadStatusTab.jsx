@@ -7,6 +7,7 @@ import {
   Flex,
   FormControl,
   FormLabel,
+  FormHelperText,
   HStack,
   IconButton,
   Input,
@@ -20,6 +21,8 @@ import {
   Thead,
   Tr,
   useColorModeValue,
+  SimpleGrid,
+  Collapse,
 } from "@chakra-ui/react";
 import { MdChevronLeft, MdChevronRight, MdRefresh, MdSearch } from "react-icons/md";
 import { showError } from "../../../helpers/messageHelper";
@@ -105,6 +108,8 @@ const LeadStatusTab = () => {
   const bgColor = useColorModeValue("#FFFFFF", "black");
   const theadBg = useColorModeValue("gray.50", "whiteAlpha.50");
   const hoverBg = useColorModeValue("gray.50", "whiteAlpha.50");
+  const panelBg = useColorModeValue("gray.50", "whiteAlpha.50");
+  const subtleText = useColorModeValue("gray.600", "gray.300");
 
   // Dropdown options loaded from API (same sources as Create / Instantly)
   const [batchNames, setBatchNames] = useState([]);
@@ -114,6 +119,7 @@ const LeadStatusTab = () => {
 
   const [filters, setFilters] = useState(defaultFilters());
   const [appliedFilters, setAppliedFilters] = useState(defaultFilters());
+  const [showAdvanced, setShowAdvanced] = useState(false);
   const [leads, setLeads] = useState([]);
   const [totalCount, setTotalCount] = useState(0);
   const [offset, setOffset] = useState(0);
@@ -218,17 +224,48 @@ const LeadStatusTab = () => {
       {/* Filters */}
       <Box
         mb={4}
-        p={4}
+        p={{ base: 4, md: 5 }}
         borderWidth="1px"
         borderColor={borderColor}
-        borderRadius="md"
+        borderRadius="12px"
         bg={bgColor}
       >
-        <Flex wrap="wrap" gap={3} mb={3}>
-          <FormControl minW="160px" maxW="220px">
-            <FormLabel fontSize="xs" mb={1}>Batch name</FormLabel>
+        <Flex justify="space-between" align={{ base: "stretch", md: "center" }} gap={4} flexWrap="wrap" mb={4}>
+          <Box minW={{ base: "100%", md: "280px" }}>
+            <Text color={textColor} fontWeight="700" fontSize="md" lineHeight="1.2">
+              Lead Status
+            </Text>
+            <Text color={subtleText} fontSize="sm" mt={1}>
+              Filter and review lead engagement across batches and campaigns.
+            </Text>
+          </Box>
+
+          <HStack spacing={2} justify={{ base: "flex-start", md: "flex-end" }} flexWrap="wrap">
+            <Button leftIcon={<MdSearch />} colorScheme="brand" size="sm" onClick={handleApplyFilters}>
+              Apply
+            </Button>
+            <Button leftIcon={<MdRefresh />} variant="outline" size="sm" borderColor={borderColor} onClick={handleResetFilters}>
+              Reset
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              borderColor={borderColor}
+              onClick={() => setShowAdvanced((s) => !s)}
+            >
+              {showAdvanced ? "Hide advanced" : "Advanced filters"}
+            </Button>
+          </HStack>
+        </Flex>
+
+        {/* Primary filters (always visible) */}
+        <SimpleGrid columns={{ base: 1, md: 3 }} spacing={3}>
+          <FormControl>
+            <FormLabel fontSize="xs" mb={1} color="gray.500">Batch</FormLabel>
             <Select
               size="sm"
+              bg={panelBg}
+              borderColor={borderColor}
               value={filters.batch_name}
               onChange={(e) => setFilters((f) => ({ ...f, batch_name: e.target.value }))}
               isDisabled={isLoadingLists}
@@ -240,10 +277,12 @@ const LeadStatusTab = () => {
             </Select>
           </FormControl>
 
-          <FormControl minW="160px" maxW="220px">
-            <FormLabel fontSize="xs" mb={1}>Campaign name</FormLabel>
+          <FormControl>
+            <FormLabel fontSize="xs" mb={1} color="gray.500">Campaign</FormLabel>
             <Select
               size="sm"
+              bg={panelBg}
+              borderColor={borderColor}
               value={filters.campaign_name}
               onChange={(e) => setFilters((f) => ({ ...f, campaign_name: e.target.value }))}
               isDisabled={isLoadingLists}
@@ -255,115 +294,119 @@ const LeadStatusTab = () => {
             </Select>
           </FormControl>
 
-          <FormControl minW="160px" maxW="200px">
-            <FormLabel fontSize="xs" mb={1}>Status</FormLabel>
-            <Select
-              size="sm"
-              value={filters.status}
-              onChange={(e) => setFilters((f) => ({ ...f, status: e.target.value }))}
-            >
-              {STATUS_OPTIONS.map((o) => (
-                <option key={o.value} value={o.value}>{o.label}</option>
-              ))}
-            </Select>
-          </FormControl>
-
-          <FormControl minW="160px" maxW="200px">
-            <FormLabel fontSize="xs" mb={1}>Interest status</FormLabel>
-            <Select
-              size="sm"
-              value={filters.interest_status}
-              onChange={(e) => setFilters((f) => ({ ...f, interest_status: e.target.value }))}
-            >
-              {INTEREST_OPTIONS.map((o) => (
-                <option key={o.value} value={o.value}>{o.label}</option>
-              ))}
-            </Select>
-          </FormControl>
-
-          <FormControl minW="120px" maxW="150px">
-            <FormLabel fontSize="xs" mb={1}>Opened</FormLabel>
-            <Select
-              size="sm"
-              value={filters.has_opened}
-              onChange={(e) => setFilters((f) => ({ ...f, has_opened: e.target.value }))}
-            >
-              {BOOL_OPTIONS.map((o) => (
-                <option key={o.value} value={o.value}>{o.label}</option>
-              ))}
-            </Select>
-          </FormControl>
-
-          <FormControl minW="120px" maxW="150px">
-            <FormLabel fontSize="xs" mb={1}>Replied</FormLabel>
-            <Select
-              size="sm"
-              value={filters.has_replied}
-              onChange={(e) => setFilters((f) => ({ ...f, has_replied: e.target.value }))}
-            >
-              {BOOL_OPTIONS.map((o) => (
-                <option key={o.value} value={o.value}>{o.label}</option>
-              ))}
-            </Select>
-          </FormControl>
-
-          <FormControl minW="120px" maxW="150px">
-            <FormLabel fontSize="xs" mb={1}>Clicked</FormLabel>
-            <Select
-              size="sm"
-              value={filters.has_clicked}
-              onChange={(e) => setFilters((f) => ({ ...f, has_clicked: e.target.value }))}
-            >
-              {BOOL_OPTIONS.map((o) => (
-                <option key={o.value} value={o.value}>{o.label}</option>
-              ))}
-            </Select>
-          </FormControl>
-
-          <FormControl minW="120px" maxW="150px">
-            <FormLabel fontSize="xs" mb={1}>Bounced</FormLabel>
-            <Select
-              size="sm"
-              value={filters.has_bounced}
-              onChange={(e) => setFilters((f) => ({ ...f, has_bounced: e.target.value }))}
-            >
-              {BOOL_OPTIONS.map((o) => (
-                <option key={o.value} value={o.value}>{o.label}</option>
-              ))}
-            </Select>
-          </FormControl>
-
-          <FormControl minW="200px" maxW="280px">
-            <FormLabel fontSize="xs" mb={1}>Search (email / name / company)</FormLabel>
+          <FormControl>
+            <FormLabel fontSize="xs" mb={1} color="gray.500">Search</FormLabel>
             <Input
               size="sm"
+              bg={panelBg}
+              borderColor={borderColor}
               value={filters.search}
               onChange={(e) => setFilters((f) => ({ ...f, search: e.target.value }))}
-              placeholder="Search..."
+              placeholder="Email, name, company…"
               onKeyDown={(e) => { if (e.key === "Enter") handleApplyFilters(); }}
             />
+            <FormHelperText fontSize="xs" color={subtleText}>
+              Press Enter to apply.
+            </FormHelperText>
           </FormControl>
-        </Flex>
+        </SimpleGrid>
 
-        <HStack spacing={2}>
-          <Button
-            leftIcon={<MdSearch />}
-            colorScheme="brand"
-            size="sm"
-            onClick={handleApplyFilters}
-          >
-            Apply
-          </Button>
-          <Button
-            leftIcon={<MdRefresh />}
-            variant="outline"
-            size="sm"
-            borderColor={borderColor}
-            onClick={handleResetFilters}
-          >
-            Reset
-          </Button>
-        </HStack>
+        {/* Advanced filters (collapsed by default) */}
+        <Collapse in={showAdvanced} animateOpacity>
+          <Box mt={4} p={4} borderWidth="1px" borderColor={borderColor} borderRadius="12px" bg={panelBg}>
+            <SimpleGrid columns={{ base: 1, md: 4 }} spacing={3}>
+              <FormControl>
+                <FormLabel fontSize="xs" mb={1} color="gray.500">Status</FormLabel>
+                <Select
+                  size="sm"
+                  bg={bgColor}
+                  borderColor={borderColor}
+                  value={filters.status}
+                  onChange={(e) => setFilters((f) => ({ ...f, status: e.target.value }))}
+                >
+                  {STATUS_OPTIONS.map((o) => (
+                    <option key={o.value} value={o.value}>{o.label}</option>
+                  ))}
+                </Select>
+              </FormControl>
+
+              <FormControl>
+                <FormLabel fontSize="xs" mb={1} color="gray.500">Interest</FormLabel>
+                <Select
+                  size="sm"
+                  bg={bgColor}
+                  borderColor={borderColor}
+                  value={filters.interest_status}
+                  onChange={(e) => setFilters((f) => ({ ...f, interest_status: e.target.value }))}
+                >
+                  {INTEREST_OPTIONS.map((o) => (
+                    <option key={o.value} value={o.value}>{o.label}</option>
+                  ))}
+                </Select>
+              </FormControl>
+
+              <FormControl>
+                <FormLabel fontSize="xs" mb={1} color="gray.500">Opened</FormLabel>
+                <Select
+                  size="sm"
+                  bg={bgColor}
+                  borderColor={borderColor}
+                  value={filters.has_opened}
+                  onChange={(e) => setFilters((f) => ({ ...f, has_opened: e.target.value }))}
+                >
+                  {BOOL_OPTIONS.map((o) => (
+                    <option key={o.value} value={o.value}>{o.label}</option>
+                  ))}
+                </Select>
+              </FormControl>
+
+              <FormControl>
+                <FormLabel fontSize="xs" mb={1} color="gray.500">Replied</FormLabel>
+                <Select
+                  size="sm"
+                  bg={bgColor}
+                  borderColor={borderColor}
+                  value={filters.has_replied}
+                  onChange={(e) => setFilters((f) => ({ ...f, has_replied: e.target.value }))}
+                >
+                  {BOOL_OPTIONS.map((o) => (
+                    <option key={o.value} value={o.value}>{o.label}</option>
+                  ))}
+                </Select>
+              </FormControl>
+
+              <FormControl>
+                <FormLabel fontSize="xs" mb={1} color="gray.500">Clicked</FormLabel>
+                <Select
+                  size="sm"
+                  bg={bgColor}
+                  borderColor={borderColor}
+                  value={filters.has_clicked}
+                  onChange={(e) => setFilters((f) => ({ ...f, has_clicked: e.target.value }))}
+                >
+                  {BOOL_OPTIONS.map((o) => (
+                    <option key={o.value} value={o.value}>{o.label}</option>
+                  ))}
+                </Select>
+              </FormControl>
+
+              <FormControl>
+                <FormLabel fontSize="xs" mb={1} color="gray.500">Bounced</FormLabel>
+                <Select
+                  size="sm"
+                  bg={bgColor}
+                  borderColor={borderColor}
+                  value={filters.has_bounced}
+                  onChange={(e) => setFilters((f) => ({ ...f, has_bounced: e.target.value }))}
+                >
+                  {BOOL_OPTIONS.map((o) => (
+                    <option key={o.value} value={o.value}>{o.label}</option>
+                  ))}
+                </Select>
+              </FormControl>
+            </SimpleGrid>
+          </Box>
+        </Collapse>
       </Box>
 
       {/* Table */}

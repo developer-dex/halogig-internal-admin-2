@@ -7,6 +7,7 @@ import {
   Flex,
   FormControl,
   FormLabel,
+  FormHelperText,
   Modal,
   ModalBody,
   ModalCloseButton,
@@ -29,6 +30,7 @@ import {
   useColorModeValue,
   useDisclosure,
   VStack,
+  SimpleGrid,
 } from "@chakra-ui/react";
 import { MdAdd, MdEmail, MdPeople, MdRefresh } from "react-icons/md";
 import { showError, showSuccess } from "../../../helpers/messageHelper";
@@ -46,7 +48,8 @@ const Instantly = () => {
   const borderColor = useColorModeValue("gray.200", "whiteAlpha.100");
   const bgColor = useColorModeValue("#FFFFFF", "black");
   const hoverBg = useColorModeValue("gray.50", "whiteAlpha.50");
-  const theadBg = useColorModeValue("gray.50", "whiteAlpha.50");
+  const panelBg = useColorModeValue("gray.50", "whiteAlpha.50");
+  const subtleText = useColorModeValue("gray.600", "gray.300");
 
   const createModal = useDisclosure();
   const followupModal = useDisclosure();
@@ -226,72 +229,87 @@ const Instantly = () => {
 
   return (
     <Box>
-      <Flex justify="flex-end" align="center" gap={3} mb={4} flexWrap="wrap">
-        <Button
-          leftIcon={<MdAdd />}
-          colorScheme="brand"
-          size="sm"
-          onClick={handleOpenCreate}
-        >
-          Create
-        </Button>
-        <Button
-          leftIcon={<MdEmail />}
-          variant="outline"
-          size="sm"
-          borderColor={borderColor}
-          onClick={followupModal.onOpen}
-        >
-          Followup Email
-        </Button>
-        <Button
-          leftIcon={<MdPeople />}
-          variant="outline"
-          size="sm"
-          borderColor={borderColor}
-          onClick={leadStatusModal.onOpen}
-        >
-          Lead Status
-        </Button>
-        <Button
-          leftIcon={<MdRefresh />}
-          variant="outline"
-          size="sm"
-          borderColor={borderColor}
-          onClick={handleRefreshTable}
-          isLoading={isRefreshingTable}
-          loadingText="Refreshing"
-        >
-          Refresh
-        </Button>
+      <Flex justify="space-between" align={{ base: "stretch", md: "center" }} gap={4} mb={4} flexWrap="wrap">
+        <Box minW={{ base: "100%", md: "280px" }}>
+          <Text color={textColor} fontWeight="700" fontSize="md" lineHeight="1.2">
+            Instantly
+          </Text>
+          <Text color={subtleText} fontSize="sm" mt={1}>
+            Push draft batches into Instantly campaigns and manage follow-ups.
+          </Text>
+        </Box>
+
+        <Flex justify="flex-end" align="center" gap={3} flexWrap="wrap">
+          <Button leftIcon={<MdAdd />} colorScheme="brand" size="sm" onClick={handleOpenCreate}>
+            Create
+          </Button>
+          <Button
+            leftIcon={<MdEmail />}
+            variant="outline"
+            size="sm"
+            borderColor={borderColor}
+            onClick={followupModal.onOpen}
+            bg={bgColor}
+          >
+            Followup Email
+          </Button>
+          <Button
+            leftIcon={<MdPeople />}
+            variant="outline"
+            size="sm"
+            borderColor={borderColor}
+            onClick={leadStatusModal.onOpen}
+            bg={bgColor}
+          >
+            Lead Status
+          </Button>
+          <Button
+            leftIcon={<MdRefresh />}
+            variant="outline"
+            size="sm"
+            borderColor={borderColor}
+            onClick={handleRefreshTable}
+            isLoading={isRefreshingTable}
+            loadingText="Refreshing"
+            bg={bgColor}
+          >
+            Refresh
+          </Button>
+        </Flex>
       </Flex>
 
-      <Box overflowX="auto" borderWidth="1px" borderColor={borderColor} borderRadius="md">
-        <Table size="sm" variant="simple">
-          <Thead bg={theadBg}>
+      <Box
+        overflowX="auto"
+        borderWidth="1px"
+        borderColor={borderColor}
+        borderRadius="8px"
+        bg={bgColor}
+      >
+        <Table variant="simple" color="gray.500" minW="1100px">
+          <Thead position="sticky" top="0" zIndex="1" bg={bgColor}>
             <Tr>
-              <Th color={textColor} borderColor={borderColor}>
+              <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="capitalize" bg={bgColor}>
                 Push ID
               </Th>
-              <Th color={textColor} borderColor={borderColor}>
+              <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="capitalize" bg={bgColor}>
                 Batch name
               </Th>
-              <Th color={textColor} borderColor={borderColor}>
+              <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="capitalize" bg={bgColor}>
                 Campaign
               </Th>
-              <Th color={textColor} borderColor={borderColor}>
+              <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="capitalize" bg={bgColor}>
                 Drafts
               </Th>
-              <Th color={textColor} borderColor={borderColor}>
+              <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="capitalize" bg={bgColor}>
                 Leads sent
               </Th>
-              <Th color={textColor} borderColor={borderColor}>
+              <Th borderColor={borderColor} color="black" fontSize="xs" fontWeight="700" textTransform="capitalize" bg={bgColor}>
                 Status
               </Th>
             </Tr>
           </Thead>
-          <Tbody bg={bgColor}>
-            <Tr _hover={{ bg: hoverBg }}>
+          <Tbody>
+            <Tr _hover={{ bg: hoverBg }} bg="#F4F7FE">
               <Td colSpan={6} textAlign="center" py={10} borderColor={borderColor}>
                 <Text color="gray.500" fontSize="sm">
                   No data yet. Use Create to push drafts to an Instantly campaign.
@@ -302,17 +320,23 @@ const Instantly = () => {
         </Table>
       </Box>
 
-      <Modal isOpen={createModal.isOpen} onClose={handleCancelModal} isCentered size="lg">
+      <Modal isOpen={createModal.isOpen} onClose={handleCancelModal} isCentered size="xl">
         <ModalOverlay />
         <ModalContent mx={4}>
-          <ModalHeader color={textColor}>Push drafts to Instantly</ModalHeader>
+          <ModalHeader color={textColor}>
+            <VStack align="start" spacing={1}>
+              <Text fontSize="lg" fontWeight="700">Push drafts to Instantly</Text>
+              <Text fontSize="sm" color={subtleText} fontWeight="500">
+                Select a batch + campaign (recommended), or use a single combined name.
+              </Text>
+            </VStack>
+          </ModalHeader>
           <ModalCloseButton />
           <ModalBody>
             <VStack spacing={4} align="stretch">
               <Flex justify="space-between" align="center" gap={3} flexWrap="wrap">
-                <Text fontSize="sm" color="gray.500" flex="1" minW={0}>
-                  Choose the email draft batch and the Instantly campaign. Lists load when this
-                  dialog opens.
+                <Text fontSize="sm" color={subtleText} flex="1" minW={0}>
+                  Lists load when this dialog opens. Reload if you don’t see the latest campaigns.
                 </Text>
                 <Button
                   size="sm"
@@ -331,24 +355,28 @@ const Instantly = () => {
                 </Flex>
               ) : (
                 <RadioGroup value={pushMode} onChange={handlePushModeChange}>
-                  <Stack spacing={4} align="stretch">
+                  <Stack spacing={3} align="stretch">
                     <Box
                       borderWidth="1px"
                       borderColor={pushMode === "split" ? "brand.400" : borderColor}
-                      borderRadius="md"
-                      p={3}
-                      bg={pushMode === "split" ? "brand.50" : "transparent"}
-                      _dark={{ bg: pushMode === "split" ? "whiteAlpha.100" : "transparent" }}
+                      borderRadius="12px"
+                      p={4}
+                      bg={pushMode === "split" ? panelBg : "transparent"}
                     >
-                      <Radio value="split" mb={3} colorScheme="brand">
-                        <Text as="span" fontWeight="600" fontSize="sm">
-                          Batch name + Campaign name
-                        </Text>
+                      <Radio value="split" colorScheme="brand">
+                        <Text as="span" fontWeight="700" fontSize="sm">Batch + Campaign</Text>
                       </Radio>
-                      <VStack spacing={3} align="stretch" pl={{ base: 0, sm: 6 }} opacity={pushMode === "split" ? 1 : 0.45}>
+                      <Text fontSize="xs" color={subtleText} mt={1} mb={3}>
+                        Best for tracking: batch stays separate from campaign name.
+                      </Text>
+
+                      <SimpleGrid columns={{ base: 1, md: 2 }} spacing={3} opacity={pushMode === "split" ? 1 : 0.45}>
                         <FormControl isRequired={pushMode === "split"}>
-                          <FormLabel fontSize="sm">Batch name</FormLabel>
+                          <FormLabel fontSize="sm" color={textColor}>Batch name</FormLabel>
                           <Select
+                            size="sm"
+                            bg={bgColor}
+                            borderColor={borderColor}
                             placeholder="Select batch name"
                             value={selectedBatchName}
                             onChange={(e) => setSelectedBatchName(e.target.value)}
@@ -360,10 +388,16 @@ const Instantly = () => {
                               </option>
                             ))}
                           </Select>
+                          <FormHelperText fontSize="xs" color={subtleText}>
+                            Source draft batch.
+                          </FormHelperText>
                         </FormControl>
                         <FormControl isRequired={pushMode === "split"}>
-                          <FormLabel fontSize="sm">Campaign name</FormLabel>
+                          <FormLabel fontSize="sm" color={textColor}>Campaign name</FormLabel>
                           <Select
+                            size="sm"
+                            bg={bgColor}
+                            borderColor={borderColor}
                             placeholder="Select campaign"
                             value={selectedCampaignName}
                             onChange={(e) => setSelectedCampaignName(e.target.value)}
@@ -380,13 +414,16 @@ const Instantly = () => {
                                 );
                               })}
                           </Select>
+                          <FormHelperText fontSize="xs" color={subtleText}>
+                            Target Instantly campaign.
+                          </FormHelperText>
                         </FormControl>
-                      </VStack>
+                      </SimpleGrid>
                     </Box>
 
                     <Flex align="center" gap={3} py={1}>
                       <Divider borderColor={borderColor} />
-                      <Text fontSize="sm" fontWeight="700" color="gray.500" flexShrink={0}>
+                      <Text fontSize="xs" fontWeight="800" color="gray.500" flexShrink={0} letterSpacing="0.08em">
                         OR
                       </Text>
                       <Divider borderColor={borderColor} />
@@ -395,22 +432,22 @@ const Instantly = () => {
                     <Box
                       borderWidth="1px"
                       borderColor={pushMode === "combine" ? "brand.400" : borderColor}
-                      borderRadius="md"
-                      p={3}
-                      bg={pushMode === "combine" ? "brand.50" : "transparent"}
-                      _dark={{ bg: pushMode === "combine" ? "whiteAlpha.100" : "transparent" }}
+                      borderRadius="12px"
+                      p={4}
+                      bg={pushMode === "combine" ? panelBg : "transparent"}
                     >
-                      <Radio value="combine" mb={3} colorScheme="brand">
-                        <Text as="span" fontWeight="600" fontSize="sm">
-                          Campaign name (combine)
-                        </Text>
+                      <Radio value="combine" colorScheme="brand">
+                        <Text as="span" fontWeight="700" fontSize="sm">Single campaign name (combine)</Text>
                       </Radio>
-                      <Text fontSize="xs" color="gray.500" mb={2} pl={{ base: 0, sm: 6 }}>
-                        One name is used as both the draft batch name and the Instantly campaign name when pushing leads.
+                      <Text fontSize="xs" color={subtleText} mt={1} mb={3}>
+                        Uses one name as both the batch and campaign when pushing leads.
                       </Text>
-                      <FormControl isRequired={pushMode === "combine"} pl={{ base: 0, sm: 6 }}>
-                        <FormLabel fontSize="sm">Campaign name</FormLabel>
+                      <FormControl isRequired={pushMode === "combine"} opacity={pushMode === "combine" ? 1 : 0.45}>
+                        <FormLabel fontSize="sm" color={textColor}>Campaign name</FormLabel>
                         <Select
+                          size="sm"
+                          bg={bgColor}
+                          borderColor={borderColor}
                           placeholder="Select name"
                           value={combinedCampaignName}
                           onChange={(e) => setCombinedCampaignName(e.target.value)}
@@ -422,6 +459,9 @@ const Instantly = () => {
                             </option>
                           ))}
                         </Select>
+                        <FormHelperText fontSize="xs" color={subtleText}>
+                          Useful when you want identical naming in Instantly.
+                        </FormHelperText>
                       </FormControl>
                     </Box>
                   </Stack>

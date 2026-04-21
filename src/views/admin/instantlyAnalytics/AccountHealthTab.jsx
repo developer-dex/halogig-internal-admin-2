@@ -71,7 +71,7 @@ const AccountHealthTab = () => {
 
   return (
     <Box>
-      <Flex wrap="wrap" gap={3} mb={5} align="flex-end">
+      <Flex wrap="wrap" gap={3} mb={5} align="flex-end" justify="flex-end">
         <FormControl minW="240px" maxW="380px">
           <FormLabel fontSize="xs" mb={1}>Email accounts (comma-separated, optional)</FormLabel>
           <Input

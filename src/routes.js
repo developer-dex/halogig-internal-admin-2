@@ -70,6 +70,7 @@ import InstantlyAnalytics from 'views/admin/instantlyAnalytics';
 import FreelancerTickets from 'views/admin/freelancerTickets';
 import ClientTickets from 'views/admin/clientTickets';
 import HalogigTestimonials from 'views/admin/testimonials';
+import WebsiteTestimonials from 'views/admin/testimonials/WebsiteTestimonials';
 import AdminProjects from 'views/admin/adminProjects';
 import WebRotData from 'views/admin/webRotData';
 import LinkedInAccessToken from 'views/admin/linkedinAccessToken';
@@ -94,6 +95,13 @@ const BlogPage = () => <Blog />;
 const LogManagerPage = () => <div>Log Manager Page - Coming Soon</div>;
 
 const routes = [
+  {
+    name: 'Dashboard',
+    layout: '/admin',
+    path: '/default',
+    icon: <Icon as={MdDashboard} width="20px" height="20px" color="inherit" />,
+    component: <MainDashboard />,
+  },
   // Auth Routes (hidden from sidebar)
   {
     category: 'Security',
@@ -122,14 +130,6 @@ const routes = [
     component: <VerifyOtp />,
     hidden: true, // Hide from sidebar navigation
   },
-  // Dashboard at the top
-  {
-    name: 'Dashboard',
-    layout: '/admin',
-    path: '/default',
-    icon: <Icon as={MdDashboard} width="20px" height="20px" color="inherit" />,
-    component: <MainDashboard />,
-  },
   {
     category: 'Registration',
     layout: '/admin',
@@ -151,7 +151,7 @@ const routes = [
     ],
   },
   {
-    category: 'Cat & Tech Management',
+    category: 'Website Modules',
     layout: '/admin',
     items: [
       {
@@ -250,8 +250,8 @@ const routes = [
         path: '/disputes',
         icon: <Icon as={MdOutlineReportProblem} width="20px" height="20px" color="inherit" />,
         component: <DisputesList />,
-      },
-    ],
+      }
+    ]
   },
   {
     category: 'Proposal',
@@ -473,6 +473,13 @@ const routes = [
         path: '/testimonials/halogig',
         icon: <Icon as={MdArticle} width="20px" height="20px" color="inherit" />,
         component: <HalogigTestimonials />,
+      },
+      {
+        name: 'Website',
+        layout: '/admin',
+        path: '/testimonials/website',
+        icon: <Icon as={MdArticle} width="20px" height="20px" color="inherit" />,
+        component: <WebsiteTestimonials />,
       },
     ],
   }

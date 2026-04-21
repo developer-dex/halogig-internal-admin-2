@@ -119,6 +119,12 @@ body.chakra-ui-dark .fdp-tab-bar {
   border-bottom-color: #667eea;
 }
 
+/* Chakra Tabs compatibility: treat selected Chakra <Tab> as active */
+.fdp-tab[aria-selected="true"] {
+  color: #667eea;
+  border-bottom-color: #667eea;
+}
+
 html.chakra-ui-dark .fdp-tab,
 body.chakra-ui-dark .fdp-tab {
   color: #718096;

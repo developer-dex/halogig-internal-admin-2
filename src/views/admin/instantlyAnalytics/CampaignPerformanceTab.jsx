@@ -88,7 +88,7 @@ const CampaignPerformanceTab = () => {
 
   return (
     <Box>
-      <Flex wrap="wrap" gap={3} mb={5} align="flex-end">
+      <Flex wrap="wrap" gap={3} mb={5} align="flex-end" justify="flex-end">
         <FormControl minW="160px" maxW="220px">
           <FormLabel fontSize="xs" mb={1}>Campaign name</FormLabel>
           <Input size="sm" value={campaignName} onChange={(e) => setCampaignName(e.target.value)} placeholder="All campaigns" />

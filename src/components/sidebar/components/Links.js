@@ -1,11 +1,12 @@
 /* eslint-disable */
-import React, { useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 // chakra imports
 import { Box, Flex, HStack, Text, useColorModeValue, Icon, Collapse, Button } from "@chakra-ui/react";
 import { ChevronDownIcon, ChevronRightIcon } from "@chakra-ui/icons";
 import { MdPowerSettingsNew } from "react-icons/md";
 import { useSelector } from "react-redux";
+import { SidebarContext } from "contexts/SidebarContext";
 
 export function SidebarLinks(props) {
   //   Chakra color mode
@@ -20,6 +21,7 @@ export function SidebarLinks(props) {
   let categoryHoverBg = useColorModeValue("gray.50", "whiteAlpha.100");
 
   const { routes } = props;
+  const { areModulesExpanded } = useContext(SidebarContext) || {};
 
   const { permissions, admin } = useSelector((state) => state.rbac || { permissions: {}, admin: null });
 
@@ -53,11 +55,24 @@ export function SidebarLinks(props) {
     const initialState = {};
     routes.forEach(route => {
       if (route.category) {
-        initialState[route.category] = true; // Default to expanded
+        initialState[route.category] = areModulesExpanded !== false; // Default to expanded
       }
     });
     return initialState;
   });
+
+  useEffect(() => {
+    const shouldExpand = areModulesExpanded !== false;
+    setExpandedCategories((prev) => {
+      const next = { ...prev };
+      routes.forEach((route) => {
+        if (route.category) {
+          next[route.category] = shouldExpand;
+        }
+      });
+      return next;
+    });
+  }, [areModulesExpanded, routes]);
 
   // verifies if routeName is the one active (in browser input)
   const activeRoute = (routeName, fullPath) => {
@@ -109,6 +124,7 @@ export function SidebarLinks(props) {
         const categoryActive = isCategoryActive(route.items, route.layout);
         // Get icon from first item in category that has an icon
         const categoryIcon = route.items?.find(item => item.icon)?.icon;
+        const isCategoryHighlighted = categoryActive;
         
         return (
           <Box key={index}>
@@ -117,38 +133,29 @@ export function SidebarLinks(props) {
               align="center"
               justify="space-between"
               px="16px"
-              py="2px"
-              mt="8px"
-              mb="8px"
+              py="6px"
+              mt="10px"
+              mb="2px"
               cursor="pointer"
               borderRadius="8px"
               _hover={{ bg: categoryHoverBg }}
               onClick={() => toggleCategory(route.category)}
             >
               <HStack spacing="8px">
-                {/* {categoryIcon && (
-                  <Box
-                    color={categoryActive ? activeIcon : textColor}
-                    // me="2px"
-                  >
-                    {categoryIcon}
-                  </Box>
-                )} */}
                 <Text
-                  fontSize="14px"
-                  color={categoryActive ? categoryColor : categoryColor}
-                  fontWeight={categoryActive ? "600" : "500"}
-                  // textTransform="capitalize"
-                  letterSpacing="0.5px"
+                  fontSize="15px"
+                  color={isCategoryHighlighted ? brandColor : categoryColor}
+                  fontWeight="700"
+                  letterSpacing="0.2px"
                 >
                   {route.category}
                 </Text>
               </HStack>
               <Icon
                 as={isExpanded ? ChevronDownIcon : ChevronRightIcon}
-                color={categoryColor}
-                w="16px"
-                h="16px"
+                color="gray.400"
+                w="14px"
+                h="14px"
                 transition="all 0.2s"
               />
             </Flex>
@@ -166,83 +173,61 @@ export function SidebarLinks(props) {
                   
                   return (
                     <NavLink key={itemIndex} to={itemFullPath}>
-                      {item.icon ? (
-                        <Box>
-                          <HStack
-                            spacing={isItemActive ? "22px" : "26px"}
-                            ps='16px'
+                      <HStack
+                        spacing="0"
+                        ps="28px"
+                        py="1px"
+                        borderRadius="10px"
+                        bg={isItemActive ? "brand.50" : "transparent"}
+                        _hover={{ bg: isItemActive ? "brand.50" : categoryHoverBg }}
+                        transition="all 0.15s"
+                      >
+                        <Box
+                          me="10px"
+                          flexShrink={0}
+                          display="flex"
+                          alignItems="center"
+                          justifyContent="center"
+                        >
+                          <Box
+                            w="6px"
+                            h="6px"
+                            borderRadius="full"
+                            bg={isItemActive ? brandColor : "gray.400"}
+                          />
+                        </Box>
+
+                        <Flex w="100%" alignItems="center" justifyContent="space-between" py="8px">
+                          <Text
+                            me="auto"
+                            color={isItemActive ? brandColor : textColor}
+                            fontSize="13px"
+                            fontWeight={isItemActive ? "600" : "normal"}
                           >
-                            <Flex w='100%' alignItems='center' justifyContent='space-between'>
-                              <Text
-                                me='auto'
-                                color={
-                                  isItemActive
-                                    ? activeColor
-                                    : textColor
-                                }
-                                fontSize="13px"
-                                fontWeight={
-                                  isItemActive
-                                    ? "semibold"
-                                    : "normal"
-                                }>
-                                {item.name}
-                              </Text>
-                              {showRedDot && (
-                                <Box
-                                  bg="red.500"
-                                  borderRadius="full"
-                                  w="10px"
-                                  h="10px"
-                                  minW="10px"
-                                  flexShrink={0}
-                                  boxShadow="0 0 0 2px white, 0 0 0 3px rgba(229, 62, 62, 0.3)"
-                                />
-                              )}
-                            </Flex>
+                            {item.name}
+                          </Text>
+                          {showRedDot && (
                             <Box
-                              h='36px'
-                              w='4px'
-                              bg="transparent"
-                              borderRadius='5px'
+                              bg="red.500"
+                              borderRadius="full"
+                              w="8px"
+                              h="8px"
+                              minW="8px"
+                              flexShrink={0}
+                              me="12px"
+                              boxShadow="0 0 0 2px white, 0 0 0 3px rgba(229, 62, 62, 0.3)"
                             />
-                          </HStack>
-                        </Box>
-                      ) : (
-                        <Box>
-                          <HStack
-                            spacing={isItemActive ? "22px" : "26px"}
-                            py='5px'
-                            ps='10px'>
-                            <Flex w='100%' alignItems='center' justifyContent='space-between'>
-                              <Text
-                                me='auto'
-                                color={
-                                  isItemActive
-                                    ? activeColor
-                                    : inactiveColor
-                                }
-                                fontWeight={
-                                  isItemActive ? "bold" : "normal"
-                                }>
-                                {item.name}
-                              </Text>
-                              {showRedDot && (
-                                <Box
-                                  bg="red.500"
-                                  borderRadius="full"
-                                  w="10px"
-                                  h="10px"
-                                  minW="10px"
-                                  flexShrink={0}
-                                  boxShadow="0 0 0 2px white, 0 0 0 3px rgba(229, 62, 62, 0.3)"
-                                />
-                              )}
-                            </Flex>
-                            <Box h='36px' w='4px' bg='transparent' borderRadius='5px' />
-                          </HStack>
-                        </Box>
-                      )}
+                          )}
+                        </Flex>
+
+                        <Box
+                          h="36px"
+                          w="4px"
+                          bg={isItemActive ? brandColor : "transparent"}
+                          borderRadius="5px"
+                          flexShrink={0}
+                        />
+                      </HStack>
                     </NavLink>
                   );
                 })}
@@ -269,98 +254,59 @@ export function SidebarLinks(props) {
         
         return (
           <NavLink key={index} to={routeFullPath}>
-            {route.icon ? (
-              <Box>
-                <HStack
-                  spacing={
-                    isRouteActive ? "22px" : "26px"
-                  }
-                  ps='16px'
-                  // py='5px'
-                  // ps='10px'>
-                  >
-                  <Flex w='100%' alignItems='center' justifyContent='space-between'>
-                    {/* <Box
-                      color={
-                        isRouteActive
-                          ? activeIcon
-                          : textColor
-                      }
-                      me='12px'>
-                      {route.icon}
-                    </Box> */}
-                    <Text
-                      me='auto'
-                      color={
-                        isRouteActive
-                          ? activeColor
-                          : textColor
-                      }
-                      fontSize="14px"
-                      fontWeight={
-                        isRouteActive
-                          ? "bold"
-                          : "normal"
-                      }>
-                      {route.name}
-                    </Text>
-                    {showRedDot && (
-                      <Box
-                        bg="red.500"
-                        borderRadius="full"
-                        w="10px"
-                        h="10px"
-                        minW="10px"
-                        flexShrink={0}
-                        boxShadow="0 0 0 2px white, 0 0 0 3px rgba(229, 62, 62, 0.3)"
-                      />
-                    )}
-                  </Flex>
+            <HStack
+              spacing="0"
+              ps="28px"
+              py="1px"
+              borderRadius="10px"
+              bg={isRouteActive ? "brand.50" : "transparent"}
+              _hover={{ bg: isRouteActive ? "brand.50" : categoryHoverBg }}
+              transition="all 0.15s"
+            >
+              <Box
+                me="10px"
+                flexShrink={0}
+                display="flex"
+                alignItems="center"
+                justifyContent="center"
+              >
+                <Box
+                  w="6px"
+                  h="6px"
+                  borderRadius="full"
+                  bg={isRouteActive ? brandColor : "gray.400"}
+                />
+              </Box>
+              <Flex w="100%" alignItems="center" justifyContent="space-between" py="8px">
+                <Text
+                  me="auto"
+                  color={isRouteActive ? brandColor : textColor}
+                  fontSize="13px"
+                  fontWeight={isRouteActive ? "600" : "normal"}
+                >
+                  {route.name}
+                </Text>
+                {showRedDot && (
                   <Box
-                    h='36px'
-                    w='4px'
-                    bg="transparent"
-                    borderRadius='5px'
+                    bg="red.500"
+                    borderRadius="full"
+                    w="8px"
+                    h="8px"
+                    minW="8px"
+                    flexShrink={0}
+                    me="12px"
+                    boxShadow="0 0 0 2px white, 0 0 0 3px rgba(229, 62, 62, 0.3)"
                   />
-                </HStack>
-              </Box>
-            ) : (
-              <Box>
-                <HStack
-                  spacing={
-                    isRouteActive ? "22px" : "26px"
-                  }
-                  py='5px'
-                  ps='10px'>
-                  <Flex w='100%' alignItems='center' justifyContent='space-between'>
-                    <Text
-                      me='auto'
-                      color={
-                        isRouteActive
-                          ? activeColor
-                          : inactiveColor
-                      }
-                      fontWeight={
-                        isRouteActive ? "bold" : "normal"
-                      }>
-                      {route.name}
-                    </Text>
-                    {showRedDot && (
-                      <Box
-                        bg="red.500"
-                        borderRadius="full"
-                        w="10px"
-                        h="10px"
-                        minW="10px"
-                        flexShrink={0}
-                        boxShadow="0 0 0 2px white, 0 0 0 3px rgba(229, 62, 62, 0.3)"
-                      />
-                    )}
-                  </Flex>
-                  <Box h='36px' w='4px' bg='transparent' borderRadius='5px' />
-                </HStack>
-              </Box>
-            )}
+                )}
+              </Flex>
+              <Box
+                h="36px"
+                w="4px"
+                bg={isRouteActive ? brandColor : "transparent"}
+                borderRadius="5px"
+                flexShrink={0}
+              />
+            </HStack>
           </NavLink>
         );
       }

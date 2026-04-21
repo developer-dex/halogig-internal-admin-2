@@ -19,6 +19,7 @@ import ProjectDeliveryDetail from 'views/admin/projectBids/ProjectDeliveryDetail
 import SalesOrder from 'views/admin/salesOrder';
 import Invoice from 'views/admin/invoice';
 import CreateClientProject from 'views/admin/projects/CreateClientProject';
+import UpdateClientProject from 'views/admin/projects/UpdateClientProject';
 import FreelancerDetailPage from 'views/admin/freelancers/FreelancerDetailPage';
 
 // Custom Chakra theme
@@ -29,7 +30,8 @@ export default function Dashboard(props) {
   const { permissions, admin } = useSelector((state) => state.rbac || { permissions: {}, admin: null });
   // states and functions
   const [fixed] = useState(false);
-  const [toggleSidebar, setToggleSidebar] = useState(false);
+  const sidebarWidth = '260px';
+  const [areModulesExpanded, setAreModulesExpanded] = useState(true);
 
   // Fetch pending view counts + admin profile (permissions) when admin layout loads
   useEffect(() => {
@@ -45,6 +47,10 @@ export default function Dashboard(props) {
 
     if (/^\/admin\/freelancer\/[^/]+$/.test(currentPath)) {
       return 'Freelancer Details';
+    }
+
+    if (/^\/admin\/update-client-project\/[^/]+$/.test(currentPath)) {
+      return 'Update Project';
     }
 
     for (let i = 0; i < routes.length; i++) {
@@ -150,8 +156,9 @@ export default function Dashboard(props) {
       <Box>
         <SidebarContext.Provider
           value={{
-            toggleSidebar,
-            setToggleSidebar,
+            sidebarWidth,
+            areModulesExpanded,
+            setAreModulesExpanded,
           }}
         >
           <Sidebar routes={routes} display="none" {...rest} />
@@ -162,9 +169,9 @@ export default function Dashboard(props) {
             overflow="auto"
             position="relative"
             maxHeight="100%"
-            w={{ base: '100%', xl: 'calc(100% - 200px)' }}
-            maxWidth={{ base: '100%', xl: 'calc(100% - 200px)' }}
-            ml={{ base: '0', xl: '200px' }}
+            w={{ base: '100%', xl: `calc(100% - ${sidebarWidth})` }}
+            maxWidth={{ base: '100%', xl: `calc(100% - ${sidebarWidth})` }}
+            ml={{ base: '0', xl: sidebarWidth }}
             transition="all 0.33s cubic-bezier(0.685, 0.0473, 0.346, 1)"
             transitionDuration=".2s, .2s, .35s"
             transitionProperty="top, bottom, width, margin-left"
@@ -221,6 +228,10 @@ export default function Dashboard(props) {
                   <Route
                     path="/create-client-project"
                     element={<CreateClientProject />}
+                  />
+                  <Route
+                    path="/update-client-project/:projectId"
+                    element={<UpdateClientProject />}
                   />
                   <Route
                     path="/freelancer/:userId"

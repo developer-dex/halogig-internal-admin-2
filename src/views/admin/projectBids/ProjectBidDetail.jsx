@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams, useNavigate } from 'react-router-dom';
+import { IoMdArrowRoundBack } from 'react-icons/io';
 import {
   Box,
   Card,
@@ -22,15 +23,11 @@ import {
   TabPanel,
   Divider,
   Link,
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
   Alert,
   AlertIcon,
   Input,
   Textarea,
   FormControl,
-  FormLabel,
   Select,
   FormHelperText,
   Modal,
@@ -41,6 +38,7 @@ import {
   ModalBody,
   ModalCloseButton,
   useDisclosure,
+  Spacer,
 } from '@chakra-ui/react';
 import {
   MdArrowBack,
@@ -57,14 +55,11 @@ import {
   MdCategory,
   MdSchedule,
   MdLanguage,
-  MdInfo,
   MdTrendingUp,
   MdAccountCircle,
-  MdAssignment,
   MdCheckCircle,
   MdHourglassEmpty,
   MdFlag,
-  MdHome,
   MdEdit,
   MdSave,
   MdCancel,
@@ -82,6 +77,11 @@ import {
   clearUpdateMilestoneState,
 } from '../../../features/admin/projectBidsSlice';
 import { showSuccess, showError } from '../../../helpers/messageHelper';
+import '../freelancers/freelancerDetailPage.css';
+
+// Make Chakra <Tab> behave like FreelancerDetailPage tabs
+// (FreelancerDetailPage uses .fdp-tab.active; Chakra uses aria-selected)
+// We keep the CSS centralized and avoid duplicating styles.
 
 export default function ProjectBidDetail({ visibleTabs = null, backRoute = '/admin/project-bids', breadcrumbLabel = 'Project Bids' }) {
   const dispatch = useDispatch();
@@ -112,20 +112,13 @@ export default function ProjectBidDetail({ visibleTabs = null, backRoute = '/adm
   
   // Determine which tabs to show
   const tabsToShow = visibleTabs || allTabs;
-  
-  // Map tab names to indices for activeTab
-  const tabIndexMap = tabsToShow.reduce((acc, tab, index) => {
-    acc[tab] = index;
-    return acc;
-  }, {});
 
   // Get data from Redux store
   const { currentBid, isApprovingMilestone, approveMilestoneSuccess, approveMilestoneError, isUpdatingBid, updateBidSuccess, updateBidError, isApprovingBid, approveBidSuccess, approveBidError, isUpdatingMilestone, updateMilestoneSuccess, updateMilestoneError } = 
     useSelector((state) => state.projectBidsReducer);
 
   const textColor = useColorModeValue('secondaryGray.900', 'white');
-  const borderColor = useColorModeValue('gray.200', 'whiteAlpha.100');
-  const cardBg = useColorModeValue('white', 'navy.800');
+  // Note: visuals are handled by freelancerDetailPage.css (fdp-*)
   const tabBg = useColorModeValue('gray.50', 'whiteAlpha.50');
 
   const fetchBidDetails = async () => {
@@ -148,6 +141,7 @@ export default function ProjectBidDetail({ visibleTabs = null, backRoute = '/adm
     return () => {
       dispatch(clearCurrentBid());
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch, bidId]);
 
   // Handle success/error states for milestone approval
@@ -161,6 +155,7 @@ export default function ProjectBidDetail({ visibleTabs = null, backRoute = '/adm
       showError('Failed to approve milestone');
       dispatch(clearApproveMilestoneState());
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [approveMilestoneSuccess, approveMilestoneError, dispatch]);
 
   // Handle success/error states for bid update
@@ -175,6 +170,7 @@ export default function ProjectBidDetail({ visibleTabs = null, backRoute = '/adm
       showError('Failed to update bid');
       dispatch(clearUpdateBidState());
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [updateBidSuccess, updateBidError, dispatch]);
 
   // Handle success/error states for bid approval
@@ -189,6 +185,7 @@ export default function ProjectBidDetail({ visibleTabs = null, backRoute = '/adm
       showError('Failed to approve bid');
       dispatch(clearApproveBidState());
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [approveBidSuccess, approveBidError, dispatch, onApprovalModalClose]);
 
   // Handle success/error states for milestone update
@@ -205,49 +202,33 @@ export default function ProjectBidDetail({ visibleTabs = null, backRoute = '/adm
       showError('Failed to update milestones');
       dispatch(clearUpdateMilestoneState());
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [updateMilestoneSuccess, updateMilestoneError, dispatch]);
-
-  // Helper function to get status colors
-  const getStatusColors = (status) => {
-    switch (status?.toLowerCase()) {
-      case 'pending':
-        return { bg: 'orange.100', color: 'orange.700', border: 'orange.300' };
-      case 'accepted':
-        return { bg: 'green.100', color: 'green.700', border: 'green.300' };
-      case 'rejected':
-        return { bg: 'red.100', color: 'red.700', border: 'red.300' };
-      case 'in_progress':
-        return { bg: 'blue.100', color: 'blue.700', border: 'blue.300' };
-      case 'completed':
-        return { bg: 'green.100', color: 'green.700', border: 'green.300' };
-      default:
-        return { bg: 'gray.100', color: 'gray.700', border: 'gray.300' };
-    }
-  };
 
   // Helper function to render info item
   const renderInfoItem = (icon, label, value, fullWidth = false, isLink = false) => {
     if (!value && value !== 0 && value !== false) return null;
 
     return (
-      <Box gridColumn={fullWidth ? 'span 2' : 'span 1'}>
-        <VStack align="start" spacing={2} p={4} bg={tabBg} borderRadius="md" h="full">
-          <HStack spacing={2}>
-            <Box color="brand.500">{icon}</Box>
-            <Text fontSize="sm" fontWeight="600" color="gray.500">
-              {label}
-            </Text>
-          </HStack>
-          {isLink ? (
-            <Link href={value} target="_blank" rel="noopener noreferrer" color="brand.500" fontSize="sm" wordBreak="break-all">
-              {value}
-            </Link>
-          ) : (
-            <Text fontSize="sm" fontWeight="500" color={textColor} wordBreak="break-word">
-              {value}
-            </Text>
-          )}
-        </VStack>
+      <Box
+        gridColumn={fullWidth ? '1 / -1' : undefined}
+        className="fdp-info-item"
+      >
+        <div className="freelancer-detail-field-label">{label}</div>
+        {isLink ? (
+          <Link
+            href={value}
+            target="_blank"
+            rel="noopener noreferrer"
+            color="brand.500"
+            fontSize="14px"
+            wordBreak="break-all"
+          >
+            {value}
+          </Link>
+        ) : (
+          <div className="freelancer-detail-field-value">{value}</div>
+        )}
       </Box>
     );
   };
@@ -486,126 +467,63 @@ export default function ProjectBidDetail({ visibleTabs = null, backRoute = '/adm
 
   if (!currentBid) {
     return (
-      <Box>
-        <Card mb="20px" bg={cardBg}>
-          <Box p="24px">
-            <Breadcrumb>
-              <BreadcrumbItem>
-                <BreadcrumbLink href="/admin/dashboard">
-                  <HStack spacing={1}>
-                    <MdHome />
-                    <Text>Home</Text>
-                  </HStack>
-                </BreadcrumbLink>
-              </BreadcrumbItem>
-              <BreadcrumbItem>
-                <BreadcrumbLink href={backRoute}>
-                  <HStack spacing={1}>
-                    <MdAssignment />
-                    <Text>{breadcrumbLabel}</Text>
-                  </HStack>
-                </BreadcrumbLink>
-              </BreadcrumbItem>
-              <BreadcrumbItem isCurrentPage>
-                <BreadcrumbLink>
-                  <HStack spacing={1}>
-                    <MdInfo />
-                    <Text>Bid #{bidId}</Text>
-                  </HStack>
-                </BreadcrumbLink>
-              </BreadcrumbItem>
-            </Breadcrumb>
-          </Box>
-        </Card>
+      <div className="fdp-page-wrapper">
+        <button className="fdp-back-btn" onClick={() => navigate(backRoute)} type="button">
+          <IoMdArrowRoundBack size={15} />
+          Back
+        </button>
 
-        <Card bg={cardBg}>
+        <div className="fdp-card-wrap">
           <Box p="24px" textAlign="center">
             <Alert status="error" mb={4}>
               <AlertIcon />
               Bid not found
             </Alert>
-            <Button
-              leftIcon={<MdArrowBack />}
-              colorScheme="brand"
-              onClick={() => navigate(backRoute)}
-            >
+            <Button leftIcon={<MdArrowBack />} colorScheme="brand" onClick={() => navigate(backRoute)}>
               Back to {breadcrumbLabel}
             </Button>
           </Box>
-        </Card>
-      </Box>
+        </div>
+      </div>
     );
   }
 
   return (
-    <Box>
-      {/* Breadcrumb */}
-      <Card mb="20px" bg={cardBg}>
-        <Box p="24px">
-          <Flex justify="space-between" align="center">
-            <Breadcrumb>
-              <BreadcrumbItem>
-                <BreadcrumbLink href="/admin/dashboard">
-                  <HStack spacing={1}>
-                    <MdHome />
-                    <Text>Home</Text>
-                  </HStack>
-                </BreadcrumbLink>
-              </BreadcrumbItem>
-              <BreadcrumbItem>
-                <BreadcrumbLink href={backRoute}>
-                  <HStack spacing={1}>
-                    <MdAssignment />
-                    <Text>{breadcrumbLabel}</Text>
-                  </HStack>
-                </BreadcrumbLink>
-              </BreadcrumbItem>
-              <BreadcrumbItem isCurrentPage>
-                <BreadcrumbLink>
-                  <HStack spacing={1}>
-                    <MdInfo />
-                    <Text>Bid #{bidId}</Text>
-                  </HStack>
-                </BreadcrumbLink>
-              </BreadcrumbItem>
-            </Breadcrumb>
-            <Button
-              leftIcon={<MdArrowBack />}
-              variant="outline"
-              onClick={() => navigate(backRoute)}
-            >
-              Back to {breadcrumbLabel}
-            </Button>
-          </Flex>
-        </Box>
-      </Card>
+    <div className="fdp-page-wrapper">
+      <button className="fdp-back-btn" onClick={() => navigate(backRoute)} type="button">
+        <IoMdArrowRoundBack size={15} />
+        Back
+      </button>
 
-      {/* Main Content */}
-      <Card bg={cardBg}>
-        <Box p="24px">
-          <Tabs index={activeTab} onChange={setActiveTab} variant="enclosed" colorScheme="brand">
-            <TabList>
-              {tabsToShow.includes('Client Info') && <Tab>Client Info</Tab>}
-              {tabsToShow.includes('Billing Info') && <Tab>Billing Info</Tab>}
-              {tabsToShow.includes('Freelancer Info') && <Tab>Freelancer Info</Tab>}
-              {tabsToShow.includes('Project Info') && <Tab>Project Info</Tab>}
-              {tabsToShow.includes('Bid Info') && <Tab>Bid Info</Tab>}
-              {tabsToShow.includes('SOW') && <Tab>SOW</Tab>}
-              {tabsToShow.includes('Milestones') && <Tab>Milestones</Tab>}
-            </TabList>
+      <div className="fdp-card-wrap">
+        <Tabs index={activeTab} onChange={setActiveTab} variant="unstyled">
+          <TabList
+            className="fdp-tab-bar"
+            sx={{
+              '.fdp-tab': {
+                fontSize: '13.5px',
+                fontWeight: 600,
+                lineHeight: '1.2',
+                letterSpacing: 'normal',
+                textTransform: 'none',
+              },
+            }}
+          >
+            {tabsToShow.includes('Client Info') && <Tab className="fdp-tab">Client Info</Tab>}
+            {tabsToShow.includes('Billing Info') && <Tab className="fdp-tab">Billing Info</Tab>}
+            {tabsToShow.includes('Freelancer Info') && <Tab className="fdp-tab">Freelancer Info</Tab>}
+            {tabsToShow.includes('Project Info') && <Tab className="fdp-tab">Project Info</Tab>}
+            {tabsToShow.includes('Bid Info') && <Tab className="fdp-tab">Bid Info</Tab>}
+            {tabsToShow.includes('SOW') && <Tab className="fdp-tab">SOW</Tab>}
+            {tabsToShow.includes('Milestones') && <Tab className="fdp-tab">Milestones</Tab>}
+          </TabList>
 
-            <TabPanels>
+          <TabPanels className="fdp-tab-panel">
               {/* Client Info Tab */}
               {tabsToShow.includes('Client Info') && <TabPanel>
                 <VStack align="start" spacing={6}>
-                  <HStack spacing={3}>
-                    <MdPerson size="24px" color="var(--chakra-colors-brand-500)" />
-                    <Text fontSize="xl" fontWeight="700" color={textColor}>
-                      Client Information
-                    </Text>
-                  </HStack>
-                  <Divider />
-                  <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4} w="full">
+                  <div className="fdp-section-heading">CONTACT &amp; PROFILE</div>
+                  <SimpleGrid className="fdp-info-grid" columns={{ base: 1, md: 2 }} spacing={4} w="full">
                     {renderInfoItem(
                       <MdPerson />,
                       'Client Name',
@@ -653,14 +571,8 @@ export default function ProjectBidDetail({ visibleTabs = null, backRoute = '/adm
               {/* Billing Info Tab */}
               {tabsToShow.includes('Billing Info') && <TabPanel>
                 <VStack align="start" spacing={6}>
-                  <HStack spacing={3}>
-                    <MdAttachMoney size="24px" color="var(--chakra-colors-brand-500)" />
-                    <Text fontSize="xl" fontWeight="700" color={textColor}>
-                      Billing Information
-                    </Text>
-                  </HStack>
-                  <Divider />
-                  <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4} w="full">
+                  <div className="fdp-section-heading">BILLING</div>
+                  <SimpleGrid className="fdp-info-grid" columns={{ base: 1, md: 2 }} spacing={4} w="full">
                     {renderInfoItem(
                       <MdPerson />,
                       'Billing Name',
@@ -699,14 +611,10 @@ export default function ProjectBidDetail({ visibleTabs = null, backRoute = '/adm
                     )}
                   </SimpleGrid>
                   {currentBid.ClientProject?.User?.billingDetails?.gst_exemted_file && (
-                    <Box p={4} bg={tabBg} borderRadius="md" w="full">
+                    <Box w="full">
+                      <div className="fdp-section-heading" style={{ marginTop: 4 }}>DOCUMENT</div>
                       <VStack align="start" spacing={2}>
-                        <HStack spacing={2}>
-                          <MdDescription color="var(--chakra-colors-brand-500)" />
-                          <Text fontSize="sm" fontWeight="600" color="gray.500">
-                            GST Exempted File
-                          </Text>
-                        </HStack>
+                        <div className="freelancer-detail-field-label">GST Exempted File</div>
                         <Button
                           size="sm"
                           variant="outline"
@@ -724,42 +632,36 @@ export default function ProjectBidDetail({ visibleTabs = null, backRoute = '/adm
               {/* Freelancer Info Tab */}
               {tabsToShow.includes('Freelancer Info') && <TabPanel>
                 <VStack align="start" spacing={6}>
-                  <HStack spacing={3}>
-                    <MdPerson size="24px" color="var(--chakra-colors-brand-500)" />
-                    <Text fontSize="xl" fontWeight="700" color={textColor}>
-                      Freelancer Information
-                    </Text>
-                  </HStack>
-                  <Divider />
+                  <div className="fdp-section-heading">FREELANCER</div>
                   
                   {/* Freelancer Profile Header */}
-                  <Flex align="center" gap={4} p={4} bg={tabBg} borderRadius="md" w="full">
-                    <Avatar
-                      size="lg"
-                      src={currentBid.freelancer?.profile_image}
-                      name={`${currentBid.freelancer?.first_name || ''} ${currentBid.freelancer?.last_name || ''}`}
-                    />
-                    <VStack align="start" spacing={2}>
-                      <Text fontSize="lg" fontWeight="700" color={textColor}>
-                        {`${currentBid.freelancer?.first_name || ''} ${currentBid.freelancer?.last_name || ''}`.trim()}
-                      </Text>
-                      <Text fontSize="sm" color="gray.500">
-                        {currentBid.freelancer?.email}
-                      </Text>
+                  <div className="fdp-profile-header">
+                    <div className="fdp-avatar-wrap">
+                      <Avatar
+                        className="fdp-avatar"
+                        src={currentBid.freelancer?.profile_image}
+                        name={`${currentBid.freelancer?.first_name || ''} ${currentBid.freelancer?.last_name || ''}`}
+                      />
+                    </div>
+                    <div className="fdp-profile-meta">
+                      <div className="fdp-profile-name">
+                        {`${currentBid.freelancer?.first_name || ''} ${currentBid.freelancer?.last_name || ''}`.trim() || '--'}
+                      </div>
                       {currentBid.freelancer?.status && (
-                        <Badge
-                          {...getStatusColors(currentBid.freelancer.status)}
-                          borderRadius="full"
-                          px={3}
-                          py={1}
+                        <span
+                          className="fdp-status-badge"
+                          style={{
+                            background: 'rgba(102,126,234,0.14)',
+                            color: '#667eea',
+                          }}
                         >
-                          {currentBid.freelancer.status}
-                        </Badge>
+                          {String(currentBid.freelancer.status).toUpperCase()}
+                        </span>
                       )}
-                    </VStack>
-                  </Flex>
+                    </div>
+                  </div>
 
-                  <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4} w="full">
+                  <SimpleGrid className="fdp-info-grid" columns={{ base: 1, md: 2 }} spacing={4} w="full">
                     {renderInfoItem(
                       <MdPhone />,
                       'Mobile',
@@ -817,14 +719,8 @@ export default function ProjectBidDetail({ visibleTabs = null, backRoute = '/adm
               {/* Project Info Tab */}
               {tabsToShow.includes('Project Info') && <TabPanel>
                 <VStack align="start" spacing={6}>
-                  <HStack spacing={3}>
-                    <MdWork size="24px" color="var(--chakra-colors-brand-500)" />
-                    <Text fontSize="xl" fontWeight="700" color={textColor}>
-                      Project Information
-                    </Text>
-                  </HStack>
-                  <Divider />
-                  <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4} w="full">
+                  <div className="fdp-section-heading">PROJECT</div>
+                  <SimpleGrid className="fdp-info-grid" columns={{ base: 1, md: 2 }} spacing={4} w="full">
                     {renderInfoItem(
                       <MdDescription />,
                       'Project Title',
@@ -889,12 +785,7 @@ export default function ProjectBidDetail({ visibleTabs = null, backRoute = '/adm
               {tabsToShow.includes('Bid Info') && <TabPanel>
                 <VStack align="start" spacing={6}>
                   <Flex justify="space-between" align="center" w="full">
-                    <HStack spacing={3}>
-                      <MdInfo size="24px" color="var(--chakra-colors-brand-500)" />
-                      <Text fontSize="xl" fontWeight="700" color={textColor}>
-                        Bid Information
-                      </Text>
-                    </HStack>
+                    <div className="fdp-section-heading" style={{ marginBottom: 0 }}>BID</div>
                     {currentBid?.ClientProject?.created_by_admin && (
                       <HStack spacing={2}>
                         {!isEditingBid ? (
@@ -941,8 +832,7 @@ export default function ProjectBidDetail({ visibleTabs = null, backRoute = '/adm
                       </HStack>
                     )}
                   </Flex>
-                  <Divider />
-                  <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4} w="full">
+                  <SimpleGrid className="fdp-info-grid" columns={{ base: 1, md: 2 }} spacing={4} w="full">
                     {renderInfoItem(
                       <MdAttachMoney />,
                       'Bid Amount',
@@ -952,13 +842,8 @@ export default function ProjectBidDetail({ visibleTabs = null, backRoute = '/adm
                     {/* Bid Amount Admin - Only show if created_by_admin */}
                     {currentBid?.ClientProject?.created_by_admin && (
                       <Box gridColumn="span 1">
-                        <VStack align="start" spacing={2} p={4} bg={tabBg} borderRadius="md" h="full">
-                          <HStack spacing={2}>
-                            <Box color="brand.500"><MdAttachMoney /></Box>
-                            <Text fontSize="sm" fontWeight="600" color="gray.500">
-                              Bid Amount Admin
-                            </Text>
-                          </HStack>
+                        <Box className="fdp-info-item">
+                          <div className="freelancer-detail-field-label">Bid Amount Admin</div>
                           {isEditingBid ? (
                             <Input
                               type="number"
@@ -968,11 +853,11 @@ export default function ProjectBidDetail({ visibleTabs = null, backRoute = '/adm
                               size="sm"
                             />
                           ) : (
-                            <Text fontSize="sm" fontWeight="500" color={textColor}>
+                            <div className="freelancer-detail-field-value">
                               {currentBid.admin_modified_bid_amount ? formatCurrency(parseFloat(currentBid.admin_modified_bid_amount)) : '--'}
-                            </Text>
+                            </div>
                           )}
-                        </VStack>
+                        </Box>
                       </Box>
                     )}
 
@@ -985,13 +870,8 @@ export default function ProjectBidDetail({ visibleTabs = null, backRoute = '/adm
                     {/* Delivery Timeline Admin - Only show if created_by_admin */}
                     {currentBid?.ClientProject?.created_by_admin && (
                       <Box gridColumn="span 1">
-                        <VStack align="start" spacing={2} p={4} bg={tabBg} borderRadius="md" h="full">
-                          <HStack spacing={2}>
-                            <Box color="brand.500"><MdSchedule /></Box>
-                            <Text fontSize="sm" fontWeight="600" color="gray.500">
-                              Delivery Timeline Admin
-                            </Text>
-                          </HStack>
+                        <Box className="fdp-info-item">
+                          <div className="freelancer-detail-field-label">Delivery Timeline Admin</div>
                           {isEditingBid ? (
                             <Input
                               type="number"
@@ -1001,11 +881,11 @@ export default function ProjectBidDetail({ visibleTabs = null, backRoute = '/adm
                               size="sm"
                             />
                           ) : (
-                            <Text fontSize="sm" fontWeight="500" color={textColor}>
+                            <div className="freelancer-detail-field-value">
                               {currentBid.admin_modified_delivery_timeline ? `${currentBid.admin_modified_delivery_timeline} days` : '--'}
-                            </Text>
+                            </div>
                           )}
-                        </VStack>
+                        </Box>
                       </Box>
                     )}
 
@@ -1118,24 +998,19 @@ export default function ProjectBidDetail({ visibleTabs = null, backRoute = '/adm
               {tabsToShow.includes('SOW') && <TabPanel>
                 {currentBid.sow ? (
                   <VStack align="start" spacing={6}>
-                    <HStack spacing={3}>
-                      <MdAssignment size="24px" color="var(--chakra-colors-brand-500)" />
-                      <Text fontSize="xl" fontWeight="700" color={textColor}>
-                        Statement of Work (SOW)
-                      </Text>
+                    <Flex justify="space-between" align="center" w="full" flexWrap="wrap" gap={3}>
+                      <div className="fdp-section-heading" style={{ marginBottom: 0 }}>STATEMENT OF WORK (SOW)</div>
                       {currentBid.sow.status && (
-                        <Badge
-                          {...getStatusColors(currentBid.sow.status)}
-                          borderRadius="full"
-                          px={3}
-                          py={1}
+                        <span
+                          className="fdp-status-badge"
+                          style={{ background: 'rgba(102,126,234,0.14)', color: '#667eea' }}
                         >
-                          {currentBid.sow.status}
-                        </Badge>
+                          {String(currentBid.sow.status).toUpperCase()}
+                        </span>
                       )}
-                    </HStack>
-                    <Divider />
-                    <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4} w="full">
+                    </Flex>
+
+                    <SimpleGrid className="fdp-info-grid" columns={{ base: 1, md: 2 }} spacing={4} w="full">
                       {renderInfoItem(
                         <MdPerson />,
                         'User ID',
@@ -1183,7 +1058,7 @@ export default function ProjectBidDetail({ visibleTabs = null, backRoute = '/adm
                   </VStack>
                 ) : (
                   <Box textAlign="center" py="40px">
-                    <Text fontSize="lg" color="gray.400">
+                    <Text fontSize="sm" color="gray.400">
                       No Statement of Work available
                     </Text>
                   </Box>
@@ -1195,12 +1070,9 @@ export default function ProjectBidDetail({ visibleTabs = null, backRoute = '/adm
                 {currentBid.sow?.milestones && currentBid.sow.milestones.length > 0 ? (
                   <VStack align="start" spacing={6}>
                     <Flex justify="space-between" align="center" w="full">
-                      <HStack spacing={3}>
-                        <MdCheckCircle size="24px" color="var(--chakra-colors-brand-500)" />
-                        <Text fontSize="xl" fontWeight="700" color={textColor}>
-                          Project Milestones ({currentBid.sow.milestones.length})
-                        </Text>
-                      </HStack>
+                      <div className="fdp-section-heading" style={{ marginBottom: 0 }}>
+                        PROJECT MILESTONES ({currentBid.sow.milestones.length})
+                      </div>
                       {currentBid?.ClientProject?.created_by_admin && currentBid.milestones && currentBid.milestones.length > 0 && (
                         <HStack spacing={2}>
                           {!isEditingMilestones ? (
@@ -1234,81 +1106,77 @@ export default function ProjectBidDetail({ visibleTabs = null, backRoute = '/adm
                         </HStack>
                       )}
                     </Flex>
-                    <Divider />
 
                     {/* Milestones Grid */}
                     <SimpleGrid columns={{ base: 1, lg: 2 }} spacing={6} w="full">
                       {currentBid.milestones?.map((milestone, index) => (
-                        <Card key={index} bg={tabBg} borderRadius="md">
-                          <Box p={6}>
+                        <Box key={index} className="fdp-section-card">
+                          <div className="fdp-section-card-accent" />
+                          <div className="fdp-section-card-body">
                             <VStack align="start" spacing={4}>
-                              <Flex justify="space-between" align="center" w="full">
-                                <Text fontSize="lg" fontWeight="700" color={textColor}>
-                                  Milestone {index + 1}
-                                </Text>
+                              <Flex justify="space-between" align="center" w="full" gap={3} flexWrap="wrap">
+                                <div className="freelancer-detail-field-label">{`Milestone ${index + 1}`}</div>
                                 <HStack spacing={2}>
-                                  <Badge
-                                    colorScheme={milestone.is_paid ? 'green' : 'orange'}
-                                    borderRadius="full"
-                                    px={3}
-                                    py={1}
+                                  <span
+                                    className="fdp-status-badge"
+                                    style={{
+                                      background: milestone.is_paid ? 'rgba(16,185,129,0.14)' : 'rgba(245,158,11,0.14)',
+                                      color: milestone.is_paid ? '#059669' : '#b45309',
+                                    }}
                                   >
-                                    {milestone.is_paid ? 'Paid' : 'Unpaid'}
-                                  </Badge>
-                                  <Badge
-                                    colorScheme="brand"
-                                    borderRadius="full"
-                                    px={3}
-                                    py={1}
+                                    {milestone.is_paid ? 'PAID' : 'UNPAID'}
+                                  </span>
+                                  <span
+                                    className="fdp-status-badge"
+                                    style={{ background: 'rgba(102,126,234,0.14)', color: '#667eea' }}
                                   >
                                     {formatCurrency(milestone.amount)}
-                                  </Badge>
+                                  </span>
                                 </HStack>
                               </Flex>
-                              
-                              <Text fontSize="sm" color={textColor}>
-                                {milestone.scope}
-                              </Text>
 
-                              <HStack spacing={4}>
-                                <HStack spacing={1}>
-                                  <MdHourglassEmpty color="var(--chakra-colors-gray-500)" />
-                                  <Text fontSize="sm" color="gray.500">
-                                    {milestone.hours} hours
-                                  </Text>
+                              <div className="freelancer-detail-field-value">
+                                {milestone.scope}
+                              </div>
+
+                              <HStack spacing={5} flexWrap="wrap">
+                                <HStack spacing={2}>
+                                  <div className="freelancer-detail-field-label">Hours</div>
+                                  <div className="freelancer-detail-field-value">{milestone.hours} hours</div>
                                 </HStack>
-                                <HStack spacing={1}>
-                                  <MdAttachMoney color="var(--chakra-colors-gray-500)" />
-                                  <Text fontSize="sm" color="gray.500">
-                                    {formatCurrency(milestone.amount)}
-                                  </Text>
+                                <HStack spacing={2}>
+                                  <div className="freelancer-detail-field-label">Amount</div>
+                                  <div className="freelancer-detail-field-value">{formatCurrency(milestone.amount)}</div>
                                 </HStack>
                               </HStack>
 
                               {milestone.is_paid && (
-                                <VStack spacing={2} w="full">
+                                <HStack
+                                  spacing={2}
+                                  w="full"
+                                  justify="flex-start"
+                                  flexWrap="wrap"
+                                >
                                   <Button
-                                    size="sm"
+                                    size="xs"
                                     colorScheme="brand"
                                     variant="outline"
-                                    w="full"
                                     onClick={() => handleViewSalesOrder(index)}
                                   >
                                     View Sales Order
                                   </Button>
                                   <Button
-                                    size="sm"
+                                    size="xs"
                                     colorScheme="brand"
                                     variant="outline"
-                                    w="full"
                                     onClick={() => handleGenerateInvoice(index)}
                                   >
                                     View Invoice
                                   </Button>
+                                  <Spacer />
                                   <Button
-                                    size="sm"
+                                    size="xs"
                                     colorScheme="green"
-                                    w="full"
                                     onClick={() => handleOrderApproved(index)}
                                     isDisabled={isApprovingMilestone || milestone.admin_approved_date != null}
                                     isLoading={isApprovingMilestone}
@@ -1316,54 +1184,39 @@ export default function ProjectBidDetail({ visibleTabs = null, backRoute = '/adm
                                   >
                                     {milestone.admin_approved_date ? 'Approved' : 'Order Approved'}
                                   </Button>
-                                </VStack>
+                                </HStack>
                               )}
                             </VStack>
-                          </Box>
-                        </Card>
+                          </div>
+                        </Box>
                       ))}
                     </SimpleGrid>
 
                     {/* Milestones Summary */}
-                    <Card bg={tabBg} borderRadius="md" w="full">
-                      <Box p={6}>
-                        <Text fontSize="lg" fontWeight="700" color={textColor} mb={4}>
-                          Milestones Summary
-                        </Text>
-                        <SimpleGrid columns={{ base: 1, md: 3 }} spacing={6}>
-                          <VStack align="start" spacing={2}>
-                            <Text fontSize="sm" fontWeight="600" color="gray.500">
-                              Total Milestones
-                            </Text>
-                            <Text fontSize="2xl" fontWeight="700" color={textColor}>
-                              {currentBid.sow.milestones.length}
-                            </Text>
-                          </VStack>
-                          <VStack align="start" spacing={2}>
-                            <Text fontSize="sm" fontWeight="600" color="gray.500">
-                              Total Hours
-                            </Text>
-                            <Text fontSize="2xl" fontWeight="700" color={textColor}>
-                              {currentBid.sow.milestones.reduce((total, milestone) =>
-                                total + parseInt(milestone.hours || 0), 0
-                              )} hours
-                            </Text>
-                          </VStack>
-                          <VStack align="start" spacing={2}>
-                            <Text fontSize="sm" fontWeight="600" color="gray.500">
-                              Total Amount
-                            </Text>
-                            <Text fontSize="2xl" fontWeight="700" color="brand.500">
-                              {formatCurrency(
-                                currentBid.sow.milestones.reduce((total, milestone) =>
-                                  total + parseFloat(milestone.amount || 0), 0
-                                )
-                              )}
-                            </Text>
-                          </VStack>
+                    <Box className="fdp-section-card" w="full">
+                      <div className="fdp-section-card-accent" />
+                      <div className="fdp-section-card-body">
+                        <div className="fdp-section-heading">MILESTONES SUMMARY</div>
+                        <SimpleGrid className="fdp-info-grid" columns={{ base: 1, md: 3 }} spacing={6}>
+                          <Box className="fdp-info-item">
+                            <div className="freelancer-detail-field-label">Total Milestones</div>
+                            <div className="freelancer-detail-field-value">{currentBid.sow.milestones.length}</div>
+                          </Box>
+                          <Box className="fdp-info-item">
+                            <div className="freelancer-detail-field-label">Total Hours</div>
+                            <div className="freelancer-detail-field-value">
+                              {currentBid.sow.milestones.reduce((total, milestone) => total + parseInt(milestone.hours || 0), 0)} hours
+                            </div>
+                          </Box>
+                          <Box className="fdp-info-item">
+                            <div className="freelancer-detail-field-label">Total Amount</div>
+                            <div className="freelancer-detail-field-value">
+                              {formatCurrency(currentBid.sow.milestones.reduce((total, milestone) => total + parseFloat(milestone.amount || 0), 0))}
+                            </div>
+                          </Box>
                         </SimpleGrid>
-                      </Box>
-                    </Card>
+                      </div>
+                    </Box>
 
                     {/* Admin Project Milestones - Only show if created_by_admin */}
                     {currentBid?.ClientProject?.created_by_admin && currentBid.milestones && currentBid.milestones.length > 0 && (
@@ -1572,9 +1425,8 @@ export default function ProjectBidDetail({ visibleTabs = null, backRoute = '/adm
                 )}
               </TabPanel>}
             </TabPanels>
-          </Tabs>
-        </Box>
-      </Card>
+        </Tabs>
+      </div>
 
       {/* Approval Confirmation Modal */}
       <Modal isOpen={isApprovalModalOpen} onClose={onApprovalModalClose} isCentered>
@@ -1608,6 +1460,6 @@ export default function ProjectBidDetail({ visibleTabs = null, backRoute = '/adm
           </ModalFooter>
         </ModalContent>
       </Modal>
-    </Box>
+    </div>
   );
 }
