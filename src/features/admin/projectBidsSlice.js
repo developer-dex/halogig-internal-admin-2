@@ -25,6 +25,9 @@ const initialState = {
   isApprovingBid: false,
   approveBidSuccess: false,
   approveBidError: false,
+  isApprovingSow: false,
+  approveSowSuccess: false,
+  approveSowError: false,
   isUpdatingMilestone: false,
   updateMilestoneSuccess: false,
   updateMilestoneError: false,
@@ -150,6 +153,20 @@ export const approveProjectBidByAdmin = createAsyncThunk(
   }
 );
 
+// Approve SOW by admin
+export const approveSowByAdmin = createAsyncThunk(
+  "/approveSowByAdmin",
+  async (sowId) => {
+    try {
+      const payload = await postApi(`admin/sow/${sowId}/approved-by-admin`, {});
+      return payload;
+    } catch (e) {
+      showError(e.response?.data?.message || "Failed to approve SOW");
+      throw e;
+    }
+  }
+);
+
 // Update milestone by admin
 export const updateMilestoneByAdmin = createAsyncThunk(
   "/updateMilestoneByAdmin",
@@ -200,6 +217,11 @@ export const projectBidsSlice = createSlice({
       state.isApprovingBid = false;
       state.approveBidSuccess = false;
       state.approveBidError = false;
+    },
+    clearApproveSowState: (state) => {
+      state.isApprovingSow = false;
+      state.approveSowSuccess = false;
+      state.approveSowError = false;
     },
     clearUpdateMilestoneState: (state) => {
       state.isUpdatingMilestone = false;
@@ -341,6 +363,22 @@ export const projectBidsSlice = createSlice({
         state.approveBidError = true;
         state.approveBidSuccess = false;
       })
+      // ApproveSowByAdmin
+      .addCase(approveSowByAdmin.pending, (state) => {
+        state.isApprovingSow = true;
+        state.approveSowError = false;
+        state.approveSowSuccess = false;
+      })
+      .addCase(approveSowByAdmin.fulfilled, (state, { payload }) => {
+        state.isApprovingSow = false;
+        state.approveSowSuccess = true;
+        state.responseCode = payload?.status;
+      })
+      .addCase(approveSowByAdmin.rejected, (state) => {
+        state.isApprovingSow = false;
+        state.approveSowError = true;
+        state.approveSowSuccess = false;
+      })
       // UpdateMilestoneByAdmin
       .addCase(updateMilestoneByAdmin.pending, (state) => {
         state.isUpdatingMilestone = true;
@@ -360,5 +398,5 @@ export const projectBidsSlice = createSlice({
   },
 });
 
-export const { clearProjectBidsState, clearCurrentBid, clearSaveInvoiceState, clearApproveMilestoneState, clearUpdateBidState, clearApproveBidState, clearUpdateMilestoneState } = projectBidsSlice.actions;
+export const { clearProjectBidsState, clearCurrentBid, clearSaveInvoiceState, clearApproveMilestoneState, clearUpdateBidState, clearApproveBidState, clearApproveSowState, clearUpdateMilestoneState } = projectBidsSlice.actions;
 export const projectBidsReducer = projectBidsSlice.reducer;

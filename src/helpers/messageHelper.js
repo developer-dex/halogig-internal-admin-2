@@ -59,5 +59,5 @@ export const adminLogout = () => {
   showInfo('You have been logged out successfully');
   
   // Redirect to login page
-  window.location.href = '/login';
+  window.location.href = '/auth/sign-in';
 };

@@ -709,11 +709,12 @@ export default function CreateClientProject() {
                 <FormLabel>Project Title *</FormLabel>
                 <Input
                   value={formData.projectTitle}
-                  onChange={(e) => setFormData(prev => ({ ...prev, projectTitle: e.target.value }))}
+                  onChange={(e) => setFormData(prev => ({ ...prev, projectTitle: e.target.value.slice(0, 50) }))}
                   placeholder="Enter project title (minimum 20 characters)"
+                  maxLength={50}
                 />
-                <Text fontSize="xs" color={formData.projectTitle.length > 0 && formData.projectTitle.length < 20 ? 'red.500' : 'gray.500'} mt={1}>
-                  {formData.projectTitle.length}/20 characters minimum
+                <Text fontSize="xs" color={formData.projectTitle.length > 0 && formData.projectTitle.length < 20 ? 'red.500' : formData.projectTitle.length >= 20 ? 'green.500' : 'gray.500'} mt={1}>
+                  {formData.projectTitle.length}/50 characters (minimum 20)
                 </Text>
               </FormControl>
 
@@ -822,25 +823,27 @@ export default function CreateClientProject() {
               {(hourlyVisible || retainershipVisible || fixedPriceVisible || halogigVisible) && (
                 <Box gridColumn={{ base: '1', md: '1 / -1' }}>
                   <FormLabel>
-                    {hourlyVisible ? 'Rate Per Hour' : retainershipVisible ? 'Rate Per Month' : fixedPriceVisible ? 'Total Project Amount' : 'Halogig Rate'} *
+                    {hourlyVisible ? 'Rate Per Hour' : retainershipVisible ? 'Rate Per Month' : fixedPriceVisible ? 'Total Project Amount' : 'Halogig Project Amount'} *
                   </FormLabel>
                   <SimpleGrid columns={{ base: 1, md: 3 }} spacing={4}>
                     <FormControl isRequired>
                       <Input
                         type="number"
                         value={formData.rateMin}
-                        onChange={(e) => setFormData(prev => ({ ...prev, rateMin: e.target.value }))}
-                        placeholder="Min"
+                        onChange={(e) => setFormData(prev => ({ ...prev, rateMin: e.target.value.slice(0, 10) }))}
+                        placeholder={hourlyVisible ? 'e.g. 500 (min ₹/hr)' : retainershipVisible ? 'e.g. 50000 (min ₹/month)' : 'e.g. 10000 (min budget)'}
                         min={0}
+                        maxLength={10}
                       />
                     </FormControl>
                     <FormControl isRequired>
                       <Input
                         type="number"
                         value={formData.rateMax}
-                        onChange={(e) => setFormData(prev => ({ ...prev, rateMax: e.target.value }))}
-                        placeholder="Max"
+                        onChange={(e) => setFormData(prev => ({ ...prev, rateMax: e.target.value.slice(0, 10) }))}
+                        placeholder={hourlyVisible ? 'e.g. 2000 (max ₹/hr)' : retainershipVisible ? 'e.g. 200000 (max ₹/month)' : 'e.g. 100000 (max budget)'}
                         min={formData.rateMin || 0}
+                        maxLength={10}
                       />
                       {parseFloat(formData.rateMin) > parseFloat(formData.rateMax) && (
                         <Text fontSize="xs" color="red.500" mt={1}>
@@ -855,7 +858,6 @@ export default function CreateClientProject() {
                       >
                         <option value="USD-$">USD-$</option>
                         <option value="INR-₹">INR-₹</option>
-                        <option value="EUR-€">EUR-€</option>
                       </Select>
                     </FormControl>
                   </SimpleGrid>
@@ -866,25 +868,27 @@ export default function CreateClientProject() {
               {(hourlyVisible || retainershipVisible || fixedPriceVisible || halogigVisible) && (
                 <Box gridColumn={{ base: '1', md: '1 / -1' }}>
                   <FormLabel>
-                    Project Duration ({hourlyVisible ? 'Hours' : retainershipVisible ? 'Months' : fixedPriceVisible ? 'Days' : 'Months'}) *
+                    Project Duration ({hourlyVisible ? 'Hours' : retainershipVisible ? 'Months' : fixedPriceVisible ? 'Days' : 'Days'}) *
                   </FormLabel>
                   <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4}>
                     <FormControl isRequired>
                       <Input
                         type="number"
                         value={formData.durationMin}
-                        onChange={(e) => setFormData(prev => ({ ...prev, durationMin: e.target.value }))}
-                        placeholder="Min"
+                        onChange={(e) => setFormData(prev => ({ ...prev, durationMin: e.target.value.slice(0, 4) }))}
+                        placeholder={hourlyVisible ? 'e.g. 40 (min hours)' : retainershipVisible ? 'e.g. 1 (min months)' : 'e.g. 7 (min days)'}
                         min={0}
+                        maxLength={4}
                       />
                     </FormControl>
                     <FormControl isRequired>
                       <Input
                         type="number"
                         value={formData.durationMax}
-                        onChange={(e) => setFormData(prev => ({ ...prev, durationMax: e.target.value }))}
-                        placeholder="Max"
+                        onChange={(e) => setFormData(prev => ({ ...prev, durationMax: e.target.value.slice(0, 4) }))}
+                        placeholder={hourlyVisible ? 'e.g. 200 (max hours)' : retainershipVisible ? 'e.g. 12 (max months)' : 'e.g. 90 (max days)'}
                         min={formData.durationMin || 0}
+                        maxLength={4}
                       />
                       {parseFloat(formData.durationMin) > parseFloat(formData.durationMax) && (
                         <Text fontSize="xs" color="red.500" mt={1}>
@@ -901,12 +905,13 @@ export default function CreateClientProject() {
                 <FormLabel>Project Summary *</FormLabel>
                 <Textarea
                   value={formData.projectSummary}
-                  onChange={(e) => setFormData(prev => ({ ...prev, projectSummary: e.target.value }))}
+                  onChange={(e) => setFormData(prev => ({ ...prev, projectSummary: e.target.value.slice(0, 300) }))}
                   rows={6}
-                  placeholder="Describe the project (minimum 160 characters)"
+                  placeholder="Describe the project (minimum 160 characters, maximum 300 characters)"
+                  maxLength={300}
                 />
-                <Text fontSize="xs" color={formData.projectSummary.length > 0 && formData.projectSummary.length < 160 ? 'red.500' : 'gray.500'} mt={1}>
-                  {formData.projectSummary.length}/160 characters minimum
+                <Text fontSize="xs" color={formData.projectSummary.length > 0 && formData.projectSummary.length < 160 ? 'red.500' : formData.projectSummary.length >= 160 ? 'green.500' : 'gray.500'} mt={1}>
+                  {formData.projectSummary.length}/300 characters (minimum 160)
                 </Text>
               </FormControl>
 

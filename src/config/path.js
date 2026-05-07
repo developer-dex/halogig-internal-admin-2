@@ -116,6 +116,8 @@ export const apiEndPoints = {
   GET_ADMIN_SALES_REFERRAL_LEAD_DETAIL: "admin/sales-referral-leads",
   UPDATE_ADMIN_SALES_REFERRAL_LEAD_STATUS: "admin/sales-referral-leads",
   
+  // Admin Notifications - REMOVED
+  
   // Testimonial endpoints
   CREATE_TESTIMONIAL: "admin/testimonial",
   GET_ALL_TESTIMONIALS: "admin/testimonials",
