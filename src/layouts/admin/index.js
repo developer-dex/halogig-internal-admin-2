@@ -20,6 +20,7 @@ import SalesOrder from 'views/admin/salesOrder';
 import Invoice from 'views/admin/invoice';
 import CreateClientProject from 'views/admin/projects/CreateClientProject';
 import UpdateClientProject from 'views/admin/projects/UpdateClientProject';
+import ViewClientProject from 'views/admin/projects/ViewClientProject';
 import FreelancerDetailPage from 'views/admin/freelancers/FreelancerDetailPage';
 
 // Custom Chakra theme
@@ -51,6 +52,10 @@ export default function Dashboard(props) {
 
     if (/^\/admin\/update-client-project\/[^/]+$/.test(currentPath)) {
       return 'Update Project';
+    }
+
+    if (/^\/admin\/view-client-project\/[^/]+$/.test(currentPath)) {
+      return 'View Project';
     }
 
     for (let i = 0; i < routes.length; i++) {
@@ -232,6 +237,10 @@ export default function Dashboard(props) {
                   <Route
                     path="/update-client-project/:projectId"
                     element={<UpdateClientProject />}
+                  />
+                  <Route
+                    path="/view-client-project/:projectId"
+                    element={<ViewClientProject />}
                   />
                   <Route
                     path="/freelancer/:userId"

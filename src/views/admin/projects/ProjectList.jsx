@@ -28,7 +28,7 @@ import {
   useDisclosure,
   Checkbox,
 } from '@chakra-ui/react';
-import { MdChevronLeft, MdChevronRight, MdEdit, MdContentCopy } from 'react-icons/md';
+import { MdChevronLeft, MdChevronRight, MdEdit, MdContentCopy, MdVisibility } from 'react-icons/md';
 import { projectData, updateProjectStatus } from '../../../features/admin/projectManagementSlice';
 import { showError, showSuccess } from '../../../helpers/messageHelper';
 import { copyToClipboard } from '../../../utils/utils';
@@ -143,6 +143,12 @@ export default function ProjectList() {
 
   const handleEditClick = (project) => {
     navigate(`/admin/update-client-project/${project.id}`, {
+      state: { returnPath: location.pathname },
+    });
+  };
+
+  const handleViewClick = (project) => {
+    navigate(`/admin/view-client-project/${project.id}`, {
       state: { returnPath: location.pathname },
     });
   };
@@ -386,16 +392,28 @@ export default function ProjectList() {
                               </Button>
                             </Td>
                             <Td borderColor={borderColor} textAlign="center" pt="8px" pb="8px">
-                              <Tooltip label="Edit Project">
-                                <IconButton
-                                  aria-label="Edit project"
-                                  icon={<MdEdit />}
-                                  size="sm"
-                                  variant="ghost"
-                                  style={{ color: 'rgb(32, 33, 36)' }}
-                                  onClick={() => handleEditClick(project)}
-                                />
-                              </Tooltip>
+                              <HStack justify="center" spacing={1}>
+                                <Tooltip label="Edit Project">
+                                  <IconButton
+                                    aria-label="Edit project"
+                                    icon={<MdEdit />}
+                                    size="sm"
+                                    variant="ghost"
+                                    style={{ color: 'rgb(32, 33, 36)' }}
+                                    onClick={() => handleEditClick(project)}
+                                  />
+                                </Tooltip>
+                                <Tooltip label="View Project">
+                                  <IconButton
+                                    aria-label="View project"
+                                    icon={<MdVisibility />}
+                                    size="sm"
+                                    variant="ghost"
+                                    style={{ color: 'rgb(32, 33, 36)' }}
+                                    onClick={() => handleViewClick(project)}
+                                  />
+                                </Tooltip>
+                              </HStack>
                             </Td>
                             <Td borderColor={borderColor} textAlign="center" pt="8px" pb="8px">
                               {project.created_by_admin && project.client_project_link ? (

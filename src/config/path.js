@@ -1,6 +1,6 @@
 export const apiEndPoints = {
   // Authentication endpoints
-  ADMIN_LOGIN: "admin/login",
+  ADMIN_LOGIN: "admin/auth/login",
   ADMIN_VERIFY_OTP: "admin/verify-otp",
   ADMIN_PROFILE: "admin/auth/profile",
   ADMINS: "admin/auth/admins",
