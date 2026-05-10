@@ -66,6 +66,10 @@ import EmailDomainAnalysis from 'views/admin/ai';
 import EmailClearens from 'views/admin/ai/EmailClearens';
 import CentralDataRecords from 'views/admin/ai/CentralDataRecords';
 import DraftCampaigns from 'views/admin/ai/DraftCampaigns';
+import EmailDomainAnalysisV2 from 'views/admin/ai2';
+import EmailClearensV2 from 'views/admin/ai2/EmailClearens';
+import CentralDataRecordsV2 from 'views/admin/ai2/CentralDataRecords';
+import DraftCampaignsV2 from 'views/admin/ai2/DraftCampaigns';
 import InstantlyAnalytics from 'views/admin/instantlyAnalytics';
 import FreelancerTickets from 'views/admin/freelancerTickets';
 import ClientTickets from 'views/admin/clientTickets';
@@ -386,6 +390,54 @@ const routes = [
         path: '/ai/draft-campaigns',
         icon: <Icon as={MdCampaign} width="20px" height="20px" color="inherit" />,
         component: <DraftCampaigns />,
+      },
+    ],
+  },
+  {
+    category: 'AI 2',
+    layout: '/admin',
+    items: [
+      {
+        name: 'Email Domain Analysis (V2)',
+        layout: '/admin',
+        path: '/ai2/email-domain-analysis',
+        icon: <Icon as={MdScience} width="20px" height="20px" color="inherit" />,
+        component: <EmailDomainAnalysisV2 />,
+      },
+      {
+        name: 'Projects',
+        layout: '/admin',
+        path: '/ai2/admin-projects',
+        icon: <Icon as={MdFolder} width="20px" height="20px" color="inherit" />,
+        component: <AdminProjects />,
+      },
+      {
+        name: 'Instantly Analytics',
+        layout: '/admin',
+        path: '/ai2/instantly-analytics',
+        icon: <Icon as={MdAnalytics} width="20px" height="20px" color="inherit" />,
+        component: <InstantlyAnalytics />,
+      },
+      {
+        name: 'Email Clearance (V2)',
+        layout: '/admin',
+        path: '/ai2/email-clearens',
+        icon: <Icon as={MdCleaningServices} width="20px" height="20px" color="inherit" />,
+        component: <EmailClearensV2 />,
+      },
+      {
+        name: 'Central Data Records (V2)',
+        layout: '/admin',
+        path: '/ai2/central-data-records',
+        icon: <Icon as={MdDataset} width="20px" height="20px" color="inherit" />,
+        component: <CentralDataRecordsV2 />,
+      },
+      {
+        name: 'Draft Campaigns (V2)',
+        layout: '/admin',
+        path: '/ai2/draft-campaigns',
+        icon: <Icon as={MdCampaign} width="20px" height="20px" color="inherit" />,
+        component: <DraftCampaignsV2 />,
       },
     ],
   },
