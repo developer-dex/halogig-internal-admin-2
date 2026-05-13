@@ -20,6 +20,7 @@ import { testimonialReducer } from "../features/admin/testimonialSlice";
 import { webRotDataReducer } from "../features/admin/webRotDataSlice";
 import { rbacReducer } from "../features/admin/rbacSlice";
 import { adminsReducer } from "../features/admin/adminsSlice";
+import { currencyRateReducer } from "../features/admin/currencyRateSlice";
 
 const store = configureStore({
   reducer: {
@@ -44,6 +45,7 @@ const store = configureStore({
     webRotData: webRotDataReducer,
     rbac: rbacReducer,
     admins: adminsReducer,
+    currencyRate: currencyRateReducer,
   },
   middleware: getDefaultMiddleware =>
     getDefaultMiddleware({

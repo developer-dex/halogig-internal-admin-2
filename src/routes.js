@@ -27,6 +27,7 @@ import {
   MdDataset,
   MdCampaign,
   MdOutlineReportProblem,
+  MdCurrencyExchange,
 } from 'react-icons/md';
 import { FaGoogle, FaLinkedin, FaTwitter } from 'react-icons/fa';
 
@@ -84,6 +85,7 @@ import CategoryManagement from 'views/admin/taxonomy/CategoryManagement';
 import SubCategoryManagement from 'views/admin/taxonomy/SubCategoryManagement';
 import TechnologyManagement from 'views/admin/taxonomy/TechnologyManagement';
 import Admins from 'views/admin/admins/Admins';
+import CurrencyExchange from 'views/admin/currencyRate';
 const ProjectBidsPage = () => <ProjectBids />;
 const HalogigBidsPage = () => <HalogigBids />;
 const NewOrderPage = () => <NewOrder />;
@@ -302,7 +304,20 @@ const routes = [
         path: '/freelancer-payments',
         icon: <Icon as={MdAttachMoney} width="20px" height="20px" color="inherit" />,
         component: <FreelancerPaymentsPage />,
-      }
+      },
+    ],
+  },
+  {
+    category: 'Currency Exchange',
+    layout: '/admin',
+    items: [
+      {
+        name: 'Rates',
+        layout: '/admin',
+        path: '/currency-exchange',
+        icon: <Icon as={MdCurrencyExchange} width="20px" height="20px" color="inherit" />,
+        component: <CurrencyExchange />,
+      },
     ],
   },
   {

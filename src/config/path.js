@@ -149,4 +149,8 @@ export const apiEndPoints = {
   TWITTER_CLEAR_TOKENS: "admin/twitter/clear-tokens",
   TWITTER_TOGGLE_STATUS: "admin/twitter/toggle-status",
   TWITTER_TEST_CONNECTION: "admin/twitter/test-connection",
+
+  // Currency Exchange Rate
+  GET_CURRENCY_RATES: "admin/currency-rates",
+  REFRESH_CURRENCY_RATE: "admin/currency-rates/refresh",
 };
