@@ -41,6 +41,7 @@ export default function AdminProjects() {
         subCategory: '',
         projectCount: '',
         description: '',
+        type: '',
     });
 
     useEffect(() => {
@@ -94,7 +95,7 @@ export default function AdminProjects() {
     };
 
     const handleSubmit = async () => {
-        if (!formData.category || !formData.subCategory || !formData.projectCount || !formData.description) {
+        if (!formData.category || !formData.subCategory || !formData.projectCount || !formData.description || !formData.type) {
             showError('Please fill all required fields');
             return;
         }
@@ -125,7 +126,8 @@ export default function AdminProjects() {
                 project_sub_category_id: parseInt(formData.subCategory),
                 number_of_projects: parseInt(formData.projectCount),
                 description: formData.description,
-                posted_by_user_id: adminId
+                posted_by_user_id: adminId,
+                type: formData.type,
             };
 
             console.log('Sending payload:', payload);
@@ -147,6 +149,7 @@ export default function AdminProjects() {
                     subCategory: '',
                     projectCount: '',
                     description: '',
+                    type: '',
                 });
             } else {
                 showError(response?.data?.message || 'Failed to generate projects');
@@ -225,6 +228,20 @@ export default function AdminProjects() {
                                 ))}
                             </Select>
                             {isLoading && <Spinner size="xs" mt="2" />}
+                        </FormControl>
+
+                        <FormControl mb="4" isRequired>
+                            <FormLabel>Type</FormLabel>
+                            <Select
+                                placeholder="Select type"
+                                value={formData.type}
+                                onChange={(e) => setFormData({ ...formData, type: e.target.value })}
+                            >
+                                <option value="fixed">Fixed</option>
+                                <option value="retainer">Retainer</option>
+                                <option value="hourly">Hourly</option>
+                                <option value="halogig">Halogig</option>
+                            </Select>
                         </FormControl>
 
                         <FormControl mb="4" isRequired>
