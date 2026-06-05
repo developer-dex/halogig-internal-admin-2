@@ -71,6 +71,8 @@ import EmailDomainAnalysisV2 from 'views/admin/ai2';
 import EmailClearensV2 from 'views/admin/ai2/EmailClearens';
 import CentralDataRecordsV2 from 'views/admin/ai2/CentralDataRecords';
 import DraftCampaignsV2 from 'views/admin/ai2/DraftCampaigns';
+import ApolloSearch from 'views/admin/ai2/ApolloSearch';
+import ExploriumSearch from 'views/admin/ai2/ExploriumSearch';
 import InstantlyAnalytics from 'views/admin/instantlyAnalytics';
 import FreelancerTickets from 'views/admin/freelancerTickets';
 import ClientTickets from 'views/admin/clientTickets';
@@ -453,6 +455,20 @@ const routes = [
         path: '/ai2/draft-campaigns',
         icon: <Icon as={MdCampaign} width="20px" height="20px" color="inherit" />,
         component: <DraftCampaignsV2 />,
+      },
+      {
+        name: 'Apollo',
+        layout: '/admin',
+        path: '/ai2/apollo',
+        icon: <Icon as={MdPerson} width="20px" height="20px" color="inherit" />,
+        component: <ApolloSearch />,
+      },
+      {
+        name: 'Explorium',
+        layout: '/admin',
+        path: '/ai2/explorium',
+        icon: <Icon as={MdScience} width="20px" height="20px" color="inherit" />,
+        component: <ExploriumSearch />,
       },
     ],
   },
