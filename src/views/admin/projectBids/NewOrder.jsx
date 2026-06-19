@@ -38,7 +38,7 @@ export default function NewOrder() {
   const hoverBg = useColorModeValue('gray.50', 'whiteAlpha.50');
 
   useEffect(() => {
-    dispatch(getAllProjectBids({ page: currentPage, pageLimit }));
+    dispatch(getAllProjectBids({ page: currentPage, pageLimit, paidOnly: true }));
   }, [dispatch, currentPage, pageLimit]);
 
   const rows = useMemo(() => Array.isArray(bids) ? bids : [], [bids]);

@@ -36,10 +36,11 @@ const initialState = {
 // Get all project bids (admin view)
 export const getAllProjectBids = createAsyncThunk(
   "/getAllProjectBids",
-  async ({ page, pageLimit, byAdmin }) => {
+  async ({ page, pageLimit, byAdmin, paidOnly }) => {
     try {
       const byAdminParam = byAdmin !== undefined ? `&byAdmin=${byAdmin}` : '';
-      const payload = await getApi(`${apiEndPoints.GET_ALL_PROJECT_BIDS}?page=${page}&limit=${pageLimit}${byAdminParam}`);
+      const paidOnlyParam = paidOnly !== undefined ? `&paidOnly=${paidOnly}` : '';
+      const payload = await getApi(`${apiEndPoints.GET_ALL_PROJECT_BIDS}?page=${page}&limit=${pageLimit}${byAdminParam}${paidOnlyParam}`);
       return payload;
     } catch (e) {
       showError(e.response?.data?.message || "Failed to fetch project bids");
