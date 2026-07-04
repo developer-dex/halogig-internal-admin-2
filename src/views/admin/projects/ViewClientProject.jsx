@@ -521,8 +521,8 @@ export default function ViewClientProject() {
               {/* pointerEvents="none" keeps the selected radio visually highlighted */}
               <RadioGroup value={formData.locationPreferancer}>
                 <Stack direction="row" spacing={4} wrap="wrap" pointerEvents="none">
-                  <Radio value="city">Anywhere in the {userCity || 'City'}</Radio>
-                  <Radio value="country">Anywhere in the {userCountry || 'Country'}</Radio>
+                  <Radio value="city">Anywhere in {userCity || 'City'}</Radio>
+                  <Radio value="country">Anywhere in {userCountry || 'Country'}</Radio>
                   <Radio value="globaly">Anywhere Globally</Radio>
                 </Stack>
               </RadioGroup>

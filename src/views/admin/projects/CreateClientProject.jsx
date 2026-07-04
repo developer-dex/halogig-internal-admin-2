@@ -63,14 +63,14 @@ export default function CreateClientProject() {
     projectSubCategories: [],
     technologyPreference: [],
     customerIndustry: '',
-    pricingModel: 'hourly',
+    pricingModel: 'halogig',
     rateMin: '',
     rateMax: '',
     durationMin: '',
     durationMax: '',
     projectSummary: '',
     typeOfProject: 'maintenance',
-    currency: 'INR-₹',
+    currency: 'USD-$',
     locationPreferancer: ''
   });
 
@@ -94,7 +94,7 @@ export default function CreateClientProject() {
       projectCategory: projectPrefill.project_category ? String(projectPrefill.project_category) : prev.projectCategory,
       projectSubCategories: subCats.length ? subCats : prev.projectSubCategories,
       customerIndustry: projectPrefill.customer_industry ? String(projectPrefill.customer_industry) : prev.customerIndustry,
-      pricingModel: projectPrefill.model_engagement || prev.pricingModel,
+      pricingModel: 'halogig', // Always use halogig pricing model
       rateMin: projectPrefill.project_amount_min || projectPrefill.project_amount || prev.rateMin,
       rateMax: projectPrefill.project_amount_max || prev.rateMax,
       durationMin: projectPrefill.project_duration_min || prev.durationMin,
@@ -811,10 +811,10 @@ export default function CreateClientProject() {
                   onChange={handlePricingModelChange}
                 >
                   <Stack direction="row" spacing={4}>
-                    <Radio value="hourly">Hourly</Radio>
-                    <Radio value="retainer">Retainership</Radio>
-                    <Radio value="fixed">Fixed Price</Radio>
-                    <Radio value="halogig">Halogig</Radio>
+                    {/* <Radio value="hourly">Hourly</Radio> */}
+                    {/* <Radio value="retainer">Retainership</Radio> */}
+                    {/* <Radio value="fixed">Fixed Price</Radio> */}
+                    <Radio value="halogig" isDisabled>Halogig</Radio>
                   </Stack>
                 </RadioGroup>
               </FormControl>
@@ -857,7 +857,7 @@ export default function CreateClientProject() {
                         onChange={(e) => setFormData(prev => ({ ...prev, currency: e.target.value }))}
                       >
                         <option value="USD-$">USD-$</option>
-                        <option value="INR-₹">INR-₹</option>
+                        {/* <option value="INR-₹">INR-₹</option> */}
                       </Select>
                     </FormControl>
                   </SimpleGrid>
@@ -957,10 +957,10 @@ export default function CreateClientProject() {
                 >
                   <Stack direction="row" spacing={4} wrap="wrap">
                     <Radio value="city">
-                      Anywhere in the {userCity || 'City'}
+                      Anywhere in {userCity || 'City'}
                     </Radio>
                     <Radio value="country">
-                      Anywhere in the {userCountry || 'Country'}
+                      Anywhere in {userCountry || 'Country'}
                     </Radio>
                     <Radio value="globaly">
                       Anywhere in Globally

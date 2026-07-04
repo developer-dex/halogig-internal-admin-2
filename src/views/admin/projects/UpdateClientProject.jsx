@@ -1023,10 +1023,10 @@ export default function UpdateClientProject() {
                 >
                   <Stack direction="row" spacing={4} wrap="wrap">
                     <Radio value="city">
-                      Anywhere in the {userCity || 'City'}
+                      Anywhere in {userCity || 'City'}
                     </Radio>
                     <Radio value="country">
-                      Anywhere in the {userCountry || 'Country'}
+                      Anywhere in {userCountry || 'Country'}
                     </Radio>
                     <Radio value="globaly">
                       Anywhere in Globally
