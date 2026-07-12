@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router-dom';
 import {
   Box,
+  Badge,
   Card,
   Text,
   Flex,
@@ -195,6 +196,20 @@ export default function ProjectList() {
     }
   };
 
+  const getBidStatusColorScheme = (bidStatus) => {
+    if (!bidStatus) return null;
+    const greenStatuses = ['Bid Accepted', 'SOW Accepted', 'Delivery Completed'];
+    const redStatuses = ['Bid Rejected', 'SOW Rejected'];
+    const blueStatuses = ['Bid Submitted', 'SOW Submitted', 'SOW Modified', 'Delivery In Progress'];
+    const grayStatuses = ['Bid On Hold'];
+
+    if (greenStatuses.includes(bidStatus)) return 'green';
+    if (redStatuses.includes(bidStatus)) return 'red';
+    if (blueStatuses.includes(bidStatus)) return 'blue';
+    if (grayStatuses.includes(bidStatus)) return 'gray';
+    return 'gray';
+  };
+
   const handleCopyLink = async (link) => {
     if (!link) {
       showError('No link available to copy');
@@ -311,6 +326,17 @@ export default function ProjectList() {
                         textAlign="center"
                         bg={bgColor}
                       >
+                        Bid Status
+                      </Th>
+                      <Th
+                        borderColor={borderColor}
+                        color="black"
+                        fontSize="xs"
+                        fontWeight="700"
+                        textTransform="capitalize"
+                        textAlign="center"
+                        bg={bgColor}
+                      >
                         Action
                       </Th>
                       <Th
@@ -329,7 +355,7 @@ export default function ProjectList() {
                   <Tbody>
                     {projects.length === 0 ? (
                       <Tr>
-                        <Td colSpan={8} textAlign="center" py="40px">
+                        <Td colSpan={9} textAlign="center" py="40px">
                           <Text color="black">No projects found</Text>
                         </Td>
                       </Tr>
@@ -390,6 +416,21 @@ export default function ProjectList() {
                               >
                                 {statusText}
                               </Button>
+                            </Td>
+                            <Td borderColor={borderColor} textAlign="center" pt="8px" pb="8px">
+                              {project.project_bid_status ? (
+                                <Badge
+                                  colorScheme={getBidStatusColorScheme(project.project_bid_status)}
+                                  fontSize="xs"
+                                  px="8px"
+                                  py="2px"
+                                  borderRadius="full"
+                                >
+                                  {project.project_bid_status}
+                                </Badge>
+                              ) : (
+                                <Text color="gray.400" fontSize="sm">—</Text>
+                              )}
                             </Td>
                             <Td borderColor={borderColor} textAlign="center" pt="8px" pb="8px">
                               <HStack justify="center" spacing={1}>
